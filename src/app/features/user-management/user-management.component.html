@@ -1,0 +1,83 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">User Management</h1>
+      <p class="text-muted-foreground mt-2">Manage system users and permissions</p>
+    </div>
+    <tolle-button variant="default">
+      <i class="ri-user-add-line mr-2"></i>
+      Add User
+    </tolle-button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg border border-border p-6">
+      <div class="flex items-center justify-between mb-2">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <i class="ri-user-line text-blue-600"></i>
+        </div>
+        <span class="text-sm text-green-600 font-medium">Active</span>
+      </div>
+      <h3 class="text-2xl font-bold">24</h3>
+      <p class="text-sm text-muted-foreground">Active Users</p>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-border p-6">
+      <div class="flex items-center justify-between mb-2">
+        <div class="p-2 bg-orange-100 rounded-lg">
+          <i class="ri-user-unfollow-line text-orange-600"></i>
+        </div>
+        <span class="text-sm text-orange-600 font-medium">Inactive</span>
+      </div>
+      <h3 class="text-2xl font-bold">3</h3>
+      <p class="text-sm text-muted-foreground">Inactive Users</p>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-border p-6">
+      <div class="flex items-center justify-between mb-2">
+        <div class="p-2 bg-purple-100 rounded-lg">
+          <i class="ri-admin-line text-purple-600"></i>
+        </div>
+        <span class="text-sm text-purple-600 font-medium">Admins</span>
+      </div>
+      <h3 class="text-2xl font-bold">5</h3>
+      <p class="text-sm text-muted-foreground">Admin Users</p>
+    </div>
+    
+    <div class="bg-white rounded-lg border border-border p-6">
+      <div class="flex items-center justify-between mb-2">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <i class="ri-shield-user-line text-green-600"></i>
+        </div>
+        <span class="text-sm text-blue-600 font-medium">Staff</span>
+      </div>
+      <h3 class="text-2xl font-bold">19</h3>
+      <p class="text-sm text-muted-foreground">Staff Users</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg border border-border">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">User Directory</h3>
+        <div class="flex gap-2">
+          <tolle-button variant="outline" size="sm">
+            <i class="ri-filter-line mr-2"></i>
+            Filter
+          </tolle-button>
+          <tolle-button variant="outline" size="sm">
+            <i class="ri-search-line mr-2"></i>
+            Search
+          </tolle-button>
+        </div>
+      </div>
+
+      <!-- Users Table Placeholder -->
+      <div class="text-center py-12 text-muted-foreground">
+        <i class="ri-user-settings-line text-4xl mb-4 block"></i>
+        <p>No user accounts found</p>
+        <p class="text-sm">Create user accounts to manage system access</p>
+      </div>
+    </div>
+  </div>
+</div>

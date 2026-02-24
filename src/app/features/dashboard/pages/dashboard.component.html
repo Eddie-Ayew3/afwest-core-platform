@@ -1,0 +1,228 @@
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white p-6 rounded-lg border border-border">
+    <div class="flex items-center justify-between mb-2">
+      <div class="p-2 bg-blue-100 rounded-lg">
+        <i class="ri-user-line text-blue-600"></i>
+      </div>
+      <span class="text-sm text-green-600 font-medium">+12%</span>
+    </div>
+    <h3 class="text-2xl font-bold">2,543</h3>
+    <p class="text-sm text-muted-foreground">Total Users</p>
+  </div>
+  
+  <div class="bg-white p-6 rounded-lg border border-border">
+    <div class="flex items-center justify-between mb-2">
+      <div class="p-2 bg-green-100 rounded-lg">
+        <i class="ri-file-line text-green-600"></i>
+      </div>
+      <span class="text-sm text-green-600 font-medium">+8%</span>
+    </div>
+    <h3 class="text-2xl font-bold">1,235</h3>
+    <p class="text-sm text-muted-foreground">Active Projects</p>
+  </div>
+  
+  <div class="bg-white p-6 rounded-lg border border-border">
+    <div class="flex items-center justify-between mb-2">
+      <div class="p-2 bg-purple-100 rounded-lg">
+        <i class="ri-task-line text-purple-600"></i>
+      </div>
+      <span class="text-sm text-green-600 font-medium">+23%</span>
+    </div>
+    <h3 class="text-2xl font-bold">3,892</h3>
+    <p class="text-sm text-muted-foreground">Completed Tasks</p>
+  </div>
+  
+  <div class="bg-white p-6 rounded-lg border border-border">
+    <div class="flex items-center justify-between mb-2">
+      <div class="p-2 bg-orange-100 rounded-lg">
+        <i class="ri-time-line text-orange-600"></i>
+      </div>
+      <span class="text-sm text-red-600 font-medium">-5%</span>
+    </div>
+    <h3 class="text-2xl font-bold">127</h3>
+    <p class="text-sm text-muted-foreground">Pending Reviews</p>
+  </div>
+</div>
+    
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Recent Activity -->
+      <div class="lg:col-span-2 bg-white rounded-lg border border-border p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Recent Activity</h3>
+          <button class="text-sm text-primary hover:underline">View All</button>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
+            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <i class="ri-user-add-line text-blue-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm"><span class="font-medium">Sarah Chen</span> joined the team</p>
+              <p class="text-xs text-muted-foreground">2 minutes ago</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
+            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+              <i class="ri-file-copy-line text-green-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm"><span class="font-medium">Q4 Report</span> was uploaded</p>
+              <p class="text-xs text-muted-foreground">1 hour ago</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
+            <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+              <i class="ri-check-line text-purple-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm"><span class="font-medium">Project Alpha</span> completed</p>
+              <p class="text-xs text-muted-foreground">3 hours ago</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
+            <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+              <i class="ri-chat-1-line text-orange-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm">New comment from <span class="font-medium">Mike Ross</span></p>
+              <p class="text-xs text-muted-foreground">5 hours ago</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Actions Dropdowns -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold">Quick Actions</h3>
+        
+        <!-- Enhanced Dropdowns -->
+        <div class="space-y-2">
+          <!-- Dropdown 1 -->
+          <div class="relative">
+            <button class="flex items-center justify-between w-full p-3 bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors">
+              <span class="flex items-center gap-2">
+                <i class="ri-user-add-line text-primary"></i>
+                Add New User
+              </span>
+              <i class="ri-arrow-down-s-line text-muted-foreground"></i>
+            </button>
+            <div class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg z-10">
+              <div class="p-2">
+                <a href="#" class="block p-2 hover:bg-muted/50 rounded-lg">Add Admin</a>
+                <a href="#" class="block p-2 hover:bg-muted/50 rounded-lg">Add Editor</a>
+                <a href="#" class="block p-2 hover:bg-muted/50 rounded-lg">Add Viewer</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Dropdown 2 -->
+          <div class="relative">
+            <button class="flex items-center justify-between w-full p-3 bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors">
+              <span class="flex items-center gap-2">
+                <i class="ri-file-add-line text-primary"></i>
+                Create New Project
+              </span>
+              <i class="ri-arrow-down-s-line text-muted-foreground"></i>
+            </button>
+          </div>
+          
+          <!-- Dropdown 3 -->
+          <div class="relative">
+            <button class="flex items-center justify-between w-full p-3 bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors">
+              <span class="flex items-center gap-2">
+                <i class="ri-settings-3-line text-primary"></i>
+                Settings
+              </span>
+              <i class="ri-arrow-down-s-line text-muted-foreground"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Projects Table -->
+    <div class="bg-white rounded-lg border border-border p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Recent Projects</h3>
+        <button class="text-sm text-primary hover:underline">View All Projects</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="text-left text-sm text-muted-foreground border-b border-border">
+              <th class="pb-3 font-medium">Project Name</th>
+              <th class="pb-3 font-medium">Status</th>
+              <th class="pb-3 font-medium">Progress</th>
+              <th class="pb-3 font-medium">Team</th>
+              <th class="pb-3 font-medium">Due Date</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border">
+              <td class="py-3 font-medium">Design System</td>
+              <td class="py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Active</span></td>
+              <td class="py-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-green-500" style="width: 75%"></div>
+                  </div>
+                  <span>75%</span>
+                </div>
+              </td>
+              <td class="py-3">
+                <div class="flex -space-x-2">
+                  <div class="h-8 w-8 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white text-xs">JD</div>
+                  <div class="h-8 w-8 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-white text-xs">SC</div>
+                  <div class="h-8 w-8 rounded-full bg-purple-500 border-2 border-white flex items-center justify-center text-white text-xs">MR</div>
+                </div>
+              </td>
+              <td class="py-3">Dec 15, 2023</td>
+            </tr>
+            <tr class="border-b border-border">
+              <td class="py-3 font-medium">Mobile App</td>
+              <td class="py-3"><span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">In Review</span></td>
+              <td class="py-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-yellow-500" style="width: 45%"></div>
+                  </div>
+                  <span>45%</span>
+                </div>
+              </td>
+              <td class="py-3">
+                <div class="flex -space-x-2">
+                  <div class="h-8 w-8 rounded-full bg-red-500 border-2 border-white flex items-center justify-center text-white text-xs">AK</div>
+                  <div class="h-8 w-8 rounded-full bg-indigo-500 border-2 border-white flex items-center justify-center text-white text-xs">PL</div>
+                </div>
+              </td>
+              <td class="py-3">Jan 5, 2024</td>
+            </tr>
+            <tr>
+              <td class="py-3 font-medium">Marketing Website</td>
+              <td class="py-3"><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Planning</span></td>
+              <td class="py-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-500" style="width: 20%"></div>
+                  </div>
+                  <span>20%</span>
+                </div>
+              </td>
+              <td class="py-3">
+                <div class="flex -space-x-2">
+                  <div class="h-8 w-8 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-white text-xs">LN</div>
+                  <div class="h-8 w-8 rounded-full bg-pink-500 border-2 border-white flex items-center justify-center text-white text-xs">KW</div>
+                  <div class="h-8 w-8 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center text-white text-xs">RJ</div>
+                </div>
+              </td>
+              <td class="py-3">Feb 28, 2024</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
