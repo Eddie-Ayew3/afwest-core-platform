@@ -1,0 +1,64 @@
+<div class="w-full h-screen overflow-auto flex bg-background">
+  <tolle-sidebar [items]="sidebarItems" [collapsed]="false" size="lg">
+    <div header class="flex items-center gap-2 font-bold text-xl px-2">
+      <i class="ri-antigravity-line text-primary"></i>
+      <span>Antigravity</span>
+    </div>
+
+    <div footer class="flex items-center gap-3 px-2 py-4 border-t border-border">
+      <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="ri-user-line text-primary"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-medium">John Doe</span>
+        <span class="text-xs text-muted-foreground">Designer</span>
+      </div>
+    </div>
+  </tolle-sidebar>
+  
+  <main class="flex-1 h-screen overflow-hidden flex flex-col">
+    <!-- Static Header Section -->
+    <div class="p-8 bg-muted/10 flex-shrink-0">
+      <!-- Breadcrumb Navigation -->
+      <tolle-breadcrumb class="mb-6">
+        <tolle-breadcrumb-item *ngFor="let item of breadcrumbItems; let last = last">
+          <ng-container *ngIf="!item.active && !last; else activeLink">
+            <a (click)="navigateTo(item.url || '')" class="text-primary hover:text-primary/80 transition-colors cursor-pointer">
+              {{ item.label }}
+            </a>
+          </ng-container>
+          <ng-template #activeLink>
+            <tolle-breadcrumb-link [active]="true">
+              {{ item.label }}
+            </tolle-breadcrumb-link>
+          </ng-template>
+          <tolle-breadcrumb-separator *ngIf="!last"></tolle-breadcrumb-separator>
+        </tolle-breadcrumb-item>
+      </tolle-breadcrumb>
+      
+      <!-- Dashboard Header -->
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold">{{ pageTitle }}</h1>
+          <p class="text-muted-foreground mt-2">{{ pageSubtitle }}</p>
+        </div>
+        <div class="flex gap-3">
+          <tolle-button variant="ghost" size="sm">
+            <i class="ri-notification-3-line text-lg"></i>
+          </tolle-button>
+          <tolle-button variant="ghost" size="sm">
+            <i class="ri-mail-line text-lg"></i>
+          </tolle-button>
+          <tolle-button variant="ghost" size="sm">
+            <i class="ri-calendar-line text-lg"></i>
+          </tolle-button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Scrollable Content Area -->
+    <div class="flex-1 overflow-auto px-8 pb-8">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

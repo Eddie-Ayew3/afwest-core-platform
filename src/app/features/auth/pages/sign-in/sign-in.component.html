@@ -1,0 +1,126 @@
+<div class="min-h-screen w-full flex items-center justify-center bg-background p-4">
+  <!-- Logo and Card Container -->
+  <div class="w-full max-w-md space-y-6">
+    <!-- Logo Section -->
+    <div class="flex justify-center">
+      <div class="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="ri-shield-line text-3xl text-primary"></i>
+      </div>
+    </div>
+
+    <!-- Sign In Card -->
+    <tolle-card class="w-full">
+      <tolle-card-header>
+        <tolle-card-title class="text-2xl font-bold">Sign In</tolle-card-title>
+        <p class="text-sm text-muted-foreground mt-1">
+          Welcome back! Please enter your details.
+        </p>
+      </tolle-card-header>
+
+      <tolle-card-content>
+        <!-- Login Form -->
+        <form class="space-y-4" (ngSubmit)="onSubmit()">
+          <!-- Email Input -->
+          <tolle-input
+            label="Email or Username"
+            type="email"
+            placeholder="Enter your email"
+            hint="We'll never share your email"
+            size="lg"
+            [(ngModel)]="email"
+            name="email"
+          >
+            <i prefix class="ri-mail-line text-muted-foreground"></i>
+          </tolle-input>
+
+          <!-- Password Input with visibility toggle -->
+          <div class="space-y-2">
+            <tolle-label for="password">Password</tolle-label>
+            <div class="relative">
+              <tolle-input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Enter your password"
+                size="lg"
+                class="pr-12"
+                [(ngModel)]="password"
+                name="password"
+              >
+                <i prefix class="ri-lock-line text-muted-foreground"></i>
+              </tolle-input>
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                [title]="showPassword ? 'Hide password' : 'Show password'"
+              >
+                <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Forgot Password Link -->
+          <div class="flex justify-end">
+            <a
+              href="#"
+              class="text-sm text-primary hover:text-primary/80 hover:underline transition-colors"
+            >
+              Forgot password?
+            </a>
+          </div>
+
+          <!-- Continue Button -->
+          <tolle-button
+            type="submit"
+            variant="default"
+            size="lg"
+            class="w-full mt-6"
+            [busy]="isLoading"
+          >
+            <i class="ri-login-box-line mr-2"></i>
+            Continue
+          </tolle-button>
+        </form>
+      </tolle-card-content>
+    </tolle-card>
+
+    <!-- Footer Links -->
+    <footer class="flex flex-col items-center gap-4">
+      <div class="flex items-center gap-2 text-sm">
+        <span class="text-muted-foreground">New to Antigravity?</span>
+        <a
+          href="#"
+          class="text-primary hover:text-primary/80 hover:underline font-medium transition-colors"
+        >
+          Create an account
+        </a>
+      </div>
+
+      <div class="flex gap-6">
+        <a
+          href="#"
+          class="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+        >
+          <i class="ri-building-line mr-1"></i>
+          Single Sign-On (SSO)
+        </a>
+        <span class="text-muted-foreground/30">|</span>
+        <a
+          href="#"
+          class="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+        >
+          <i class="ri-key-line mr-1"></i>
+          Reset password
+        </a>
+      </div>
+
+      <!-- Additional Links -->
+      <div class="flex gap-4 mt-2 text-xs text-muted-foreground/60">
+        <a href="#" class="hover:text-muted-foreground transition-colors">Terms</a>
+        <a href="#" class="hover:text-muted-foreground transition-colors">Privacy</a>
+        <a href="#" class="hover:text-muted-foreground transition-colors">Help</a>
+      </div>
+    </footer>
+  </div>
+</div>
