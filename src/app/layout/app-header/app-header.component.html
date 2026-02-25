@@ -19,27 +19,22 @@
           </tolle-avatar>
         </tolle-button>
         <tolle-popover-content>
-          <div class="grid gap-2 p-4 w-full min-w-32">
-            <div class="space-y-2 pb-2 border-b border-border">
-              <div class="flex items-center gap-3">
-                <tolle-avatar src="https://github.com/nutlope.png" size="lg">
-                  <tolle-avatar-fallback>JD</tolle-avatar-fallback>
-                </tolle-avatar>
-                <div>
-                  <h4 class="font-medium leading-none">{{userName}}</h4>
-                  <p class="text-sm text-muted-foreground">{{userRole}}</p>
-                </div>
+          <div class="grid gap-2 p-3 w-full min-w-40">
+            <div class="flex items-center gap-3 pb-2 border-b border-border">
+              <div>
+                <h4 class="font-medium leading-none">{{userName}}</h4>
+                <p class="text-sm text-muted-foreground">{{userRole}}</p>
               </div>
             </div>
             
-            <div class="grid gap-3">
-              <div class="grid grid-cols-3 items-center gap-4">
-                <span class="text-sm font-medium">Email</span>
-                <span class="col-span-2 text-sm text-left px-3 py-2 border rounded bg-muted/50 break-words">{{userEmail}}</span>
+            <div class="grid gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium">Email:</span>
+                <span class="text-sm text-muted-foreground truncate">{{userEmail}}</span>
               </div>
-              <div class="grid grid-cols-3 items-center gap-4">
-                <span class="text-sm font-medium">Status</span>
-                <span class="col-span-2 text-sm text-left px-3 py-2 border rounded bg-muted/50">Active</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium">Status:</span>
+                <span class="text-sm text-muted-foreground">Active</span>
               </div>
             </div>
             
