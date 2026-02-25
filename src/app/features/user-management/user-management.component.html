@@ -1,83 +1,265 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-2xl font-bold">User Management</h1>
-      <p class="text-muted-foreground mt-2">Manage system users and permissions</p>
-    </div>
-    <tolle-button variant="default">
-      <i class="ri-user-add-line mr-2"></i>
-      Add User
-    </tolle-button>
-  </div>
+<div class="flex h-full bg-background">
+  <!-- Main Content Area -->
+  <div class="flex-1 p-8 overflow-auto">
+    <!-- Breadcrumb Navigation -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>
+          Home
+        </tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>
+         HR
+        </tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">
+          User Management & Role Assignment
+        </tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
 
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-blue-100 rounded-lg">
-          <i class="ri-user-line text-blue-600"></i>
-        </div>
-        <span class="text-sm text-green-600 font-medium">Active</span>
-      </div>
-      <h3 class="text-2xl font-bold">24</h3>
-      <p class="text-sm text-muted-foreground">Active Users</p>
-    </div>
-    
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-orange-100 rounded-lg">
-          <i class="ri-user-unfollow-line text-orange-600"></i>
-        </div>
-        <span class="text-sm text-orange-600 font-medium">Inactive</span>
-      </div>
-      <h3 class="text-2xl font-bold">3</h3>
-      <p class="text-sm text-muted-foreground">Inactive Users</p>
-    </div>
-    
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-purple-100 rounded-lg">
-          <i class="ri-admin-line text-purple-600"></i>
-        </div>
-        <span class="text-sm text-purple-600 font-medium">Admins</span>
-      </div>
-      <h3 class="text-2xl font-bold">5</h3>
-      <p class="text-sm text-muted-foreground">Admin Users</p>
-    </div>
-    
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-green-100 rounded-lg">
-          <i class="ri-shield-user-line text-green-600"></i>
-        </div>
-        <span class="text-sm text-blue-600 font-medium">Staff</span>
-      </div>
-      <h3 class="text-2xl font-bold">19</h3>
-      <p class="text-sm text-muted-foreground">Staff Users</p>
-    </div>
-  </div>
+    <!-- Page Title and Actions -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+      <h1 class="text-2xl font-bold">User Management & Role Assignment</h1>
+      <p class="text-muted-foreground mt-2">Manage user roles, permissions, and access rights</p>
 
-  <div class="bg-white rounded-lg border border-border">
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">User Directory</h3>
-        <div class="flex gap-2">
-          <tolle-button variant="outline" size="sm">
-            <i class="ri-filter-line mr-2"></i>
-            Filter
-          </tolle-button>
-          <tolle-button variant="outline" size="sm">
-            <i class="ri-search-line mr-2"></i>
-            Search
-          </tolle-button>
-        </div>
       </div>
+       <!-- Action Buttons -->
+    <div class="flex items-center gap-3 mb-6">
+      <tolle-button variant="outline" size="default" (click)="openAssignRoleDialog()">
+        <i class="ri-user-add-line mr-2"></i>
+        Assign New Role
+      </tolle-button>
+      <tolle-button variant="outline" size="default" (click)="viewAccessLogs()">
+        <i class="ri-list-check-2 mr-2"></i>
+        Access Logs
+      </tolle-button>
+    </div>
 
-      <!-- Users Table Placeholder -->
-      <div class="text-center py-12 text-muted-foreground">
-        <i class="ri-user-settings-line text-4xl mb-4 block"></i>
-        <p>No user accounts found</p>
-        <p class="text-sm">Create user accounts to manage system access</p>
+    </div>
+
+   
+
+    <!-- Search and Filter Section -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex-1 max-w-md">
+        <tolle-input
+          placeholder="Search users by name, role, or permissions..."
+          size="default"
+          class="w-full"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>
+          Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>
+          Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>
+          Export
+        </tolle-button>
       </div>
     </div>
+
+    <!-- Filter Panel (conditionally shown) -->
+    <div *ngIf="showFilterPanel" class="mb-6 p-4 bg-card border border-border rounded-lg">
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Role</label>
+          <tolle-select 
+            placeholder="All Roles" 
+            size="default" 
+            class="w-full"
+            [(ngModel)]="selectedRole"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Roles</tolle-select-item>
+            <tolle-select-item *ngFor="let role of roleOptions" [value]="role">{{role}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Status</label>
+          <tolle-select 
+            placeholder="All Status" 
+            size="default" 
+            class="w-full"
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Status</tolle-select-item>
+            <tolle-select-item *ngFor="let status of statusOptions" [value]="status">{{status}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Permissions</label>
+          <tolle-select 
+            placeholder="All Permissions" 
+            size="default" 
+            class="w-full"
+            [(ngModel)]="selectedPermission"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Permissions</tolle-select-item>
+            <tolle-select-item *ngFor="let perm of permissionOptions" [value]="perm">{{perm}}</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-close-line mr-1"></i>
+          Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- User Table Card -->
+    <tolle-card class="w-full overflow-hidden flex-1 min-h-0">
+      <tolle-card-content class="p-0">
+
+        <!-- TABLE - only shown when there is data -->
+        <div class="overflow-x-auto" *ngIf="displayedUsers.length > 0">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-border bg-muted/5 text-muted-foreground text-xs">
+                <th class="text-left p-4 text-xs font-medium">
+                  <i class="ri-user-friends mr-2 text-xs"></i> User
+                </th>
+                <th class="text-left p-4 text-xs font-medium">
+                  <i class="ri-pencil-line mr-2 text-xs"></i> Designated Role
+                </th>
+                <th class="text-left p-4 text-xs font-medium">
+                  <i class="ri-align-left mr-2 text-xs"></i> Permissions
+                </th>
+                <th class="text-left p-4 text-xs font-medium">
+                  <i class="ri-checkbox-circle-line mr-2 text-xs"></i> Status
+                </th>
+                <th class="text-right p-4 text-xs font-medium">
+                  <i class="ri-menu-line mr-2 text-xs"></i> Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of displayedUsers"
+                  class="border-b border-border hover:bg-muted/50 transition-colors">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <img [src]="user.avatar" alt="{{user.name}}" class="w-8 h-8 rounded-full object-cover" 
+                         onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(user.name)+'&background=random'">
+                    <div>
+                      <p class="font-medium">{{user.name}}</p>
+                      <p class="text-xs text-muted-foreground">ID: {{user.id}}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span class="badge px-3 py-1.5 text-xs rounded" [ngClass]="getRoleBadgeClass(user.role)">
+                    {{user.role}}
+                  </span>
+                </td>
+                <td class="p-4">
+                  <span class="badge px-3 py-1.5 text-xs rounded" [ngClass]="getPermissionBadgeClass(user.permissions)">
+                    {{user.permissions}}
+                  </span>
+                </td>
+                <td class="p-4">
+                  <span class="badge px-3 py-1.5 text-xs rounded" [ngClass]="getStatusBadgeClass(user.status)">
+                    {{user.status}}
+                  </span>
+                </td>
+                <td class="p-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewUserDetails(user)">
+                      <i class="ri-eye-line text-muted-foreground"></i>
+                    </tolle-button>
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit user" placement="top" (click)="editUser(user)">
+                      <i class="ri-edit-line text-muted-foreground"></i>
+                    </tolle-button>
+                    <div class="relative">
+                      <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                        <i class="ri-more-2-fill text-muted-foreground"></i>
+                      </tolle-button>
+                      <tolle-dropdown-menu #actionMenu>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-mail-line text-muted-foreground"></i> Send Email
+                        </button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-file-copy-line text-muted-foreground"></i> Duplicate
+                        </button>
+                        <div class="h-px bg-border my-1"></div>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 text-destructive rounded-sm">
+                          <i class="ri-delete-bin-line"></i> Delete
+                        </button>
+                      </tolle-dropdown-menu>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div *ngIf="displayedUsers.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+          <tolle-empty-state
+            title="No users found"
+            description="Try adjusting your search or filter criteria"
+            variant="default">
+            <i icon class="ri-user-star-line text-4xl text-muted-foreground"></i>
+            <div class="mt-4">
+              <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                Clear Filters
+              </tolle-button>
+            </div>
+          </tolle-empty-state>
+        </div>
+
+        <!-- Pagination -->
+        <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="displayedUsers.length > 0 || filteredUsers.length > 0">
+          <div class="flex items-center gap-2">
+            <tolle-select 
+              placeholder="10 per page" 
+              size="sm" 
+              class="w-auto"
+              [(ngModel)]="pageSize"
+              (ngModelChange)="onPageSizeChange()">
+              <tolle-select-item value="5">5 per page</tolle-select-item>
+              <tolle-select-item value="10">10 per page</tolle-select-item>
+              <tolle-select-item value="25">25 per page</tolle-select-item>
+              <tolle-select-item value="50">50 per page</tolle-select-item>
+            </tolle-select>
+            <span class="text-sm text-muted-foreground">
+              Showing {{startIndex + 1}}-{{endIndex}} of {{filteredUsers.length}}
+            </span>
+          </div>
+          
+          <tolle-pagination
+            [totalRecords]="filteredUsers.length"
+            [currentPage]="currentPage"
+            [currentPageSize]="pageSize"
+            [showPageOptions]="false"
+            (pageChange)="onPageChange($event)">
+          </tolle-pagination>
+        </div>
+
+      </tolle-card-content>
+    </tolle-card>
+    
+    <!-- Bottom spacer -->
+    <div class="h-20"></div>
   </div>
 </div>

@@ -20,11 +20,6 @@ import { AppHeaderComponent } from '../app-header/app-header.component';
     AppHeaderComponent,
     SidebarComponent, 
     RouterOutlet,
-    BreadcrumbComponent,
-    BreadcrumbItemComponent,
-    BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent,
-    ButtonComponent,
     CommonModule
   ],
   templateUrl: './dashboard-layout.component.html',

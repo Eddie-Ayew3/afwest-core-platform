@@ -1,27 +1,25 @@
 <div class="flex h-full bg-background">
   <!-- Main Content Area -->
   <div class="flex-1 p-8 overflow-auto">
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-6">
-        <!-- Breadcrumb Navigation -->
-        <tolle-breadcrumb class="mb-6">
-          <tolle-breadcrumb-item>
-            <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
-          </tolle-breadcrumb-item>
-          <tolle-breadcrumb-separator>
-            <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
-          </tolle-breadcrumb-separator>
-          <tolle-breadcrumb-item>
-            <tolle-breadcrumb-link>HR</tolle-breadcrumb-link>
-          </tolle-breadcrumb-item>
-          <tolle-breadcrumb-separator>
-            <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
-          </tolle-breadcrumb-separator>
-          <tolle-breadcrumb-item>
-            <tolle-breadcrumb-link [active]="true">Staff Management</tolle-breadcrumb-link>
-          </tolle-breadcrumb-item>
-        </tolle-breadcrumb>
-      </div>
+
+      <!-- Breadcrumb Navigation -->
+      <tolle-breadcrumb class="mb-6">
+        <tolle-breadcrumb-item>
+          <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+        </tolle-breadcrumb-item>
+        <tolle-breadcrumb-separator>
+          <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+        </tolle-breadcrumb-separator>
+        <tolle-breadcrumb-item>
+          <tolle-breadcrumb-link>HR</tolle-breadcrumb-link>
+        </tolle-breadcrumb-item>
+        <tolle-breadcrumb-separator>
+          <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+        </tolle-breadcrumb-separator>
+        <tolle-breadcrumb-item>
+          <tolle-breadcrumb-link [active]="true">Staff Management</tolle-breadcrumb-link>
+        </tolle-breadcrumb-item>
+      </tolle-breadcrumb>
 
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -63,19 +61,24 @@
         </div>
       </div>
 
-      <!-- Tabs for Staff and Guards -->
+      <!-- Small Tabs for Staff and Guards -->
       <tolle-tabs class="w-full" [value]="activeTab" (valueChange)="onTabChange($event)">
-        <tolle-tabs-list class="grid grid-cols-2">
-          <tolle-tabs-trigger value="staff" class="px-3 py-2">
-            <i class="ri-user-3-line mr-1"></i>
-            Staff
-          </tolle-tabs-trigger>
-          <tolle-tabs-trigger value="guards" class="px-3 py-2">
-            <i class="ri-shield-check-line mr-1"></i>
-            Guards
-          </tolle-tabs-trigger>
-        </tolle-tabs-list>
-        <tolle-card class="w-full overflow-hidden flex-1 min-h-0 mt-0">
+        <!-- Small Tabs List -->
+        <div class="flex justify-center mb-4">
+          <tolle-tabs-list class="inline-flex h-8 items-center rounded-md bg-muted p-1 text-muted-foreground">
+            <tolle-tabs-trigger value="staff" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm h-7">
+              <i class="ri-user-3-line mr-1 text-sm"></i>
+              Staff
+            </tolle-tabs-trigger>
+            <tolle-tabs-trigger value="guards" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm h-7">
+              <i class="ri-shield-check-line mr-1 text-sm"></i>
+              Guards
+            </tolle-tabs-trigger>
+          </tolle-tabs-list>
+        </div>
+
+        <!-- Card Container for Content -->
+        <tolle-card class="w-full overflow-hidden flex-1 min-h-0">
 
           <!-- Staff Tab Content -->
           <tolle-tabs-content value="staff">
@@ -315,5 +318,4 @@
         </tolle-card>
       </tolle-tabs>
     </div>
-  </div>
 </div>
