@@ -1,37 +1,319 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h1 class="text-2xl font-bold">Staff/Guard Management</h1>
-      <p class="text-muted-foreground mt-2">Manage staff and guard personnel</p>
-    </div>
-    <tolle-button variant="default">
-      <i class="ri-add-line mr-2"></i>
-      Add Staff
-    </tolle-button>
-  </div>
-
-  <div class="bg-white rounded-lg border border-border">
+<div class="flex h-full bg-background">
+  <!-- Main Content Area -->
+  <div class="flex-1 p-8 overflow-auto">
     <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">Staff Directory</h3>
+      <div class="flex justify-between items-center mb-6">
+        <!-- Breadcrumb Navigation -->
+        <tolle-breadcrumb class="mb-6">
+          <tolle-breadcrumb-item>
+            <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+          </tolle-breadcrumb-item>
+          <tolle-breadcrumb-separator>
+            <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+          </tolle-breadcrumb-separator>
+          <tolle-breadcrumb-item>
+            <tolle-breadcrumb-link>HR</tolle-breadcrumb-link>
+          </tolle-breadcrumb-item>
+          <tolle-breadcrumb-separator>
+            <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+          </tolle-breadcrumb-separator>
+          <tolle-breadcrumb-item>
+            <tolle-breadcrumb-link [active]="true">Staff Management</tolle-breadcrumb-link>
+          </tolle-breadcrumb-item>
+        </tolle-breadcrumb>
+      </div>
+
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 class="text-2xl font-bold">Staff/Guard Management</h1>
+          <p class="text-muted-foreground mt-2">Manage staff and guard personnel</p>
+        </div>
+        <tolle-button variant="default">
+          <i class="ri-add-line mr-2"></i>
+          Add Staff
+        </tolle-button>
+      </div>
+
+      <!-- Search and Filter Section -->
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex-1 max-w-md">
+          <tolle-input
+            placeholder="Search staff/guards..."
+            size="default"
+            class="w-full"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearch()">
+            <i prefix class="ri-search-line text-muted-foreground"></i>
+          </tolle-input>
+        </div>
+        
         <div class="flex gap-2">
-          <tolle-button variant="outline" size="sm">
+          <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
             <i class="ri-filter-line mr-2"></i>
+            Filters ({{activeFilterCount}})
+          </tolle-button>
+          <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+            <i class="ri-equalizer-line mr-2"></i>
             Filter
           </tolle-button>
-          <tolle-button variant="outline" size="sm">
-            <i class="ri-search-line mr-2"></i>
-            Search
+          <tolle-button variant="outline" size="default">
+            <i class="ri-download-line mr-2"></i>
+            Export
           </tolle-button>
         </div>
       </div>
 
-      <!-- Staff Table Placeholder -->
-      <div class="text-center py-12 text-muted-foreground">
-        <i class="ri-team-line text-4xl mb-4 block"></i>
-        <p>No staff records found</p>
-        <p class="text-sm">Add your first staff member to get started</p>
-      </div>
+      <!-- Tabs for Staff and Guards -->
+      <tolle-tabs class="w-full" [value]="activeTab" (valueChange)="onTabChange($event)">
+        <tolle-tabs-list class="grid grid-cols-2">
+          <tolle-tabs-trigger value="staff" class="px-3 py-2">
+            <i class="ri-user-3-line mr-1"></i>
+            Staff
+          </tolle-tabs-trigger>
+          <tolle-tabs-trigger value="guards" class="px-3 py-2">
+            <i class="ri-shield-check-line mr-1"></i>
+            Guards
+          </tolle-tabs-trigger>
+        </tolle-tabs-list>
+        <tolle-card class="w-full overflow-hidden flex-1 min-h-0 mt-0">
+
+          <!-- Staff Tab Content -->
+          <tolle-tabs-content value="staff">
+            <tolle-card-content class="p-0">
+              <!-- TABLE - only shown when there is data -->
+              <div class="overflow-x-auto" *ngIf="displayedStaff.length > 0">
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-border bg-muted/5">
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Staff Name</th>
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Role</th>
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Contact</th>
+                      <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let staff of displayedStaff"
+                        class="border-b border-border hover:bg-muted/30 transition-colors"
+                        [ngClass]="staff.status === 'Suspended' ? 'bg-muted/10' : ''">
+                      <td class="p-4">
+                        <div class="flex items-center gap-3">
+                          <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                            {{staff.name.charAt(0)}}
+                          </div>
+                          <div>
+                            <p class="font-medium">{{staff.name}}</p>
+                            <p class="text-xs text-muted-foreground">ID: {{staff.id}}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="p-4">
+                        <p class="text-sm">{{staff.role}}</p>
+                      </td>
+                      <td class="p-4">
+                        <tolle-badge 
+                          [variant]="staff.status === 'Active' ? 'default' : 'secondary'"
+                          size="sm">
+                          {{staff.status}}
+                        </tolle-badge>
+                      </td>
+                      <td class="p-4">
+                        <div>
+                          <p class="text-sm">{{staff.contact}}</p>
+                        </div>
+                      </td>
+                      <td class="p-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                          <tolle-button variant="default" size="xs">
+                            Edit
+                          </tolle-button>
+                          <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewPerson(staff)">
+                            <i class="ri-eye-line"></i>
+                          </tolle-button>
+                          <div class="relative">
+                            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="staffActionMenu">
+                              <i class="ri-more-2-fill"></i>
+                            </tolle-button>
+                            <tolle-dropdown-menu #staffActionMenu>
+                              <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                                <i class="ri-mail-line"></i> Send Email
+                              </button>
+                              <div class="h-px bg-border my-1"></div>
+                              <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                                <i class="ri-delete-bin-line"></i> Delete
+                              </button>
+                            </tolle-dropdown-menu>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- EMPTY STATE - completely outside the table -->
+              <div *ngIf="displayedStaff.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+                <tolle-empty-state
+                  title="No staff found"
+                  description="Try adjusting your search or filter criteria"
+                  variant="default">
+                  <i icon class="ri-user-line text-4xl"></i>
+                  <div class="mt-4">
+                    <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                      Clear Filters
+                    </tolle-button>
+                  </div>
+                </tolle-empty-state>
+              </div>
+
+              <!-- Pagination (only show when there is data) -->
+              <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="filteredStaff.length > 0">
+                <div class="flex items-center gap-2">
+                  <tolle-select 
+                    placeholder="10 per page" 
+                    size="sm" 
+                    [(ngModel)]="pageSize"
+                    (ngModelChange)="onPageSizeChange()">
+                    <tolle-select-item value="5">5 per page</tolle-select-item>
+                    <tolle-select-item value="10">10 per page</tolle-select-item>
+                    <tolle-select-item value="25">25 per page</tolle-select-item>
+                    <tolle-select-item value="50">50 per page</tolle-select-item>
+                  </tolle-select>
+                  <span class="text-sm text-muted-foreground">
+                    Showing {{staffStartIndex + 1}}-{{staffEndIndex}} of {{filteredStaff.length}}
+                  </span>
+                </div>
+                
+                <tolle-pagination
+                  [totalRecords]="filteredStaff.length"
+                  [currentPage]="currentPage"
+                  [currentPageSize]="pageSize"
+                  [showPageOptions]="false"
+                  (pageChange)="onPageChange($event)">
+                </tolle-pagination>
+              </div>
+            </tolle-card-content>
+          </tolle-tabs-content>
+
+          <!-- Guards Tab Content -->
+          <tolle-tabs-content value="guards">
+            <tolle-card-content class="p-0">
+              <!-- TABLE - only shown when there is data -->
+              <div class="overflow-x-auto" *ngIf="displayedGuards.length > 0">
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-border bg-muted/5">
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Guard Name</th>
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Role</th>
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                      <th class="text-left p-4 text-sm font-medium text-muted-foreground">Contact</th>
+                      <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let guard of displayedGuards"
+                        class="border-b border-border hover:bg-muted/30 transition-colors"
+                        [ngClass]="guard.status === 'Suspended' ? 'bg-muted/10' : ''">
+                      <td class="p-4">
+                        <div class="flex items-center gap-3">
+                          <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                            {{guard.name.charAt(0)}}
+                          </div>
+                          <div>
+                            <p class="font-medium">{{guard.name}}</p>
+                            <p class="text-xs text-muted-foreground">ID: {{guard.id}}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="p-4">
+                        <p class="text-sm">{{guard.role}}</p>
+                      </td>
+                      <td class="p-4">
+                        <tolle-badge 
+                          [variant]="guard.status === 'Active' ? 'default' : 'secondary'"
+                          size="sm">
+                          {{guard.status}}
+                        </tolle-badge>
+                      </td>
+                      <td class="p-4">
+                        <div>
+                          <p class="text-sm">{{guard.contact}}</p>
+                        </div>
+                      </td>
+                      <td class="p-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                          <tolle-button variant="default" size="xs">
+                            Edit
+                          </tolle-button>
+                          <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewPerson(guard)">
+                            <i class="ri-eye-line"></i>
+                          </tolle-button>
+                          <div class="relative">
+                            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="guardActionMenu">
+                              <i class="ri-more-2-fill"></i>
+                            </tolle-button>
+                            <tolle-dropdown-menu #guardActionMenu>
+                              <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                                <i class="ri-mail-line"></i> Send Email
+                              </button>
+                              <div class="h-px bg-border my-1"></div>
+                              <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                                <i class="ri-delete-bin-line"></i> Delete
+                              </button>
+                            </tolle-dropdown-menu>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- EMPTY STATE - completely outside the table -->
+              <div *ngIf="displayedGuards.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+                <tolle-empty-state
+                  title="No guards found"
+                  description="Try adjusting your search or filter criteria"
+                  variant="default">
+                  <i icon class="ri-shield-line text-4xl"></i>
+                  <div class="mt-4">
+                    <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                      Clear Filters
+                    </tolle-button>
+                  </div>
+                </tolle-empty-state>
+              </div>
+
+              <!-- Pagination (only show when there is data) -->
+              <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="filteredGuards.length > 0">
+                <div class="flex items-center gap-2">
+                  <tolle-select 
+                    placeholder="10 per page" 
+                    size="sm" 
+                    [(ngModel)]="pageSize"
+                    (ngModelChange)="onPageSizeChange()">
+                    <tolle-select-item value="5">5 per page</tolle-select-item>
+                    <tolle-select-item value="10">10 per page</tolle-select-item>
+                    <tolle-select-item value="25">25 per page</tolle-select-item>
+                    <tolle-select-item value="50">50 per page</tolle-select-item>
+                  </tolle-select>
+                  <span class="text-sm text-muted-foreground">
+                    Showing {{guardStartIndex + 1}}-{{guardEndIndex}} of {{filteredGuards.length}}
+                  </span>
+                </div>
+                
+                <tolle-pagination
+                  [totalRecords]="filteredGuards.length"
+                  [currentPage]="currentPage"
+                  [currentPageSize]="pageSize"
+                  [showPageOptions]="false"
+                  (pageChange)="onPageChange($event)">
+                </tolle-pagination>
+              </div>
+            </tolle-card-content>
+          </tolle-tabs-content>
+        </tolle-card>
+      </tolle-tabs>
     </div>
   </div>
 </div>

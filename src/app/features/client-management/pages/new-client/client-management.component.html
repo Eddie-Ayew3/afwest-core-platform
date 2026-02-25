@@ -1,0 +1,206 @@
+<div class="flex h-full bg-background">
+  <!-- Main Content Area -->
+  <div class="flex-1 p-8 overflow-auto">
+    <!-- Breadcrumb Navigation -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>HR</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Client Management</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Client Management</h1>
+      <p class="text-muted-foreground mt-2">Manage client relationships and contracts</p>
+    </div>
+    <tolle-button variant="default" size="lg" (click)="openNewClientDialog()">
+        <i class="ri-user-add-line mr-2"></i>
+        New Client
+      </tolle-button>
+  </div>
+    
+
+    <!-- Search and Filter Section -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex-1 max-w-md">
+        <tolle-input
+          placeholder="Search clients..."
+          size="default"
+          class="w-full"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>
+          Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>
+          Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>
+          Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Client Table -->
+    <tolle-card class="w-full overflow-hidden flex-1 min-h-0">
+      <tolle-card-content class="p-0">
+
+        <!-- TABLE - only shown when there is data -->
+        <div class="overflow-x-auto" *ngIf="displayedClients.length > 0">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-border bg-muted/5">
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Client Name</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Contact Person</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Contract End Date</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Assigned Region</th>
+                <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of displayedClients"
+                  class="border-b border-border hover:bg-muted/30 transition-colors"
+                  [ngClass]="client.status === 'Suspended' ? 'bg-muted/10' : ''">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                      {{client.name.charAt(0)}}
+                    </div>
+                    <div>
+                      <p class="font-medium">{{client.name}}</p>
+                      <p class="text-xs text-muted-foreground">ID: {{client.id}}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div>
+                    <p class="text-sm">{{client.contactPerson}}</p>
+                    <p class="text-xs text-muted-foreground">{{client.contactEmail}}</p>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <tolle-badge 
+                    [variant]="client.status === 'Active' ? 'default' : 'secondary'"
+                    size="sm">
+                    {{client.status}}
+                  </tolle-badge>
+                </td>
+                <td class="p-4">
+                  <div class="flex items-center gap-2">
+                    <i class="ri-calendar-line text-muted-foreground"></i>
+                    <span class="text-sm" [class.text-orange-600]="isContractEndingSoon(client.contractEnd)">
+                      {{client.contractEnd | date:'MMM d, y'}}
+                    </span>
+                    <tolle-badge 
+                      *ngIf="isContractEndingSoon(client.contractEnd)" 
+                      variant="destructive" 
+                      size="xs">
+                      Ending Soon
+                    </tolle-badge>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div class="flex items-center gap-2">
+                    <i class="ri-map-pin-line text-muted-foreground"></i>
+                    <span class="text-sm">{{client.region}}</span>
+                  </div>
+                </td>
+                <td class="p-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <tolle-button variant="default" size="xs">
+                      Edit
+                    </tolle-button>
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewClient(client)">
+                      <i class="ri-eye-line"></i>
+                    </tolle-button>
+                    <div class="relative">
+                      <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                        <i class="ri-more-2-fill"></i>
+                      </tolle-button>
+                      <tolle-dropdown-menu #actionMenu>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-mail-line"></i> Send Email
+                        </button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-file-copy-line"></i> Duplicate
+                        </button>
+                        <div class="h-px bg-border my-1"></div>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                          <i class="ri-delete-bin-line"></i> Delete
+                        </button>
+                      </tolle-dropdown-menu>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY STATE - completely outside the table -->
+        <div *ngIf="displayedClients.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+          <tolle-empty-state
+            title="No clients found"
+            description="Try adjusting your search or filter criteria"
+            variant="default">
+            <i icon class="ri-user-star-line text-4xl"></i>
+            <div class="mt-4">
+              <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                Clear Filters
+              </tolle-button>
+            </div>
+          </tolle-empty-state>
+        </div>
+
+        <!-- Pagination (only show when there is data) -->
+        <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="displayedClients.length > 0 || filteredClients.length > 0">
+          <div class="flex items-center gap-2">
+            <tolle-select 
+              placeholder="10 per page" 
+              size="sm" 
+              [(ngModel)]="pageSize"
+              (ngModelChange)="onPageSizeChange()">
+              <tolle-select-item value="5">5 per page</tolle-select-item>
+              <tolle-select-item value="10">10 per page</tolle-select-item>
+              <tolle-select-item value="25">25 per page</tolle-select-item>
+              <tolle-select-item value="50">50 per page</tolle-select-item>
+            </tolle-select>
+            <span class="text-sm text-muted-foreground">
+              Showing {{startIndex + 1}}-{{endIndex}} of {{filteredClients.length}}
+            </span>
+          </div>
+          
+          <tolle-pagination
+            [totalRecords]="filteredClients.length"
+            [currentPage]="currentPage"
+            [currentPageSize]="pageSize"
+            [showPageOptions]="false"
+            (pageChange)="onPageChange($event)">
+          </tolle-pagination>
+        </div>
+
+      </tolle-card-content>
+    </tolle-card>
+  </div>
+</div>

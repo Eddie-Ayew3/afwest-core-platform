@@ -2,10 +2,6 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  CardComponent,
-  CardHeaderComponent,
-  CardTitleComponent,
-  CardContentComponent,
   InputComponent,
   ButtonComponent,
   LabelComponent
@@ -16,10 +12,6 @@ import {
   standalone: true,
   imports: [
     FormsModule,
-    CardComponent,
-    CardHeaderComponent,
-    CardTitleComponent,
-    CardContentComponent,
     InputComponent,
     ButtonComponent,
     LabelComponent
@@ -32,7 +24,7 @@ export class SignInComponent {
   isLoading = false;
 
   // Form model
-  email = '';
+  staffId = '';
   password = '';
 
   constructor(private router: Router) {}
@@ -48,7 +40,7 @@ export class SignInComponent {
     setTimeout(() => {
       this.isLoading = false;
       // Handle sign-in logic here
-      console.log('Signing in with:', this.email, this.password);
+      console.log('Signing in with:', this.staffId, this.password);
       
       // Navigate to dashboard on successful sign-in
       this.router.navigate(['/dashboard']);

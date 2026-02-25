@@ -11,7 +11,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([])),
     provideRouter(routes, withRouterConfig({ onSameUrlNavigation: 'reload' })),
     provideTolleConfig({
-      primaryColor: '#8b5cf6', // Indigo
+      primaryColor: '#f14444ff', // Indigo
       radius: '0.5rem',
       darkByDefault: false
     })

@@ -1,0 +1,33 @@
+.app-header {
+  background: white;
+  border-bottom: white;
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.header-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 1rem;
+  }
+  
+  .logo-section span {
+    display: none;
+  }
+}
