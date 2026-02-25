@@ -11,11 +11,13 @@ import {
 } from '@tolle_/tolle-ui';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { AppHeaderComponent } from '../app-header/app-header.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    AppHeaderComponent,
     SidebarComponent, 
     RouterOutlet,
     BreadcrumbComponent,

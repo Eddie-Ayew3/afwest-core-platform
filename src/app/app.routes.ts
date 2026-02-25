@@ -3,7 +3,7 @@ import { SignInComponent } from './features/auth/pages/sign-in/sign-in.component
 import { DashBoardComponent } from './features/dashboard/pages/dashboard.component';
 import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
 import { StaffManagementComponent } from './features/staff-management/staff-management.component';
-import { ClientManagementComponent } from './features/client-management/client-management.component';
+import { ClientManagementComponent } from './features/client-management/pages/new-client/client-management.component';
 import { LeaveManagementComponent } from './features/leave-management/leave-management.component';
 import { UserManagementComponent } from './features/user-management/user-management.component';
 import { ShiftManagementComponent } from './features/shift-management/shift-management.component';
@@ -11,10 +11,12 @@ import { CheckInOutComponent } from './features/check-in-out/check-in-out.compon
 import { SupplierManagementComponent } from './features/supplier-management/supplier-management.component';
 import { LogisticsManagementComponent } from './features/logistics-management/logistics-management.component';
 import { PettyCashManagementComponent } from './features/petty-cash-management/petty-cash-management.component';
+import { ResetPasswordComponent } from './features/auth/pages/reset-password/reset-password.component';
 
 export const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: '/sign-in' },
     { path: 'sign-in', component: SignInComponent },
+    { path: 'reset-password', component: ResetPasswordComponent },
      {
     path: '',
     component: DashboardLayoutComponent,

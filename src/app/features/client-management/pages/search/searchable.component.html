@@ -1,0 +1,16 @@
+<div class="p-6">
+  <tolle-data-table 
+    [columns]="columns"
+    [searchable]="true"
+    [data]="users"
+    [allowColumnHiding]="true"
+    [pageSize]="5"
+    [pageSizeOptions]="[5, 10, 15, 20, 25, 50]"
+    [paginate]="true">
+    
+    <ng-template tolleCell="actions" let-row="row">
+      <tolle-button size="xs">Edit</tolle-button>
+    </ng-template>
+    
+  </tolle-data-table>
+</div>
