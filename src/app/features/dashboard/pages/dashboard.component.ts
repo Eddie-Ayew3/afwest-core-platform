@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { ButtonComponent } from '@tolle_/tolle-ui';
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
