@@ -1,0 +1,338 @@
+<div class="flex h-full bg-background">
+  <!-- Main Content Area -->
+  <div class="flex-1 p-8 overflow-auto">
+    <!-- Breadcrumb Navigation -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Client Management</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Client Dashboard</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Site Management</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- User Role Indicator and Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Site Management</h1>
+        <p class="text-muted-foreground mt-2">Manage all client sites and branches across regions</p>
+        <div class="flex items-center gap-2 mt-2">
+          <tolle-badge [variant]="currentUserRole === 'head-office' ? 'default' : 'secondary'" size="sm">
+            {{currentUserRole === 'head-office' ? 'Head Office View' : 'Zonal Commander View'}}
+          </tolle-badge>
+          <span *ngIf="currentUserRole === 'zonal-commander' && currentUserRegion" class="text-sm text-muted-foreground">
+            ({{currentUserRegion}} Region)
+          </span>
+          <tolle-button variant="outline" size="xs" (click)="switchUserRole()">
+            <i class="ri-refresh-line mr-1"></i>
+            Switch View
+          </tolle-button>
+        </div>
+      </div>
+      <tolle-button variant="default" size="lg" (click)="openNewSiteDialog()">
+        <i class="ri-add-line mr-2"></i>
+        New Site
+      </tolle-button>
+    </div>
+
+    <!-- Region Summary Cards (only for head office) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6" *ngIf="currentUserRole === 'head-office'">
+      <div *ngFor="let region of regions" class="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h3 class="font-semibold">{{region.name}}</h3>
+            <p class="text-sm text-muted-foreground">{{region.capital}}</p>
+          </div>
+          <i class="ri-map-pin-line text-lg text-muted-foreground"></i>
+        </div>
+        <div class="space-y-2">
+          <div class="flex justify-between text-sm">
+            <span>Sites:</span>
+            <span class="font-medium">{{region.siteCount}}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span>Active Guards:</span>
+            <span class="font-medium">{{region.activeGuards}}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span>Zonal Commander:</span>
+            <span class="font-medium text-xs">{{region.zonalCommander}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex-1 max-w-md">
+        <tolle-input
+          placeholder="Search sites..."
+          size="default"
+          class="w-full"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>
+          Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>
+          Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>
+          Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="mb-6 p-4 border rounded-lg bg-muted/20" *ngIf="showFilterPanel">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Region</label>
+          <tolle-select 
+            placeholder="All Regions" 
+            size="sm" 
+            [(ngModel)]="selectedRegion"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Regions</tolle-select-item>
+            <tolle-select-item *ngFor="let region of regions" [value]="region.name">{{region.name}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Status</label>
+          <tolle-select 
+            placeholder="All Status" 
+            size="sm" 
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Status</tolle-select-item>
+            <tolle-select-item value="active">Active</tolle-select-item>
+            <tolle-select-item value="inactive">Inactive</tolle-select-item>
+            <tolle-select-item value="maintenance">Maintenance</tolle-select-item>
+            <tolle-select-item value="under-construction">Under Construction</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Type</label>
+          <tolle-select 
+            placeholder="All Types" 
+            size="sm" 
+            [(ngModel)]="selectedType"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Types</tolle-select-item>
+            <tolle-select-item value="headquarters">Headquarters</tolle-select-item>
+            <tolle-select-item value="branch">Branch</tolle-select-item>
+            <tolle-select-item value="sub-branch">Sub-Branch</tolle-select-item>
+            <tolle-select-item value="atm">ATM</tolle-select-item>
+            <tolle-select-item value="agency">Agency</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Security Level</label>
+          <tolle-select 
+            placeholder="All Levels" 
+            size="sm" 
+            [(ngModel)]="selectedSecurityLevel"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Levels</tolle-select-item>
+            <tolle-select-item value="low">Low</tolle-select-item>
+            <tolle-select-item value="medium">Medium</tolle-select-item>
+            <tolle-select-item value="high">High</tolle-select-item>
+            <tolle-select-item value="critical">Critical</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+          Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Sites Table -->
+    <tolle-card class="w-full overflow-hidden flex-1 min-h-0">
+      <tolle-card-content class="p-0">
+
+        <!-- TABLE -->
+        <div class="overflow-x-auto" *ngIf="displayedSites.length > 0">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-border bg-muted/5">
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Site Info</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Location</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Contact</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Staff</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Security</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let site of displayedSites"
+                  class="border-b border-border hover:bg-muted/30 transition-colors">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                      <i [class]="getSiteTypeIcon(site.type)"></i>
+                    </div>
+                    <div>
+                      <p class="font-medium">{{site.name}}</p>
+                      <p class="text-xs text-muted-foreground">ID: {{site.id}}</p>
+                      <tolle-badge variant="secondary" size="xs" class="mt-1">
+                        {{site.type.replace('-', ' ')}}
+                      </tolle-badge>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div>
+                    <p class="text-sm font-medium">{{site.city}}, {{site.region}}</p>
+                    <p class="text-xs text-muted-foreground">{{site.address}}</p>
+                    <p class="text-xs text-muted-foreground mt-1" *ngIf="site.coordinates">
+                      <i class="ri-map-pin-2-line"></i>
+                      {{site.coordinates.latitude.toFixed(4)}}, {{site.coordinates.longitude.toFixed(4)}}
+                    </p>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div>
+                    <p class="text-sm font-medium">{{site.contact.manager}}</p>
+                    <p class="text-xs text-muted-foreground">{{site.contact.phone}}</p>
+                    <p class="text-xs text-muted-foreground">{{site.contact.email}}</p>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-2 text-sm">
+                      <i class="ri-user-line text-muted-foreground"></i>
+                      <span>{{site.staffCount}} Staff</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                      <i class="ri-shield-user-line text-muted-foreground"></i>
+                      <span>{{site.guardCount}} Guards</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <tolle-badge 
+                    [variant]="'default'"
+                    size="sm">
+                    {{site.securityLevel}}
+                  </tolle-badge>
+                  <p class="text-xs text-muted-foreground mt-1" *ngIf="site.zonalCommander">
+                    {{site.zonalCommander}}
+                  </p>
+                </td>
+                <td class="p-4">
+                  <tolle-badge 
+                    [variant]="'default'"
+                    size="sm">
+                    {{site.status}}
+                  </tolle-badge>
+                </td>
+                <td class="p-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewSiteDetails(site)">
+                      <i class="ri-eye-line"></i>
+                    </tolle-button>
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View on map" placement="top" (click)="viewSiteOnMap(site)" *ngIf="site.coordinates">
+                      <i class="ri-map-line"></i>
+                    </tolle-button>
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit site" placement="top" (click)="editSite(site)">
+                      <i class="ri-edit-line"></i>
+                    </tolle-button>
+                    <div class="relative">
+                      <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                        <i class="ri-more-2-fill"></i>
+                      </tolle-button>
+                      <tolle-dropdown-menu #actionMenu>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-printer-line"></i> Print Site Info
+                        </button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-mail-line"></i> Email Manager
+                        </button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-calendar-line"></i> Schedule Inspection
+                        </button>
+                        <div class="h-px bg-border my-1"></div>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                          <i class="ri-delete-bin-line"></i> Delete Site
+                        </button>
+                      </tolle-dropdown-menu>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div *ngIf="displayedSites.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+          <tolle-empty-state
+            title="No sites found"
+            description="Try adjusting your search or filter criteria"
+            variant="default">
+            <i icon class="ri-map-pin-line text-4xl"></i>
+            <div class="mt-4">
+              <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                Clear Filters
+              </tolle-button>
+            </div>
+          </tolle-empty-state>
+        </div>
+
+        <!-- Pagination -->
+        <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="displayedSites.length > 0 || filteredSites.length > 0">
+          <div class="flex items-center gap-2">
+            <tolle-select 
+              placeholder="10 per page" 
+              size="sm" 
+              [(ngModel)]="pageSize"
+              (ngModelChange)="onPageSizeChange()">
+              <tolle-select-item value="5">5 per page</tolle-select-item>
+              <tolle-select-item value="10">10 per page</tolle-select-item>
+              <tolle-select-item value="25">25 per page</tolle-select-item>
+              <tolle-select-item value="50">50 per page</tolle-select-item>
+            </tolle-select>
+            <span class="text-sm text-muted-foreground">
+              Showing {{startIndex + 1}}-{{endIndex}} of {{filteredSites.length}}
+            </span>
+          </div>
+          
+          <tolle-pagination
+            [totalRecords]="filteredSites.length"
+            [currentPage]="currentPage"
+            [currentPageSize]="pageSize"
+            [showPageOptions]="false"
+            (pageChange)="onPageChange($event)">
+          </tolle-pagination>
+        </div>
+
+      </tolle-card-content>
+    </tolle-card>
+  </div>
+</div>

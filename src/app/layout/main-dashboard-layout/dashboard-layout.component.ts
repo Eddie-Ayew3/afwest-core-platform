@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
 import { AppHeaderComponent } from '../app-header/app-header.component';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-main-dashboard-layout',
   standalone: true,
   imports: [
     AppHeaderComponent,
@@ -37,6 +37,11 @@ export class DashboardLayoutComponent {
                     title: 'Overview',
                     icon: 'ri-dashboard-line',
                     url: '/dashboard'
+                },
+                {
+                    title: 'Client Management',
+                    icon: 'ri-team-line',
+                    url: '/client-management'
                 }
             ]
         },
@@ -118,6 +123,13 @@ export class DashboardLayoutComponent {
         ];
         this.pageTitle = 'Dashboard';
         this.pageSubtitle = 'Welcome back, John! Here\'s what\'s happening.';
+      } else if (url === '/client-management') {
+        this.breadcrumbItems = [
+          { label: 'Home', url: '/dashboard' },
+          { label: 'Client Management', active: true }
+        ];
+        this.pageTitle = 'Client Management';
+        this.pageSubtitle = 'Manage clients and their information.';
       } else if (url.startsWith('/hr/')) {
         const section = url.replace('/hr/', '');
         const sectionName = this.formatSectionName(section);

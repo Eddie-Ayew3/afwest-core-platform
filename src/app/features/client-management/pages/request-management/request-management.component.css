@@ -1,0 +1,406 @@
+/* Request Management Component Styles */
+
+/* Status badge colors */
+.status-pending {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.status-approved {
+  background-color: #10b981;
+  color: white;
+}
+
+.status-rejected {
+  background-color: #ef4444;
+  color: white;
+}
+
+.status-completed {
+  background-color: #6366f1;
+  color: white;
+}
+
+/* Urgency badge colors */
+.urgency-low {
+  background-color: #6b7280;
+  color: white;
+}
+
+.urgency-medium {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.urgency-high {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.urgency-urgent {
+  background-color: #ef4444;
+  color: white;
+}
+
+/* Request type icons */
+.request-type-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+/* Table row hover effects */
+.table-row-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Filter panel animation */
+.filter-panel {
+  transition: all 0.3s ease;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.filter-panel.show {
+  max-height: 200px;
+}
+
+/* Request items display */
+.request-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.request-item {
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+}
+
+/* Empty state styling */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+/* Cost display */
+.cost-display {
+  font-weight: 600;
+  color: #059669;
+}
+
+.cost-negative {
+  color: #dc2626;
+}
+
+/* Date formatting */
+.date-display {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Request details section */
+.request-details {
+  max-width: 300px;
+}
+
+.request-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.request-description {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Guard info display */
+.guard-info {
+  min-width: 120px;
+}
+
+.guard-name {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.guard-id {
+  font-size: 12px;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+/* Request ID display */
+.request-id {
+  font-family: monospace;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Type display with icon */
+.type-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.type-icon {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+.type-text {
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+/* Badge styling */
+.badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* Pagination styling */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Search and filter section */
+.search-filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.search-input {
+  flex: 1;
+  max-width: 400px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Header section */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-title h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.header-subtitle {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Breadcrumb styling */
+.breadcrumb-section {
+  margin-bottom: 24px;
+}
+
+/* Card container */
+.request-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Table container */
+.table-container {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Button styling */
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn-xs {
+  padding: 2px 6px;
+  font-size: 11px;
+}
+
+/* Icon buttons */
+.icon-btn {
+  padding: 6px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.icon-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.icon-btn-sm {
+  padding: 4px;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  min-width: 150px;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 4px 0;
+}

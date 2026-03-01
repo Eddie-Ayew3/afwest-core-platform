@@ -1,0 +1,289 @@
+<div class="flex h-full bg-background">
+  <!-- Main Content Area -->
+  <div class="flex-1 p-8 overflow-auto">
+    <!-- Breadcrumb Navigation -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Client Management</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Client Dashboard</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Request Management</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Request Management</h1>
+        <p class="text-muted-foreground mt-2">Manage guard requests for uniforms, petty cash, equipment, and transportation</p>
+      </div>
+      <tolle-button variant="default" size="lg" (click)="openNewRequestDialog()">
+        <i class="ri-add-line mr-2"></i>
+        New Request
+      </tolle-button>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex-1 max-w-md">
+        <tolle-input
+          placeholder="Search requests..."
+          size="default"
+          class="w-full"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>
+          Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>
+          Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>
+          Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel (shown when toggled) -->
+    <div class="mb-6 p-4 border rounded-lg bg-muted/20" *ngIf="showFilterPanel">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Status</label>
+          <tolle-select 
+            placeholder="All Status" 
+            size="sm" 
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Status</tolle-select-item>
+            <tolle-select-item value="pending">Pending</tolle-select-item>
+            <tolle-select-item value="approved">Approved</tolle-select-item>
+            <tolle-select-item value="rejected">Rejected</tolle-select-item>
+            <tolle-select-item value="completed">Completed</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Request Type</label>
+          <tolle-select 
+            placeholder="All Types" 
+            size="sm" 
+            [(ngModel)]="selectedType"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Types</tolle-select-item>
+            <tolle-select-item value="uniform">Uniform</tolle-select-item>
+            <tolle-select-item value="petty-cash">Petty Cash</tolle-select-item>
+            <tolle-select-item value="equipment">Equipment</tolle-select-item>
+            <tolle-select-item value="transportation">Transportation</tolle-select-item>
+            <tolle-select-item value="other">Other</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Urgency</label>
+          <tolle-select 
+            placeholder="All Urgency" 
+            size="sm" 
+            [(ngModel)]="selectedUrgency"
+            (ngModelChange)="applyFilters()">
+            <tolle-select-item value="all">All Urgency</tolle-select-item>
+            <tolle-select-item value="low">Low</tolle-select-item>
+            <tolle-select-item value="medium">Medium</tolle-select-item>
+            <tolle-select-item value="high">High</tolle-select-item>
+            <tolle-select-item value="urgent">Urgent</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+          Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Request Table -->
+    <tolle-card class="w-full overflow-hidden flex-1 min-h-0">
+      <tolle-card-content class="p-0">
+
+        <!-- TABLE - only shown when there is data -->
+        <div class="overflow-x-auto" *ngIf="displayedRequests.length > 0">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-border bg-muted/5">
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Request ID</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Guard Info</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Request Details</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Type</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Urgency</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Cost</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Requested Date</th>
+                <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of displayedRequests"
+                  class="border-b border-border hover:bg-muted/30 transition-colors">
+                <td class="p-4">
+                  <div class="font-mono text-sm">{{request.id}}</div>
+                </td>
+                <td class="p-4">
+                  <div>
+                    <p class="font-medium">{{request.guardName}}</p>
+                    <p class="text-xs text-muted-foreground">ID: {{request.guardId}}</p>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div>
+                    <p class="font-medium text-sm">{{request.title}}</p>
+                    <p class="text-xs text-muted-foreground mt-1">{{request.description}}</p>
+                    <div *ngIf="request.items && request.items.length > 0" class="mt-2">
+                      <p class="text-xs text-muted-foreground">Items:</p>
+                      <div class="flex flex-wrap gap-1 mt-1">
+                        <span *ngFor="let item of request.items" 
+                              class="text-xs bg-muted px-2 py-1 rounded">{{item}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <div class="flex items-center gap-2">
+                    <i [class]="getRequestTypeIcon(request.requestType)" class="text-muted-foreground"></i>
+                    <span class="text-sm capitalize">{{request.requestType.replace('-', ' ')}}</span>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <tolle-badge 
+                    [variant]="'default'"
+                    size="sm">
+                    {{request.urgency}}
+                  </tolle-badge>
+                </td>
+                <td class="p-4">
+                  <tolle-badge 
+                    [variant]="'default'"
+                    size="sm">
+                    {{request.status}}
+                  </tolle-badge>
+                </td>
+                <td class="p-4">
+                  <span class="text-sm font-medium" *ngIf="request.cost">
+                    ${{request.cost.toFixed(2)}}
+                  </span>
+                  <span class="text-sm text-muted-foreground" *ngIf="!request.cost">-</span>
+                </td>
+                <td class="p-4">
+                  <div class="text-sm">{{request.requestedDate | date:'MMM d, y'}}</div>
+                </td>
+                <td class="p-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewRequestDetails(request)">
+                      <i class="ri-eye-line"></i>
+                    </tolle-button>
+                    
+                    <!-- Action buttons based on status -->
+                    <ng-container [ngSwitch]="request.status">
+                      <ng-container *ngSwitchCase="'pending'">
+                        <tolle-button variant="default" size="xs" (click)="approveRequest(request)">
+                          Approve
+                        </tolle-button>
+                        <tolle-button variant="destructive" size="xs" (click)="rejectRequest(request)">
+                          Reject
+                        </tolle-button>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'approved'">
+                        <tolle-button variant="default" size="xs" (click)="completeRequest(request)">
+                          Complete
+                        </tolle-button>
+                      </ng-container>
+                    </ng-container>
+                    
+                    <div class="relative">
+                      <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                        <i class="ri-more-2-fill"></i>
+                      </tolle-button>
+                      <tolle-dropdown-menu #actionMenu>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-printer-line"></i> Print Request
+                        </button>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                          <i class="ri-mail-line"></i> Email Guard
+                        </button>
+                        <div class="h-px bg-border my-1"></div>
+                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                          <i class="ri-delete-bin-line"></i> Delete
+                        </button>
+                      </tolle-dropdown-menu>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EMPTY STATE - completely outside the table -->
+        <div *ngIf="displayedRequests.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+          <tolle-empty-state
+            title="No requests found"
+            description="Try adjusting your search or filter criteria"
+            variant="default">
+            <i icon class="ri-file-list-line text-4xl"></i>
+            <div class="mt-4">
+              <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                Clear Filters
+              </tolle-button>
+            </div>
+          </tolle-empty-state>
+        </div>
+
+        <!-- Pagination (only show when there is data) -->
+        <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="displayedRequests.length > 0 || filteredRequests.length > 0">
+          <div class="flex items-center gap-2">
+            <tolle-select 
+              placeholder="10 per page" 
+              size="sm" 
+              [(ngModel)]="pageSize"
+              (ngModelChange)="onPageSizeChange()">
+              <tolle-select-item value="5">5 per page</tolle-select-item>
+              <tolle-select-item value="10">10 per page</tolle-select-item>
+              <tolle-select-item value="25">25 per page</tolle-select-item>
+              <tolle-select-item value="50">50 per page</tolle-select-item>
+            </tolle-select>
+            <span class="text-sm text-muted-foreground">
+              Showing {{startIndex + 1}}-{{endIndex}} of {{filteredRequests.length}}
+            </span>
+          </div>
+          
+          <tolle-pagination
+            [totalRecords]="filteredRequests.length"
+            [currentPage]="currentPage"
+            [currentPageSize]="pageSize"
+            [showPageOptions]="false"
+            (pageChange)="onPageChange($event)">
+          </tolle-pagination>
+        </div>
+
+      </tolle-card-content>
+    </tolle-card>
+  </div>
+</div>

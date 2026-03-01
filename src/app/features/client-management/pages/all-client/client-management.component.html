@@ -131,7 +131,7 @@
                     <tolle-button variant="default" size="xs">
                       Edit
                     </tolle-button>
-                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewClient(client)">
+                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top"  [routerLink]="['/client/dashboard', client.id]">
                       <i class="ri-eye-line"></i>
                     </tolle-button>
                     <div class="relative">

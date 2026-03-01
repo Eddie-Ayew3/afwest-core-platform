@@ -1,0 +1,267 @@
+/* Reduce input field width */
+tolle-input {
+  max-width: 200px !important;
+  width: 200px !important;
+}
+
+/* Target the input elements within tolle-input components */
+tolle-input input {
+  max-width: 200px !important;
+  width: 200px !important;
+}
+
+/* Unique security-themed background design */
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Animated security pattern overlay */
+:host::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    /* Circuit board lines */
+    repeating-linear-gradient(0deg, 
+      rgba(255, 255, 255, 0.03) 0px, 
+      rgba(255, 255, 255, 0.03) 2px,
+      transparent 2px, 
+      transparent 20px),
+    repeating-linear-gradient(90deg, 
+      rgba(255, 255, 255, 0.03) 0px, 
+      rgba(255, 255, 255, 0.03) 2px,
+      transparent 2px, 
+      transparent 20px),
+    /* Hexagon pattern for security feel */
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px, 30px 30px, 30px 30px, 30px 30px, 30px 30px;
+  pointer-events: none;
+  z-index: 0;
+  animation: securityScan 20s linear infinite;
+}
+
+/* Animated scanning line effect */
+:host::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 255, 255, 0.2) 50%, 
+    transparent 100%);
+  animation: scanLine 8s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Floating binary numbers */
+.binary-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: rgba(0, 255, 255, 0.03);
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.binary-string {
+  position: absolute;
+  animation: floatBinary 20s linear infinite;
+  opacity: 0.3;
+}
+
+.binary-string-1 {
+  top: 10%;
+  left: 5%;
+}
+
+.binary-string-2 {
+  top: 30%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+.binary-string-3 {
+  top: 60%;
+  left: 15%;
+  animation-delay: 5s;
+}
+
+.binary-string-4 {
+  top: 85%;
+  left: 70%;
+  animation-delay: 8s;
+}
+
+.binary-string-5 {
+  top: 20%;
+  left: 45%;
+  animation-delay: 11s;
+}
+
+.binary-string-6 {
+  top: 75%;
+  left: 25%;
+  animation-delay: 14s;
+}
+
+/* Glowing orbs for depth */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.orb-1 {
+  top: 10%;
+  left: 5%;
+  width: 300px;
+  height: 300px;
+  background: rgba(102, 126, 234, 0.15);
+  animation: float 15s ease-in-out infinite;
+}
+
+.orb-2 {
+  bottom: 10%;
+  right: 5%;
+  width: 400px;
+  height: 400px;
+  background: rgba(118, 75, 162, 0.15);
+  animation: float 18s ease-in-out infinite reverse;
+}
+
+.orb-3 {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: rgba(0, 255, 255, 0.05);
+  animation: pulse 10s ease-in-out infinite;
+}
+
+/* Ensure your content stays above the background */
+main, footer {
+  position: relative;
+  z-index: 10;
+}
+
+/* Keep your original card background white */
+.bg-white {
+  background-color: white !important;
+  position: relative;
+  z-index: 20;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border-radius: 0; /* Keep your original styling */
+}
+
+/* Animations */
+@keyframes securityScan {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 60px 60px, 60px 60px, 30px 30px, 30px 30px, 30px 30px, 30px 30px;
+  }
+}
+
+@keyframes scanLine {
+  0%, 100% {
+    top: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    top: 100%;
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+}
+
+@keyframes floatBinary {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(30px, -30px);
+  }
+  66% {
+    transform: translate(-20px, 20px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .orb-1, .orb-2, .orb-3 {
+    filter: blur(40px);
+  }
+  
+  .orb-1 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .orb-2 {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .orb-3 {
+    width: 350px;
+    height: 350px;
+  }
+}
