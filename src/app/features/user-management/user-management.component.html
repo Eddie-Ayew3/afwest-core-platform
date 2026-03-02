@@ -1,6 +1,6 @@
 <div class="flex h-full bg-background">
   <!-- Main Content Area -->
-  <div class="flex-1 p-8 overflow-auto">
+  <div class="flex-1 p-6 overflow-auto">
     <!-- Breadcrumb Navigation -->
     <tolle-breadcrumb class="mb-6">
       <tolle-breadcrumb-item>
@@ -263,3 +263,41 @@
     <div class="h-20"></div>
   </div>
 </div>
+
+<!-- Assign role modal -->
+<ng-template #assignRoleModal>
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-2">Select User</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Choose a user</option>
+        <option value="USR001">Sarah Chen</option>
+        <option value="USR002">Mike Johnson</option>
+        <option value="USR003">Emily Davis</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Role</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Select role</option>
+        <option value="HR Admin">HR Admin</option>
+        <option value="Security Supervisor">Security Supervisor</option>
+        <option value="Operations Manager">Operations Manager</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Permissions</label>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="rounded border-border"> Full Access
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="rounded border-border"> View-only
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="rounded border-border"> Approval Rights
+        </label>
+      </div>
+    </div>
+  </div>
+</ng-template>

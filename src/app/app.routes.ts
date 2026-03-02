@@ -16,7 +16,9 @@ import { ResetPasswordComponent } from './features/auth/pages/reset-password/res
 import { ClientDashboardLayoutComponent } from './layout/client-dashboard-layout/client-dashboard-layout.component';
 import { DashboardLayoutComponent } from './layout/main-dashboard-layout/dashboard-layout.component';
 import { LeaveManagementComponent } from './features/leave-management/leave-management.component';
+import { PermissionsManagementComponent } from './features/permissions-management/permissions-management.component';
 import { authGuard } from './guards/auth.guard';
+import { globalOnlyGuard, notGuardRoleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: '/sign-in' },
@@ -82,7 +84,13 @@ export const routes: Routes = [
                     },
                     {
                         path: 'user-management',
-                        component: UserManagementComponent
+                        component: UserManagementComponent,
+                        canActivate: [globalOnlyGuard]
+                    },
+                    {
+                        path: 'permissions-management',
+                        component: PermissionsManagementComponent,
+                        canActivate: [globalOnlyGuard]
                     }
                 ]
             },
@@ -91,7 +99,8 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'shift-management',
-                        component: ShiftManagementComponent
+                        component: ShiftManagementComponent,
+                        canActivate: [notGuardRoleGuard]
                     },
                     {
                         path: 'check-in-out',
@@ -101,6 +110,7 @@ export const routes: Routes = [
             },
             {
                 path: 'procurement',
+                canActivate: [globalOnlyGuard],
                 children: [
                     {
                         path: 'supplier-management',

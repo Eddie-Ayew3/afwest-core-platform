@@ -1,6 +1,6 @@
 <div class="flex h-full bg-background">
   <!-- Main Content Area -->
-  <div class="flex-1 p-8 overflow-auto">
+  <div class="flex-1 p-6 overflow-auto">
     <!-- Breadcrumb Navigation -->
     <tolle-breadcrumb class="mb-6">
       <tolle-breadcrumb-item>
@@ -287,3 +287,46 @@
     </tolle-card>
   </div>
 </div>
+
+<!-- New request modal -->
+<ng-template #newRequestModal>
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-2">Guard Name</label>
+      <input type="text" placeholder="Enter guard name" class="w-full p-2 border rounded-md bg-background">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Request Type</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Select type</option>
+        <option value="Equipment">Equipment</option>
+        <option value="Uniform">Uniform</option>
+        <option value="Training">Training</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Title</label>
+      <input type="text" placeholder="Enter request title" class="w-full p-2 border rounded-md bg-background">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Description</label>
+      <textarea rows="3" placeholder="Describe the request..." class="w-full p-2 border rounded-md bg-background resize-none"></textarea>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Urgency</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Select urgency</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Estimated Cost (GHS)</label>
+      <input type="number" placeholder="0.00" class="w-full p-2 border rounded-md bg-background">
+    </div>
+  </div>
+</ng-template>

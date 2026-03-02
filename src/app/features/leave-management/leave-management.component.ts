@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -38,6 +38,8 @@ interface LeaveRequest {
 })
 export class LeaveManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  @ViewChild('requestModal') requestModal!: TemplateRef<any>;
+  @ViewChild('leaveSuccessModal') leaveSuccessModal!: TemplateRef<any>;
 
   requests: LeaveRequest[] = [
     { id: 1, employee: 'Sarah Johnson', department: 'Marketing', type: 'Vacation', start: new Date('2024-12-10'), end: new Date('2024-12-15'), status: 'Approved', manager: 'John Doe', reason: 'Family vacation' },
@@ -163,59 +165,8 @@ export class LeaveManagementComponent implements OnInit {
       backdropClose: true,
       size: 'default',
       showCloseButton: true,
-      content: `
-        <div class="space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
-              ${request.employee.charAt(0)}
-            </div>
-            <div>
-              <h4 class="font-semibold">${request.employee}</h4>
-              <p class="text-sm text-muted-foreground">${request.department}</p>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
-              <div>
-                <p class="text-xs text-muted-foreground uppercase font-semibold">Leave Type</p>
-                <p class="font-medium mt-1">${request.type}</p>
-              </div>
-              <div>
-                <p class="text-xs text-muted-foreground uppercase font-semibold">Manager</p>
-                <p class="font-medium mt-1">${request.manager}</p>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
-              <div>
-                <p class="text-xs text-muted-foreground uppercase font-semibold">Start Date</p>
-                <p class="font-medium mt-1">${this.formatDate(request.start)}</p>
-              </div>
-              <div>
-                <p class="text-xs text-muted-foreground uppercase font-semibold">End Date</p>
-                <p class="font-medium mt-1">${this.formatDate(request.end)}</p>
-              </div>
-            </div>
-            <div class="p-3 bg-muted/50 rounded-lg">
-              <p class="text-xs text-muted-foreground uppercase font-semibold">Total Duration</p>
-              <p class="font-medium mt-1">${this.calculateRequestDays(request)} days</p>
-            </div>
-            <div class="p-3 bg-muted/50 rounded-lg">
-              <p class="text-xs text-muted-foreground uppercase font-semibold">Status</p>
-              <p class="font-medium mt-1 flex items-center gap-2">
-                <span class="h-2 w-2 rounded-full ${
-                  request.status === 'Approved' ? 'bg-green-500' : 
-                  request.status === 'Pending' ? 'bg-orange-500' : 'bg-red-500'
-                }"></span>
-                ${request.status}
-              </p>
-            </div>
-          </div>
-          <div class="p-4 bg-muted/50 rounded-lg">
-            <p class="text-xs text-muted-foreground uppercase font-semibold mb-2">Comments</p>
-            <p class="text-sm text-muted-foreground italic">${request.reason || 'No comments provided'}</p>
-          </div>
-        </div>
-      `
+      content: this.requestModal,
+      context: { request }
     });
   }
 
@@ -282,7 +233,7 @@ export class LeaveManagementComponent implements OnInit {
         backdropClose: true,
         size: 'default',
         showCloseButton: true,
-        content: 'Your leave request has been submitted successfully. You will receive a notification when it is reviewed.'
+        content: this.leaveSuccessModal
       });
     }, 800);
   }

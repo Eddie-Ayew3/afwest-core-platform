@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -94,6 +94,7 @@ export interface Site {
 })
 export class GuardManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  @ViewChild('newGuardModal') newGuardModal!: TemplateRef<any>;
 
   // Mock data for guards
   guards: Guard[] = [
@@ -506,66 +507,13 @@ export class GuardManagementComponent implements OnInit {
   openNewGuardDialog(): void {
     const modalRef = this.modalService.open({
       title: 'Add New Guard',
-      content: `
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">First Name</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter first name">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Last Name</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter last name">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Email</label>
-            <input type="email" class="w-full p-2 border rounded-md" placeholder="Enter email address">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Phone</label>
-            <input type="tel" class="w-full p-2 border rounded-md" placeholder="Enter phone number">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Position</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter position">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Rank</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select rank</option>
-              <option value="Private">Private</option>
-              <option value="Lance Corporal">Lance Corporal</option>
-              <option value="Corporal">Corporal</option>
-              <option value="Sergeant">Sergeant</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Site Assignment</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select site</option>
-              <option *ngFor="let site of sites" [value]="site.id">{{site.name}} - {{site.city}}</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Department</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter department">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Salary</label>
-            <input type="number" class="w-full p-2 border rounded-md" placeholder="Enter salary">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Emergency Contact</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter emergency contact">
-          </div>
-        </div>
-      `,
+      content: this.newGuardModal,
       size: 'default'
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {
       if (result?.success) {
         console.log('New guard added successfully');
-        // Here you would typically refresh the guard list
       }
     });
   }

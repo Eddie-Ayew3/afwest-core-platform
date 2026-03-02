@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { PopoverComponent, PopoverContentComponent, ButtonComponent, AvatarComponent, AvatarFallbackComponent } from '@tolle_/tolle-ui';
+import { PermissionsService } from '../../core/services/permissions.service';
+import { LS } from '../../core/models/rbac.models';
 
 @Component({
   selector: 'app-header',
@@ -10,13 +13,15 @@ import { PopoverComponent, PopoverContentComponent, ButtonComponent, AvatarCompo
   styleUrl: './app-header.component.css'
 })
 export class AppHeaderComponent {
-  userEmail = 'john.doe@example.com';
-  userName = 'John Doe';
-  userRole = 'Designer';
-  userAvatar = 'https://github.com/nutlope.png';
-  
+  private permissions = inject(PermissionsService);
+  private router = inject(Router);
+
+  get userName()    { return this.permissions.displayName; }
+  get userRole()    { return this.permissions.role; }
+  get userStaffId() { return this.permissions.staffId; }
+
   logout(): void {
-    console.log('Logging out...');
-    // Add logout logic here
+    Object.values(LS).forEach(key => localStorage.removeItem(key));
+    this.router.navigate(['/sign-in']);
   }
 }

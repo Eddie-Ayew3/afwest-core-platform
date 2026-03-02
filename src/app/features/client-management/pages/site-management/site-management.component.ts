@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -94,6 +94,7 @@ export interface Region {
 })
 export class SiteManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  @ViewChild('newSiteModal') newSiteModal!: TemplateRef<any>;
 
   // Mock data for Ecobank branches across Ghana regions
   regions: Region[] = [
@@ -411,70 +412,13 @@ export class SiteManagementComponent implements OnInit {
   openNewSiteDialog(): void {
     const modalRef = this.modalService.open({
       title: 'Add New Site',
-      content: `
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">Site Name</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter site name">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Site Code</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter site code">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Type</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select type</option>
-              <option value="headquarters">Headquarters</option>
-              <option value="branch">Branch</option>
-              <option value="sub-branch">Sub-Branch</option>
-              <option value="atm">ATM</option>
-              <option value="agency">Agency</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Region</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select region</option>
-              <option value="Greater Accra">Greater Accra</option>
-              <option value="Ashanti">Ashanti</option>
-              <option value="Brong-Ahafo">Brong-Ahafo</option>
-              <option value="Central">Central</option>
-              <option value="Eastern">Eastern</option>
-              <option value="Volta">Volta</option>
-              <option value="Western">Western</option>
-              <option value="Upper East">Upper East</option>
-              <option value="Upper West">Upper West</option>
-              <option value="Northern">Northern</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">City</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter city">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Address</label>
-            <textarea class="w-full p-2 border rounded-md" rows="2" placeholder="Enter address"></textarea>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Security Level</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select security level</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="critical">Critical</option>
-            </select>
-          </div>
-        </div>
-      `,
+      content: this.newSiteModal,
       size: 'default'
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {
       if (result?.success) {
         console.log('New site added successfully');
-        // Here you would typically refresh the site list
       }
     });
   }

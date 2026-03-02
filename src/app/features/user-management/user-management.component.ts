@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -56,6 +56,7 @@ interface User {
 })
 export class UserManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  @ViewChild('assignRoleModal') assignRoleModal!: TemplateRef<any>;
 
   users: User[] = [
     { 
@@ -239,49 +240,13 @@ export class UserManagementComponent implements OnInit {
   openAssignRoleDialog(): void {
     const modalRef = this.modalService.open({
       title: 'Assign New Role',
-      content: `
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">Select User</label>
-            <select class="w-full p-2 border rounded-md bg-background">
-              <option value="">Choose a user</option>
-              <option value="USR001">Sarah Chen</option>
-              <option value="USR002">Mike Johnson</option>
-              <option value="USR003">Emily Davis</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Role</label>
-            <select class="w-full p-2 border rounded-md bg-background">
-              <option value="">Select role</option>
-              <option value="HR Admin">HR Admin</option>
-              <option value="Security Supervisor">Security Supervisor</option>
-              <option value="Operations Manager">Operations Manager</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Permissions</label>
-            <div class="space-y-2">
-              <label class="flex items-center gap-2">
-                <input type="checkbox" class="rounded border-border"> Full Access
-              </label>
-              <label class="flex items-center gap-2">
-                <input type="checkbox" class="rounded border-border"> View-only
-              </label>
-              <label class="flex items-center gap-2">
-                <input type="checkbox" class="rounded border-border"> Approval Rights
-              </label>
-            </div>
-          </div>
-        </div>
-      `,
+      content: this.assignRoleModal,
       size: 'default'
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {
       if (result?.success) {
         console.log('Role assigned successfully');
-        // Here you would typically refresh the user list
       }
     });
   }

@@ -1,0 +1,4201 @@
+# Tolle UI - Full Context for AI Agents
+
+Tolle UI is a modern, config-first UI component library for Angular. 
+It emphasizes accessibility, customizability, and premium aesthetics.
+
+
+---
+
+<section id="components">
+## Components Reference
+
+## Accordion
+
+### API Reference
+#### accordion Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| type | `'single' | 'multiple'` | 'single' | Determines whether one or multiple items can be opened at the same time. |
+| class | `string` | - | Additional CSS classes for the accordion container. |
+
+#### accordionItem Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| title | `string` | - | The text displayed in the accordion item header. |
+| id | `string | number` | - | Unique identifier for the item. Auto-generated if not provided. |
+| class | `string` | - | Additional CSS classes for the accordion item. |
+
+### Usage Examples
+#### basic
+```html
+<tolle-accordion>
+  <tolle-accordion-item title="Can I open many at once?">
+    Yes, because the type is set to multiple by default or explicitly.
+  </tolle-accordion-item>
+  <tolle-accordion-item title="Is it animated?">
+    No, it uses static rendering for a snappy, high-performance feel.
+  </tolle-accordion-item>
+</tolle-accordion>
+```
+
+#### multi
+```html
+<tolle-accordion type="multiple">
+  <tolle-accordion-item title="Can I open many at once?">
+    Yes, because the type is set to multiple.
+  </tolle-accordion-item>
+  <tolle-accordion-item title="Is it animated?">
+    No, it uses static rendering for a snappy, high-performance feel.
+  </tolle-accordion-item>
+</tolle-accordion>
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-accordion type="${this.playgroundType}">
+  <tolle-accordion-item title="Is it accessible?">
+    Yes. It adheres to the WAI-ARIA design pattern.
+  </tolle-accordion-item>
+  <tolle-accordion-item title="Is it styled?">
+    Yes. It comes with default styles that match the other components' aesthetic.
+  </tolle-accordion-item>
+  <tolle-accordion-item title="Is it animated?">
+    Yes. It features smooth open/close animations.
+  </tolle-accordion-item>
+</tolle-accordion>
+```
+
+### Overview & Installation
+```typescript
+import { AccordionComponent, AccordionItemComponent } from '@tolle_/tolle-ui';
+
+@Component({
+  // ...
+  imports: [AccordionComponent, AccordionItemComponent]
+})
+```
+
+
+
+---
+
+## Alert-dialog
+
+### API Reference
+#### alertDialog Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| open | `boolean` | false | The controlled open state of the dialog. |
+| openChange | `EventEmitter<boolean>` | - | Event emitted when the open state changes. |
+
+#### content Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes to apply to the content panel. |
+
+### Usage Examples
+#### playground
+```html
+<!-- Template-driven -->
+<tolle-alert-dialog>
+  <tolle-alert-dialog-trigger>
+    <tolle-button variant="outline">Open Dialog</tolle-button>
+  </tolle-alert-dialog-trigger>
+  ...
+</tolle-alert-dialog>
+
+<!-- Service-based (in your component.ts) -->
+open() {
+  this.alertDialog.open({
+    title: "Are you sure?",
+    description: "This is irreversible.",
+    variant: "destructive"
+  });
+}
+```
+
+#### usage
+```typescript
+<tolle-alert-dialog>
+  <tolle-alert-dialog-trigger>
+    <button>Open Dialog</button>
+  </tolle-alert-dialog-trigger>
+  ...
+</tolle-alert-dialog>
+```
+
+#### serviceUsage
+```typescript
+import { AlertDialogService } from '@tolle_/tolle-ui';
+
+export class MyComponent {
+  private alertDialog = inject(AlertDialogService);
+
+  openDialog() {
+    const dialogRef = this.alertDialog.open({
+      title: "Are you absolutely sure?",
+      description: "This action cannot be undone.",
+      actionText: "Delete Account",
+      variant: "destructive"
+    });
+
+    dialogRef.afterClosed$.subscribe(confirmed => {
+      if (confirmed) {
+        // Handle confirmation
+      }
+    });
+  }
+}
+```
+
+
+
+---
+
+## Alert
+
+### Overview & Installation
+```typescript
+import { AlertComponent } from '@tolle_/tolle-ui';
+
+@Component({
+  // ...
+  imports: [AlertComponent]
+})
+```
+
+### Usage Examples
+#### preview
+```html
+<div class="p-20 rounded-lg bg-background flex flex-col space-y-4">
+  <tolle-alert title="Heads up!">
+    <i icon class="ri-information-line"></i>
+    You can add components to your app using the cli.
+  </tolle-alert>
+
+  <tolle-alert variant="destructive" title="Error">
+    <i icon class="ri-error-warning-line"></i>
+    Your session has expired. Please log in again.
+  </tolle-alert>
+
+  <tolle-alert variant="success" title="Success!">
+    <i icon class="ri-checkbox-circle-line"></i>
+    Your profile has been updated successfully.
+  </tolle-alert>
+
+  <tolle-alert
+    variant="warning"
+    title="System Maintenance"
+    [dismissible]="true">
+    <i icon class="ri-error-warning-line"></i>
+    The server will be down for 5 minutes at midnight.
+  </tolle-alert>
+</div>
+```
+
+#### previewNoDismiss
+```html
+<div class="p-20 rounded-lg bg-background flex flex-col space-y-4">
+  <tolle-alert title="Heads up!">
+    <i icon class="ri-information-line"></i>
+    You can add components to your app using the cli.
+  </tolle-alert>
+
+  <tolle-alert variant="destructive" title="Error">
+    <i icon class="ri-error-warning-line"></i>
+    Your session has expired. Please log in again.
+  </tolle-alert>
+
+  <tolle-alert variant="success" title="Success!">
+    <i icon class="ri-checkbox-circle-line"></i>
+    Your profile has been updated successfully.
+  </tolle-alert>
+</div>
+```
+
+#### previewDismiss
+```html
+<tolle-alert
+  variant="warning"
+  title="System Maintenance"
+  [dismissible]="true">
+  <i icon class="ri-error-warning-line"></i>
+  The server will be down for 5 minutes at midnight.
+</tolle-alert>
+```
+
+#### playground
+```html
+<tolle-alert 
+  variant="${this.playgroundVariant}" 
+  title="${this.playgroundTitle}" 
+  [dismissible]="${this.playgroundDismissible}">
+  <i icon class="ri-information-line"></i>
+  You can add components to your app using the cli.
+</tolle-alert>
+```
+
+### API Reference
+#### alert Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| variant | `'default' | 'destructive' | 'success' | 'warning' | 'info'` | 'default' | The visual style of the alert. |
+| title | `string` | - | The title displayed at the top of the alert. |
+| dismissible | `boolean` | false | Whether the alert can be dismissed by the user. |
+| class | `string` | - | Additional CSS classes for the container. |
+
+
+
+---
+
+## Aspect-ratio
+
+### API Reference
+#### aspectRatio Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| ratio | `string | number` | '16 / 9' | The preferred aspect ratio for the container. Can be a string (e.g., "16 / 9") or a decimal number (e.g., 1.777). |
+| class | `string` | '' | Additional CSS classes for styling the container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-aspect-ratio ratio="${this.ratio}">
+  <img src="${this.imageUrl}" alt="..." />
+</tolle-aspect-ratio>
+```
+
+
+
+---
+
+## Avatar
+
+### API Reference
+#### avatar Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| src | `string` | - | The source URL of the avatar image. |
+| alt | `string` | '' | Alternative text for the avatar image. |
+| size | `'sm' | 'default' | 'lg' | 'xl'` | 'default' | The size of the avatar. |
+| shape | `'circle' | 'square'` | 'circle' | The shape of the avatar. |
+
+#### fallback Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | - | Additional CSS classes for the fallback container. |
+
+### Usage Examples
+#### basic
+```html
+<tolle-avatar src="https://github.com/nutlope.png">
+  <tolle-avatar-fallback>JD</tolle-avatar-fallback>
+</tolle-avatar>
+```
+
+#### sizes
+```html
+<tolle-avatar size="sm" src="...">...</tolle-avatar>
+<tolle-avatar size="default" src="...">...</tolle-avatar>
+<tolle-avatar size="lg" src="...">...</tolle-avatar>
+<tolle-avatar size="xl" src="...">...</tolle-avatar>
+```
+
+#### shapes
+```html
+<tolle-avatar shape="circle" src="...">...</tolle-avatar>
+<tolle-avatar shape="square" src="...">...</tolle-avatar>
+```
+
+#### fallback
+```html
+<tolle-avatar src="invalid.png">
+  <tolle-avatar-fallback>JD</tolle-avatar-fallback>
+</tolle-avatar>
+
+<tolle-avatar>
+  <tolle-avatar-fallback>
+    <i class="ri-user-line"></i>
+  </tolle-avatar-fallback>
+</tolle-avatar>
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-avatar src="${this.src}" size="${this.size}" shape="${this.shape}">
+  <tolle-avatar-fallback>${this.fallbackText}</tolle-avatar-fallback>
+</tolle-avatar>
+```
+
+### Overview & Installation
+```typescript
+import { AvatarComponent, AvatarFallbackComponent } from '@tolle_/tolle-ui';
+
+@Component({
+  // ...
+  imports: [AvatarComponent, AvatarFallbackComponent]
+})
+```
+
+
+
+---
+
+## Badge
+
+### API Reference
+#### badge Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| variant | `'default' | 'secondary' | 'outline' | 'destructive'` | 'default' | The visual variant of the badge. |
+| size | `'xs' | 'sm' | 'default'` | 'default' | The size of the badge. |
+| removable | `boolean` | false | Whether the badge shows a remove button. |
+| class | `string` | - | Additional CSS classes for the badge container. |
+
+### Usage Examples
+#### basic
+```html
+<tolle-badge>Active</tolle-badge>
+<tolle-badge variant="secondary">Draft</tolle-badge>
+<tolle-badge variant="outline">Archived</tolle-badge>
+<tolle-badge variant="destructive">Error</tolle-badge>
+```
+
+#### sizes
+```html
+<tolle-badge size="xs">XS Tag</tolle-badge>
+<tolle-badge size="sm">SM Tag</tolle-badge>
+<tolle-badge size="default">Default Tag</tolle-badge>
+```
+
+#### removable
+```html
+<tolle-badge [removable]="true" (onRemove)="remove(id)">
+  Design
+</tolle-badge>
+```
+
+#### icons
+```html
+<tolle-badge variant="secondary">
+  <i prefix class="ri-price-tag-3-line"></i>
+  Ecommerce
+</tolle-badge>
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-badge variant="${this.variant}" size="${this.size}"[removable]="${this.removable}">
+  ${this.label}
+</tolle-badge>
+```
+
+### Overview & Installation
+```typescript
+import { BadgeComponent } from '@tolle_/tolle-ui';
+
+@Component({
+  // ...
+  imports: [BadgeComponent]
+})
+```
+
+
+
+---
+
+## Breadcrumb
+
+### API Reference
+#### breadcrumb Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | - | Additional CSS classes for the nav container. |
+
+#### link Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| active | `boolean` | false | Whether the link is the current page (disables clicking). |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { BreadcrumbComponent } from '../../../../../tolle/src/lib/breadcrumb.component';
+import { BreadcrumbItemComponent } from '../../../../../tolle/src/lib/breadcrumb-item.component';
+import { BreadcrumbLinkComponent } from '../../../../../tolle/src/lib/breadcrumb-link.component';
+import { BreadcrumbSeparatorComponent } from '../../../../../tolle/src/lib/breadcrumb-separator.component';
+
+@Component({
+    selector: 'app-basic-breadcrumb',
+    imports: [
+        BreadcrumbComponent,
+        BreadcrumbItemComponent,
+        BreadcrumbLinkComponent,
+        BreadcrumbSeparatorComponent
+    ],
+    template: `
+    <tolle-breadcrumb>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Components</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Breadcrumb</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+  `
+})
+export class BasicBreadcrumbComponent { }
+
+```
+
+#### separator
+```typescript
+import { Component } from '@angular/core';
+import { BreadcrumbComponent } from '../../../../../tolle/src/lib/breadcrumb.component';
+import { BreadcrumbItemComponent } from '../../../../../tolle/src/lib/breadcrumb-item.component';
+import { BreadcrumbLinkComponent } from '../../../../../tolle/src/lib/breadcrumb-link.component';
+import { BreadcrumbSeparatorComponent } from '../../../../../tolle/src/lib/breadcrumb-separator.component';
+
+@Component({
+    selector: 'app-custom-separator-breadcrumb',
+    imports: [
+        BreadcrumbComponent,
+        BreadcrumbItemComponent,
+        BreadcrumbLinkComponent,
+        BreadcrumbSeparatorComponent
+    ],
+    template: `
+    <tolle-breadcrumb>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Components</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Breadcrumb</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+  `
+})
+export class CustomSeparatorBreadcrumbComponent { }
+
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-breadcrumb>
+  <tolle-breadcrumb-item>
+    <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+  </tolle-breadcrumb-item>
+  <tolle-breadcrumb-separator></tolle-breadcrumb-separator>
+  <tolle-breadcrumb-item>
+    <tolle-breadcrumb-link [active]="${this.isActive}">
+      ${this.label}
+    </tolle-breadcrumb-link>
+  </tolle-breadcrumb-item>
+</tolle-breadcrumb>
+```
+
+
+
+---
+
+## Button
+
+### API Reference
+#### button Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| variant | `'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'` | 'default' | The visual style of the button. |
+| size | `'default' | 'xs' | 'sm' | 'lg' | 'icon-xs' | 'icon-sm' | 'icon' | 'icon-lg'` | 'default' | The size of the button. |
+| disabled | `boolean` | false | Whether the button is disabled. |
+| busy | `boolean` | false | Whether the button is in a loading state. Disables interaction and shows a spinner. |
+| class | `string` | '' | Additional CSS classes to apply to the button. |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+
+@Component({
+    selector: 'app-basic-button',
+    imports: [ButtonComponent],
+    template: `
+    <div class="flex flex-wrap gap-4">
+      <tolle-button>Primary (Auto)</tolle-button>
+      <tolle-button variant="secondary">Secondary (Derived)</tolle-button>
+      <tolle-button variant="outline">Outline</tolle-button>
+      <tolle-button variant="ghost">Ghost</tolle-button>
+      <tolle-button variant="link">Link</tolle-button>
+    </div>
+    
+    <div class="flex flex-wrap items-center gap-4 mt-8">
+      <tolle-button size="sm">Small</tolle-button>
+      <tolle-button size="default">Default</tolle-button>
+      <tolle-button size="lg">Large</tolle-button>
+    </div>
+  `
+})
+export class BasicButtonComponent { }
+
+```
+
+#### destructive
+```typescript
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+
+@Component({
+    selector: 'app-destructive-button',
+    imports: [ButtonComponent],
+    template: `
+    <div class="flex flex-wrap gap-4">
+      <tolle-button variant="destructive">Destructive Default</tolle-button>
+      <tolle-button variant="destructive" size="sm">Small</tolle-button>
+      <tolle-button variant="destructive" size="lg">Large</tolle-button>
+    </div>
+  `
+})
+export class DestructiveButtonComponent { }
+
+```
+
+#### icon
+```typescript
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+import { TooltipDirective } from '../../../../../tolle/src/lib/tooltip.directive';
+
+@Component({
+    selector: 'app-icon-button',
+    imports: [ButtonComponent, TooltipDirective],
+    template: `
+    <div class="flex flex-wrap gap-4 items-center">
+      <tolle-button variant="outline">
+        <i class="ri-github-line mr-2"></i>
+        <span>View on GitHub</span>
+      </tolle-button>
+
+      <tolle-button variant="outline" size="icon" tolleTooltip="Edit Profile" placement="top">
+        <i class="ri-edit-line"></i>
+      </tolle-button>
+
+      <tolle-button size="icon-lg">
+        <i class="ri-more-2-fill"></i>
+      </tolle-button>
+
+      <tolle-button size="icon" variant="destructive">
+        <i class="ri-more-2-fill"></i>
+      </tolle-button>
+
+      <tolle-button size="icon-sm" variant="secondary">
+        <i class="ri-more-2-fill"></i>
+      </tolle-button>
+
+      <tolle-button size="icon-xs">
+        <i class="ri-more-2-fill"></i>
+      </tolle-button>
+    </div>
+  `
+})
+export class IconButtonComponent { }
+
+```
+
+#### busy
+```typescript
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+
+@Component({
+    selector: 'app-busy-button',
+    imports: [ButtonComponent],
+    template: `
+    <div class="flex flex-wrap gap-4">
+      <tolle-button [busy]="true">Please wait</tolle-button>
+      <tolle-button variant="outline" [busy]="true">Loading...</tolle-button>
+      <tolle-button size="icon" [busy]="true">
+        <i class="ri-save-line"></i>
+      </tolle-button>
+    </div>
+  `
+})
+export class BusyButtonComponent { }
+
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-button${variantAttr}${sizeAttr}${busyAttr}${disabledAttr}>
+  ${this.label}
+</tolle-button>
+```
+
+
+
+---
+
+## Button-group
+
+### API Reference
+#### buttonGroup Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes to apply to the button group container. |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+import { ButtonGroupComponent } from '../../../../../tolle/src/lib/button-group.component';
+
+@Component({
+    selector: 'app-basic-button-group',
+    imports: [ButtonComponent, ButtonGroupComponent],
+    template: `
+    <tolle-button-group>
+      <tolle-button variant="outline">Year</tolle-button>
+      <tolle-button variant="outline">Month</tolle-button>
+      <tolle-button variant="outline">Day</tolle-button>
+    </tolle-button-group>
+
+    <div class="mt-8">
+      <tolle-button-group>
+        <tolle-button>Primary</tolle-button>
+        <tolle-button variant="secondary">Secondary</tolle-button>
+        <tolle-button variant="outline">Outline</tolle-button>
+        <tolle-button variant="destructive">Destructive</tolle-button>
+      </tolle-button-group>
+    </div>
+  `
+})
+export class BasicButtonGroupComponent { }
+
+```
+
+#### mixed
+```typescript
+import { Component } from '@angular/core';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+import { ButtonGroupComponent } from '../../../../../tolle/src/lib/button-group.component';
+import { TooltipDirective } from '../../../../../tolle/src/lib/tooltip.directive';
+
+@Component({
+    selector: 'app-mixed-button-group',
+    imports: [ButtonComponent, ButtonGroupComponent, TooltipDirective],
+    template: `
+    <tolle-button-group>
+      <tolle-button variant="outline" size="lg">
+        <i class="ri-github-line mr-2"></i>
+        <span>View on GitHub</span>
+      </tolle-button>
+
+      <tolle-button
+        variant="outline"
+        size="icon-lg"
+        tolleTooltip="Edit Profile"
+        placement="top">
+        <i class="ri-edit-line"></i>
+      </tolle-button>
+    </tolle-button-group>
+
+    <div class="mt-8">
+      <tolle-button-group>
+        <tolle-button size="icon-lg">
+          <i class="ri-arrow-left-s-line"></i>
+        </tolle-button>
+        <tolle-button size="icon-lg">
+          <i class="ri-arrow-right-s-line"></i>
+        </tolle-button>
+      </tolle-button-group>
+    </div>
+  `
+})
+export class MixedButtonGroupComponent { }
+
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-button-group>
+  <tolle-button${variantAttr}${sizeAttr}>One</tolle-button>
+  <tolle-button${variantAttr}${sizeAttr}>Two</tolle-button>
+  <tolle-button${variantAttr}${sizeAttr}>Three</tolle-button>
+</tolle-button-group>
+```
+
+
+
+---
+
+## Calendar
+
+### API Reference
+#### calendar Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| mode | `'date' | 'month' | 'year'` | 'date' | The selection mode of the calendar. |
+| disablePastDates | `boolean` | false | Prevents selection of dates before today. |
+| showQuickActions | `boolean` | true | Shows/hides "Today" and "Clear" buttons. |
+| minDate | `Date` | undefined | Minimum selectable date. |
+| maxDate | `Date` | undefined | Maximum selectable date. |
+| class | `string` | '' | Additional CSS classes for the container. |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { CalendarComponent } from '../../../../../tolle/src/lib/calendar.component';
+import { DatePipe } from '@angular/common';
+
+@Component({
+    selector: 'app-basic-calendar',
+    imports: [CalendarComponent, FormsModule, DatePipe],
+    template: `
+    <div class="flex flex-col items-center gap-4 p-4 border rounded-lg bg-card">
+      <p class="text-sm text-muted-foreground">Selected: {{ date | date:'fullDate' }}</p>
+      <tolle-calendar [(ngModel)]="date"></tolle-calendar>
+    </div>
+  `
+})
+export class BasicCalendarComponent {
+  date: Date = new Date();
+}
+
+```
+
+#### mode
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CalendarComponent } from '../../../../../tolle/src/lib/calendar.component';
+
+@Component({
+    selector: 'app-mode-calendar',
+    imports: [CalendarComponent, FormsModule],
+    template: `
+    <div class="flex flex-wrap gap-8 justify-center p-4 border rounded-lg bg-card">
+      <div class="flex flex-col items-center gap-2">
+        <span class="text-sm font-medium">Month Mode</span>
+        <tolle-calendar mode="month"></tolle-calendar>
+      </div>
+      
+      <div class="flex flex-col items-center gap-2">
+        <span class="text-sm font-medium">Year Mode</span>
+        <tolle-calendar mode="year"></tolle-calendar>
+      </div>
+    </div>
+  `
+})
+export class ModeCalendarComponent { }
+
+```
+
+#### disabled
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CalendarComponent } from '../../../../../tolle/src/lib/calendar.component';
+import { addDays, subDays } from 'date-fns';
+
+@Component({
+    selector: 'app-disabled-calendar',
+    imports: [CalendarComponent, FormsModule],
+    template: `
+    <div class="flex flex-wrap gap-8 justify-center p-4 border rounded-lg bg-card">
+      <div class="flex flex-col items-center gap-2">
+        <span class="text-sm font-medium">Disable Past Dates</span>
+        <tolle-calendar [disablePastDates]="true"></tolle-calendar>
+      </div>
+      
+      <div class="flex flex-col items-center gap-2">
+        <span class="text-sm font-medium">Min/Max Date (Â±7 days)</span>
+        <tolle-calendar [minDate]="minDate" [maxDate]="maxDate"></tolle-calendar>
+      </div>
+    </div>
+  `
+})
+export class DisabledCalendarComponent {
+    minDate = subDays(new Date(), 7);
+    maxDate = addDays(new Date(), 7);
+}
+
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-calendar [(ngModel)]="selectedDate"${modeAttr}${disablePastAttr}${quickActionsAttr}></tolle-calendar>
+```
+
+
+
+---
+
+## Calendar-range
+
+### API Reference
+#### range Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| disablePastDates | `boolean` | false | Prevents selection of dates before today. |
+| class | `string` | '' | Additional CSS classes for the container. |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { JsonPipe } from '@angular/common';
+import { RangeCalendarComponent } from '../../../../../tolle/src/lib/range-calendar.component';
+
+@Component({
+    selector: 'app-basic-range-calendar',
+    imports: [RangeCalendarComponent, FormsModule, JsonPipe],
+    template: `
+    <div class="flex flex-col items-center gap-4 p-4 border rounded-lg bg-card">
+      <pre class="text-xs bg-muted p-2 rounded w-full overflow-auto">{{ range | json }}</pre>
+      <tolle-range-calendar [(ngModel)]="range"></tolle-range-calendar>
+    </div>
+  `
+})
+export class BasicRangeCalendarComponent {
+    range = { start: null, end: null };
+}
+
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-range-calendar [(ngModel)]="dateRange"${disablePastAttr}></tolle-range-calendar>
+```
+
+
+
+---
+
+## Card
+
+### API Reference
+#### card Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes for the card container. |
+
+#### subComponent Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes for the sub-component container. |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../../../../tolle/src/lib/card.component';
+
+@Component({
+    selector: 'app-basic-card',
+    imports: [CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent],
+    template: `
+    <tolle-card class="max-w-[350px]">
+      <tolle-card-header>
+        <tolle-card-title>Card Title</tolle-card-title>
+      </tolle-card-header>
+      <tolle-card-content>
+        <p class="text-sm text-muted-foreground">This is a basic card with a title and content area.</p>
+      </tolle-card-content>
+    </tolle-card>
+  `
+})
+export class BasicCardComponent { }
+
+```
+
+#### full
+```typescript
+import { Component } from '@angular/core';
+import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, CardFooterComponent } from '../../../../../tolle/src/lib/card.component';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+
+@Component({
+    selector: 'app-full-card',
+    imports: [CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, CardFooterComponent, ButtonComponent],
+    template: `
+    <tolle-card class="max-w-[400px]">
+      <tolle-card-header>
+        <tolle-card-title>Project Details</tolle-card-title>
+        <p class="text-sm text-muted-foreground">Manage your project settings and configuration.</p>
+      </tolle-card-header>
+      <tolle-card-content>
+        <div class="p-4 rounded-lg bg-secondary text-secondary-foreground text-sm">
+          Everything you need to build amazing user interfaces.
+        </div>
+      </tolle-card-content>
+      <tolle-card-footer class="flex justify-end gap-2">
+        <tolle-button variant="ghost">Cancel</tolle-button>
+        <tolle-button>Save</tolle-button>
+      </tolle-card-footer>
+    </tolle-card>
+  `
+})
+export class FullCardComponent { }
+
+```
+
+#### form
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, CardFooterComponent } from '../../../../../tolle/src/lib/card.component';
+import { ButtonComponent } from '../../../../../tolle/src/lib/button.component';
+import { InputComponent } from '../../../../../tolle/src/lib/input.component';
+
+@Component({
+    selector: 'app-form-card',
+    imports: [CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, CardFooterComponent, ButtonComponent, InputComponent, FormsModule],
+    template: `
+    <tolle-card class="max-w-md">
+      <tolle-card-header>
+        <tolle-card-title class="flex items-center gap-2">
+          <i class="ri-palette-line text-primary"></i>
+          Theme Settings
+        </tolle-card-title>
+        <p class="text-sm text-muted-foreground">
+          Derived colors will update as you change the primary.
+        </p>
+      </tolle-card-header>
+
+      <tolle-card-content class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold uppercase text-muted-foreground">Primary Hex</label>
+          <tolle-input [ngModel]="'#2563eb'">
+            <i prefix class="ri-drop-line"></i>
+          </tolle-input>
+        </div>
+
+        <div class="p-4 rounded-lg bg-secondary text-secondary-foreground text-sm">
+          <strong>Pro Tip:</strong> This background is auto-generated using <code>color-mix</code>
+          based on your primary color!
+        </div>
+      </tolle-card-content>
+
+      <tolle-card-footer class="flex justify-between gap-1">
+        <tolle-button variant="ghost">Cancel</tolle-button>
+        <tolle-button>Save Changes</tolle-button>
+      </tolle-card-footer>
+    </tolle-card>
+  `
+})
+export class FormCardComponent { }
+
+```
+
+### Usage Examples
+#### playground
+```html
+<tolle-card class="${this.customClass}">${header}
+  <tolle-card-content>
+    <p class="text-sm">Card content goes here...</p>
+  </tolle-card-content>${footer}
+</tolle-card>
+```
+
+
+
+---
+
+## Carousel
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-basic-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <!-- Navigation Buttons -->
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <!-- Dots -->
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class BasicCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### multiple
+```typescript
+import { Component } from '@angular/core';
+
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-multiple-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-3xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ align: 'start', slidesToScroll: 'auto' }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+              <div tolleCarouselItem class="basis-[45%] md:basis-[31%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class MultipleCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### vertical
+```typescript
+import { Component } from '@angular/core';
+
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-vertical-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group flex flex-col items-center">
+      <tolle-carousel (api)="onApi($event)" orientation="vertical" [opts]="{ align: 'start', loop: true }" class="w-full">
+        <div tolleCarouselContent class="h-[400px]">
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute top-4 left-1/2 -translate-x-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30 z-10">
+          <i class="ri-arrow-up-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute bottom-4 left-1/2 -translate-x-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30 z-10">
+          <i class="ri-arrow-down-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex flex-col justify-center gap-2 absolute -right-8 top-1/2 -translate-y-1/2 h-full py-12">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary h-4 rounded-full' : 'bg-neutral-300 dark:bg-neutral-700 h-2 rounded-full')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class VerticalCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### autoplay
+```typescript
+import { Component } from '@angular/core';
+
+import Autoplay from 'embla-carousel-autoplay';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-autoplay-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [plugins]="plugins" [opts]="{ loop: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class AutoplayCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  plugins = [
+    Autoplay({
+      delay: 4000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true
+    })
+  ];
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### loop
+```typescript
+import { Component } from '@angular/core';
+
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-loop-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ loop: true, dragFree: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class LoopCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### thumbnails
+```typescript
+import { Component } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-thumbnails-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="space-y-4 max-w-3xl mx-auto group">
+      <!-- Main Carousel -->
+      <tolle-carousel (api)="onMainApi($event)" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of images; track item; let i = $index) {
+              <div tolleCarouselItem class="basis-full">
+                <div class="p-1">
+                  <div class="relative flex aspect-[16/9] items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-100 overflow-hidden shadow-sm dark:border-neutral-800 dark:bg-neutral-900 transition-all duration-500">
+                    <img [src]="item" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                    <div class="absolute bottom-6 left-6 right-6">
+                      <h4 class="text-white text-xl font-bold mb-1">Slide {{ i + 1 }}</h4>
+                      <p class="text-white/80 text-sm">Description for beautiful landscape {{ i + 1 }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full border border-neutral-200 bg-white/90 backdrop-blur-md text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/90 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-xl transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30 -translate-x-2 group-hover:translate-x-0">
+          <i class="ri-arrow-left-s-line text-2xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-6 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full border border-neutral-200 bg-white/90 backdrop-blur-md text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/90 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-xl transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30 translate-x-2 group-hover:translate-x-0">
+          <i class="ri-arrow-right-s-line text-2xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <!-- Thumbnails Carousel -->
+      <div class="px-1">
+        <tolle-carousel (api)="onThumbApi($event)" [opts]="{ containScroll: 'keepSnaps', dragFree: true }" class="w-full">
+          <div tolleCarouselContent>
+            <div tolleCarouselContainer class="flex -ml-2">
+              @for (item of images; track item; let i = $index) {
+                <div
+                  tolleCarouselItem
+                  class="basis-1/4 md:basis-[18%] pl-2 cursor-pointer"
+                  (click)="onThumbClick(i)">
+                  <div [class]="'relative flex aspect-[4/3] items-center justify-center rounded-xl overflow-hidden border-2 transition-all duration-300 ' + (selectedIndex === i ? 'border-primary ring-2 ring-primary/20 scale-[1.02]' : 'border-transparent opacity-60 hover:opacity-100')">
+                    <img [src]="item" class="absolute inset-0 w-full h-full object-cover">
+                    @if (selectedIndex === i) {
+                      <div class="absolute inset-0 bg-primary/10"></div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </tolle-carousel>
+      </div>
+    </div>
+    `
+})
+export class ThumbnailsCarouselComponent {
+  mainApi?: EmblaCarouselType;
+  thumbApi?: EmblaCarouselType;
+  selectedIndex = 0;
+  images = [
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1434725039720-abb26e22ebe8?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=800'
+  ];
+
+  onMainApi(api: EmblaCarouselType) {
+    this.mainApi = api;
+    this.mainApi.on('select', () => {
+      this.selectedIndex = this.mainApi!.selectedScrollSnap();
+      this.thumbApi?.scrollTo(this.selectedIndex);
+    });
+  }
+
+  onThumbApi(api: EmblaCarouselType) {
+    this.thumbApi = api;
+  }
+
+  onThumbClick(index: number) {
+    this.mainApi?.scrollTo(index);
+  }
+}
+
+```
+
+#### alignment
+```typescript
+import { Component } from '@angular/core';
+
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-alignment-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="space-y-12">
+      <!-- Center -->
+      <div class="relative max-w-2xl mx-auto group">
+        <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4 text-center">Center Alignment</p>
+        <tolle-carousel (api)="onApiCenter($event)" [opts]="{ align: 'center' }" class="w-full">
+          <div tolleCarouselContent>
+            <div tolleCarouselContainer>
+              @for (item of [1, 2, 3, 4, 5]; track item) {
+                <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                  <div class="p-2">
+                    <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                      <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+            <i class="ri-arrow-left-s-line text-xl"></i>
+          </button>
+          <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+            <i class="ri-arrow-right-s-line text-xl"></i>
+          </button>
+        </tolle-carousel>
+        <div class="flex justify-center gap-2 mt-4">
+          @for (snap of centerSnaps; track snap; let i = $index) {
+            <button (click)="centerApi?.scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (centerIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"></button>
+          }
+        </div>
+      </div>
+    
+      <!-- End -->
+      <div class="relative max-w-2xl mx-auto group">
+        <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4 text-center">End Alignment</p>
+        <tolle-carousel (api)="onApiEnd($event)" [opts]="{ align: 'end' }" class="w-full">
+          <div tolleCarouselContent>
+            <div tolleCarouselContainer>
+              @for (item of [1, 2, 3, 4, 5]; track item) {
+                <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                  <div class="p-2">
+                    <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                      <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+            <i class="ri-arrow-left-s-line text-xl"></i>
+          </button>
+          <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+            <i class="ri-arrow-right-s-line text-xl"></i>
+          </button>
+        </tolle-carousel>
+        <div class="flex justify-center gap-2 mt-4">
+          @for (snap of endSnaps; track snap; let i = $index) {
+            <button (click)="endApi?.scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (endIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"></button>
+          }
+        </div>
+      </div>
+    </div>
+    `
+})
+export class AlignmentCarouselComponent {
+  centerApi?: any;
+  centerSnaps: number[] = [];
+  centerIndex = 0;
+
+  endApi?: any;
+  endSnaps: number[] = [];
+  endIndex = 0;
+
+  onApiCenter(api: any) {
+    this.centerApi = api;
+    this.centerSnaps = api.scrollSnapList();
+    this.centerIndex = api.selectedScrollSnap();
+    api.on('select', () => this.centerIndex = api.selectedScrollSnap());
+  }
+
+  onApiEnd(api: any) {
+    this.endApi = api;
+    this.endSnaps = api.scrollSnapList();
+    this.endIndex = api.selectedScrollSnap();
+    api.on('select', () => this.endIndex = api.selectedScrollSnap());
+  }
+}
+
+```
+
+#### variableWidth
+```typescript
+import { Component } from '@angular/core';
+
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-variable-width-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ align: 'start' }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            <div tolleCarouselItem class="basis-[60%] pl-4">
+              <div class="p-2">
+                <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                  <span class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 select-none italic">60%</span>
+                </div>
+              </div>
+            </div>
+            <div tolleCarouselItem class="basis-[30%] pl-4">
+              <div class="p-2">
+                <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                  <span class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 select-none italic">30%</span>
+                </div>
+              </div>
+            </div>
+            <div tolleCarouselItem class="basis-[50%] pl-4">
+              <div class="p-2">
+                <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                  <span class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 select-none italic">50%</span>
+                </div>
+              </div>
+            </div>
+            <div tolleCarouselItem class="basis-[40%] pl-4">
+              <div class="p-2">
+                <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                  <span class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 select-none italic">40%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class VariableWidthCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### rtl
+```typescript
+import { Component } from '@angular/core';
+
+import {
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-rtl-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div dir="rtl" class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ direction: 'rtl' }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class RtlCarouselComponent {
+    api?: any;
+    scrollSnaps: number[] = [];
+    selectedIndex = 0;
+
+    onApi(api: any) {
+        this.api = api;
+        this.scrollSnaps = api.scrollSnapList();
+        this.selectedIndex = api.selectedScrollSnap();
+
+        api.on('select', () => {
+            this.selectedIndex = api.selectedScrollSnap();
+        });
+
+        api.on('reInit', () => {
+            this.scrollSnaps = api.scrollSnapList();
+            this.selectedIndex = api.selectedScrollSnap();
+        });
+    }
+
+    scrollTo(index: number) {
+        this.api?.scrollTo(index);
+    }
+}
+
+```
+
+#### autoScroll
+```typescript
+import { Component } from '@angular/core';
+
+import AutoScroll from 'embla-carousel-auto-scroll';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-auto-scroll-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective
+],
+    template: `
+    <div class="relative max-w-3xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [plugins]="plugins" [opts]="{ loop: true, dragFree: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+              <div tolleCarouselItem class="basis-[45%] md:basis-[31%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class AutoScrollCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  plugins = [
+    AutoScroll({
+      speed: 1,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true
+    })
+  ];
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### fade
+```typescript
+import { Component } from '@angular/core';
+
+import Fade from 'embla-carousel-fade';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-fade-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [plugins]="plugins" [opts]="{ loop: true, duration: 0 }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-full">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class FadeCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+  plugins = [Fade()];
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### classNames
+```typescript
+import { Component } from '@angular/core';
+
+import ClassNames from 'embla-carousel-class-names';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-class-names-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [plugins]="plugins" [opts]="{ loop: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="embla__slide_class flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-all duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    
+    <style>
+      :host ::ng-deep .embla__slide_class.is-selected {
+      border-color: #7c3aed;
+      background-color: rgba(124, 58, 237, 0.05);
+      transform: scale(1.05);
+    }
+    :host ::ng-deep .embla__slide_class.is-selected span {
+    color: #7c3aed;
+    }
+    </style>
+    `
+})
+export class ClassNamesCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  plugins = [
+    ClassNames({
+      snapped: 'is-selected'
+    })
+  ];
+
+  onApi(api: any) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### parallax
+```typescript
+import { Component, ChangeDetectorRef } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-parallax-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ dragFree: true, loop: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="relative flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden shadow-sm transition-all duration-300">
+                    <!-- Parallax Content -->
+                    <div class="parallax__layer absolute inset-0 flex items-center justify-center pointer-events-none" [style.transform]="'translateX(' + parallaxValues[item-1] + '%)'">
+                      <span class="text-[12rem] font-bold opacity-10 select-none text-neutral-400 dark:text-neutral-600">{{ item }}</span>
+                    </div>
+                    <span class="relative text-3xl font-bold z-10 text-neutral-600 dark:text-neutral-400">Slide {{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class ParallaxCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+  parallaxValues: number[] = [0, 0, 0, 0, 0];
+  TWEEN_FACTOR = 1.2;
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  onApi(api: EmblaCarouselType) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    api.on('scroll', () => {
+      const engine = api.internalEngine();
+      const scrollProgress = api.scrollProgress();
+
+      api.scrollSnapList().forEach((scrollSnap, index) => {
+        let diffToTarget = scrollSnap - scrollProgress;
+
+        if (engine.options.loop) {
+          engine.slideLooper.loopPoints.forEach((loopPoint) => {
+            const target = loopPoint.target();
+            if (loopPoint.index === index) {
+              if (diffToTarget > 0.5) diffToTarget -= 1;
+              if (diffToTarget < -0.5) diffToTarget += 1;
+            }
+          });
+        }
+
+        const parallax = diffToTarget * (-1) * 100 * this.TWEEN_FACTOR;
+        this.parallaxValues[index] = parallax;
+      });
+      this.cdr.detectChanges();
+    });
+
+    api.on('select', () => this.selectedIndex = api.selectedScrollSnap());
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+    });
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### scale
+```typescript
+import { Component, ChangeDetectorRef } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-scale-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ loop: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-all duration-75"
+                    [style.transform]="'scale(' + scaleValues[item-1] + ')'">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class ScaleCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+  scaleValues: number[] = [1, 1, 1, 1, 1];
+  TWEEN_FACTOR = 0.5;
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  onApi(api: EmblaCarouselType) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    const update = () => {
+      const engine = api.internalEngine();
+      const scrollProgress = api.scrollProgress();
+
+      api.scrollSnapList().forEach((scrollSnap, index) => {
+        let diffToTarget = scrollSnap - scrollProgress;
+
+        if (engine.options.loop) {
+          engine.slideLooper.loopPoints.forEach((loopPoint) => {
+            if (loopPoint.index === index) {
+              if (diffToTarget > 0.5) diffToTarget -= 1;
+              if (diffToTarget < -0.5) diffToTarget += 1;
+            }
+          });
+        }
+
+        const tweenValue = 1 - Math.abs(diffToTarget * this.TWEEN_FACTOR);
+        this.scaleValues[index] = Math.max(0.7, tweenValue);
+      });
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    };
+
+    api.on('scroll', update);
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      update();
+    });
+    api.on('select', update);
+    update();
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### opacity
+```typescript
+import { Component, ChangeDetectorRef } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-opacity-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ loop: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-all duration-300"
+                    [style.opacity]="opacityValues[item-1]">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class OpacityCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+  opacityValues: number[] = [1, 1, 1, 1, 1];
+  TWEEN_FACTOR = 1.2;
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  onApi(api: EmblaCarouselType) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    const update = () => {
+      const engine = api.internalEngine();
+      const scrollProgress = api.scrollProgress();
+
+      api.scrollSnapList().forEach((scrollSnap, index) => {
+        let diffToTarget = scrollSnap - scrollProgress;
+
+        if (engine.options.loop) {
+          engine.slideLooper.loopPoints.forEach((loopPoint) => {
+            if (loopPoint.index === index) {
+              if (diffToTarget > 0.5) diffToTarget -= 1;
+              if (diffToTarget < -0.5) diffToTarget += 1;
+            }
+          });
+        }
+
+        const tweenValue = 1 - Math.abs(diffToTarget * this.TWEEN_FACTOR);
+        this.opacityValues[index] = Math.max(0.1, tweenValue);
+      });
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    };
+
+    api.on('scroll', update);
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      update();
+    });
+    api.on('select', update);
+    update();
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### progress
+```typescript
+import { Component, ChangeDetectorRef } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+import { ProgressComponent } from '../../../../../tolle/src/lib/progress.component';
+
+@Component({
+    selector: 'app-progress-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective,
+    ProgressComponent
+],
+    template: `
+    <div class="space-y-6 max-w-2xl mx-auto group">
+      <div class="relative">
+        <tolle-carousel (api)="onApi($event)" [opts]="{ dragFree: true }" class="w-full">
+          <div tolleCarouselContent>
+            <div tolleCarouselContainer>
+              @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+                <div tolleCarouselItem class="basis-[80%] md:basis-[48%]">
+                  <div class="p-2">
+                    <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                      <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ item }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+    
+          <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+            <i class="ri-arrow-left-s-line text-xl"></i>
+          </button>
+          <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+            <i class="ri-arrow-right-s-line text-xl"></i>
+          </button>
+        </tolle-carousel>
+      </div>
+    
+      <div class="space-y-4">
+        <!-- Progress Bar -->
+        <tolle-progress [value]="progress" class="bg-neutral-100 dark:bg-neutral-800"></tolle-progress>
+    
+        <!-- Dots -->
+        <div class="flex justify-center gap-2">
+          @for (snap of scrollSnaps; track snap; let i = $index) {
+            <button
+              (click)="scrollTo(i)"
+              [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+              [attr.aria-label]="'Go to slide ' + (i + 1)">
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+    `
+})
+export class ProgressCarouselComponent {
+  api?: any;
+  progress = 0;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  onApi(api: EmblaCarouselType) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    const update = () => {
+      this.progress = Math.max(0, Math.min(1, api.scrollProgress())) * 100;
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    };
+
+    api.on('scroll', update);
+    api.on('select', update);
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      update();
+    });
+    update();
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### lazyLoad
+```typescript
+import { Component, ChangeDetectorRef } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-lazy-load-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of slides; track item; let i = $index) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[70%]">
+                <div class="p-2">
+                  <div class="relative flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden shadow-sm transition-all duration-300">
+                    @if (loadedSlides.has(i)) {
+                      <img
+                        [src]="'https://images.unsplash.com/photo-' + (seeds[i]) + '?auto=format&fit=crop&q=80&w=800'"
+                        class="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out"
+                        (load)="onImageLoad(i)"
+                        [class.opacity-0]="!imagesReady.has(i)"
+                        [class.scale-110]="!imagesReady.has(i)"
+                        [class.scale-100]="imagesReady.has(i)">
+                    }
+                    @if (!imagesReady.has(i)) {
+                      <div class="absolute inset-0 flex items-center justify-center bg-neutral-100 dark:bg-neutral-900">
+                        <div class="flex flex-col items-center gap-2">
+                          <i class="ri-loader-4-line animate-spin text-3xl text-primary/40"></i>
+                          <span class="text-[10px] uppercase tracking-widest text-neutral-400 font-medium">Loading asset</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+    </div>
+    `
+})
+export class LazyLoadCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+  slides = Array.from({ length: 10 });
+  loadedSlides = new Set<number>();
+  imagesReady = new Set<number>();
+  seeds = [
+    '1464822759023-fed622ff2c3b',
+    '1501785888041-af3ef285b470',
+    '1506744038136-46273834b3fb',
+    '1511884642898-4c92249e20b6',
+    '1434725039720-abb26e22ebe8',
+    '1469474968028-56623f02e42e',
+    '1441974231531-c6227db76b6e',
+    '1500382017468-9049fee7c9cd',
+    '1470071459604-3b5ec3a7fe05',
+    '1447752875215-b2761acb3c5d'
+  ];
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  onApi(api: EmblaCarouselType) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    const update = () => {
+      const index = api.selectedScrollSnap();
+      const slidesInView = api.slidesInView();
+
+      slidesInView.forEach(i => {
+        if (!this.loadedSlides.has(i)) {
+          this.loadedSlides.add(i);
+        }
+      });
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    };
+
+    api.on('select', update);
+    api.on('slidesInView', update);
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      update();
+    });
+    update();
+  }
+
+  onImageLoad(index: number) {
+    this.imagesReady.add(index);
+    this.cdr.detectChanges();
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+#### infiniteScroll
+```typescript
+import { Component, ChangeDetectorRef } from '@angular/core';
+
+import { EmblaCarouselType } from 'embla-carousel';
+import {
+  CarouselComponent,
+  CarouselContentDirective,
+  CarouselContainerDirective,
+  CarouselItemDirective,
+  CarouselPreviousDirective,
+  CarouselNextDirective
+} from '../../../../../tolle/src/lib/carousel';
+
+@Component({
+    selector: 'app-infinite-scroll-carousel',
+    imports: [
+    CarouselComponent,
+    CarouselContentDirective,
+    CarouselContainerDirective,
+    CarouselItemDirective,
+    CarouselPreviousDirective,
+    CarouselNextDirective
+],
+    template: `
+    <div class="relative max-w-2xl mx-auto group">
+      <tolle-carousel (api)="onApi($event)" [opts]="{ dragFree: true }" class="w-full">
+        <div tolleCarouselContent>
+          <div tolleCarouselContainer>
+            @for (item of slides; track item; let i = $index) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[48%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-colors duration-300">
+                    <span class="text-6xl font-bold text-neutral-200 dark:text-neutral-800 select-none">{{ i + 1 }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+    
+            <!-- Loading Indicator -->
+            @if (loading) {
+              <div tolleCarouselItem class="basis-[80%] md:basis-[48%]">
+                <div class="p-2">
+                  <div class="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-primary/30 p-4 bg-primary/5 dark:bg-primary/5 transition-all duration-300">
+                    <div class="flex flex-col items-center gap-3">
+                      <i class="ri-loader-4-line animate-spin text-4xl text-primary/60"></i>
+                      <span class="text-xs font-semibold text-primary/40 uppercase tracking-widest">Fetching data</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+    
+        <button tolleCarouselPrevious class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-left-s-line text-xl"></i>
+        </button>
+        <button tolleCarouselNext class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full border border-neutral-200 bg-white/80 backdrop-blur-sm text-neutral-600 hover:bg-white dark:border-neutral-800 dark:bg-neutral-950/80 dark:text-neutral-400 dark:hover:bg-neutral-900 shadow-sm transition-all opacity-0 group-hover:opacity-100 disabled:opacity-30">
+          <i class="ri-arrow-right-s-line text-xl"></i>
+        </button>
+      </tolle-carousel>
+    
+      <div class="flex justify-center gap-2 mt-4">
+        @for (snap of scrollSnaps; track snap; let i = $index) {
+          <button
+            (click)="scrollTo(i)"
+            [class]="'w-2 h-2 rounded-full transition-all duration-300 ' + (selectedIndex === i ? 'bg-primary w-4' : 'bg-neutral-300 dark:bg-neutral-700')"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        }
+      </div>
+      <p class="text-center text-xs text-muted-foreground mt-4 italic">Scroll to the end to load more slides...</p>
+    </div>
+    `
+})
+export class InfiniteScrollCarouselComponent {
+  api?: any;
+  scrollSnaps: number[] = [];
+  selectedIndex = 0;
+  slides = Array.from({ length: 10 });
+  loading = false;
+  hasMore = true;
+
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  onApi(api: EmblaCarouselType) {
+    this.api = api;
+    this.scrollSnaps = api.scrollSnapList();
+    this.selectedIndex = api.selectedScrollSnap();
+
+    const checkScroll = () => {
+      if (this.loading || !this.hasMore) return;
+      const scrollProgress = api.scrollProgress();
+
+      if (scrollProgress > 0.9) {
+        this.loadMore();
+      }
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    };
+
+    api.on('scroll', checkScroll);
+    api.on('select', () => {
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    });
+    api.on('reInit', () => {
+      this.scrollSnaps = api.scrollSnapList();
+      this.selectedIndex = api.selectedScrollSnap();
+      this.cdr.detectChanges();
+    });
+  }
+
+  loadMore() {
+    this.loading = true;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      const nextBatch = Array.from({ length: 5 });
+      this.slides = [...this.slides, ...nextBatch];
+      this.loading = false;
+
+      if (this.slides.length > 50) {
+        this.hasMore = false;
+      }
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  scrollTo(index: number) {
+    this.api?.scrollTo(index);
+  }
+}
+
+```
+
+
+
+---
+
+## Check-box
+
+### API Reference
+#### checkbox Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| checked | `boolean` | false | The controlled checked state of the checkbox. |
+| disabled | `boolean` | false | When true, prevents the user from interacting with the checkbox. |
+| size | `'xs' | 'sm' | 'default' | 'lg'` | 'default' | The size of the checkbox. |
+| class | `string` | '' | Additional CSS classes for the checkbox. |
+
+### Usage Examples
+#### basic
+```typescript
+import { Component } from '@angular/core';
+import { CheckboxComponent } from '../../../../../tolle/src/lib/checkbox.component';
+
+@Component({
+    selector: 'app-basic-checkbox',
+    imports: [CheckboxComponent],
+    template: `
+    <div class="flex items-center space-x-2">
+      <tolle-checkbox id="terms" />
+      <label
+        for="terms"
+        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      >
+        Accept terms and conditions
+      </label>
+    </div>
+  `
+})
+export class BasicCheckboxComponent { }
+
+```
+
+#### description
+```typescript
+import { Component } from '@angular/core';
+import { CheckboxComponent } from '../../../../../tolle/src/lib/checkbox.component';
+
+@Component({
+    selector: 'app-checkbox-with-description',
+    imports: [CheckboxComponent],
+    template: `
+    <div class="items-top flex space-x-2">
+      <tolle-checkbox id="terms1" />
+      <div class="grid gap-1.5 leading-none">
+        <label
+          for="terms1"
+          class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Accept terms and conditions
+        </label>
+        <p class="text-sm text-muted-foreground">
+          You agree to our Terms of Service and Privacy Policy.
+        </p>
+      </div>
+    </div>
+  `
+})
+export class CheckboxWithDescriptionComponent { }
+
+```
+
+#### disabled
+```typescript
+import { Component } from '@angular/core';
+import { CheckboxComponent } from '../../../../../tolle/src/lib/checkbox.component';
+
+@Component({
+    selector: 'app-checkbox-disabled',
+    imports: [CheckboxComponent],
+    template: `
+    <div class="flex items-center space-x-2">
+      <tolle-checkbox id="terms2" [disabled]="true" />
+      <label
+        for="terms2"
+        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      >
+        Accept terms and conditions
+      </label>
+    </div>
+  `
+})
+export class CheckboxDisabledComponent { }
+
+```
+
+### Usage Examples
+#### playground
+```html
+<div class="flex items-start space-x-2">
+  <tolle-checkbox
+    [(ngModel)]="checked"
+    size="${this.playgroundSize}"
+    ${this.playgroundDisabled ? '[disabled]="true"' : ''}
+  />
+  <div class="grid gap-1.5 leading-none">
+    <label class="text-sm font-medium leading-none">
+      ${this.playgroundLabel}
+    </label>
+    ${this.playgroundDescription ? `<p class="text-xs text-muted-foreground">${this.playgroundDescription}</p>` : ''}
+  </div>
+</div>
+```
+
+### Overview & Installation
+```typescript
+import { CheckBoxComponent } from '@tolle_/tolle-ui';
+
+@Component({
+  // ...
+  imports: [CheckBoxComponent]
+})
+```
+
+
+
+---
+
+## Collapsible
+
+### API Reference
+#### collapsible Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| open | `boolean` | false | The controlled open state of the collapsible. |
+| openChange | `EventEmitter<boolean>` | - | Event emitted when the open state changes. |
+| class | `string` | '' | Additional CSS classes to apply to the container. |
+
+#### trigger Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes to apply to the trigger. |
+
+#### content Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes to apply to the content panel. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-collapsible [(open)]="isOpen" class="w-[350px] space-y-2 flex flex-col">
+  <div class="flex items-center justify-between space-x-4 px-4">
+    <h4 class="text-sm font-semibold">@peduarte starred 3 repositories</h4>
+    <tolle-collapsible-trigger>
+      <tolle-button variant="ghost" size="sm" class="w-9 p-0">
+        <i class="ri-expand-up-down-line h-4 w-4"></i>
+      </tolle-button>
+    </tolle-collapsible-trigger>
+  </div>
+  <div class="rounded-md border px-4 py-3 font-mono text-sm">
+    @tolle-ui/primitives
+  </div>
+  <tolle-collapsible-content class="space-y-2 flex flex-col">
+    <div class="rounded-md border px-4 py-3 font-mono text-sm">
+      @tolle-ui/colors
+    </div>
+    <div class="rounded-md border px-4 py-3 font-mono text-sm">
+      @stitches/react
+    </div>
+  </tolle-collapsible-content>
+</tolle-collapsible>
+```
+
+
+
+---
+
+## Context-menu
+
+### API Reference
+#### trigger Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| tolleContextMenuTrigger | `ContextMenuItem[]` | - | The array of menu items to display. |
+| (action) | `EventEmitter<string>` | - | Emitted when a menu item is clicked. The payload is the item ID. |
+
+#### item Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| id | `string` | - | Unique identifier for the item. Optional if separator is true. |
+| label | `string` | - | The text to display. Optional if separator is true. |
+| icon | `string` | - | Optional icon class (e.g., "ri-home-line"). |
+| disabled | `boolean` | false | Whether the item is interactable. |
+| destructive | `boolean` | false | Styles the item with a destructive color (red). |
+| separator | `boolean` | false | If true, renders a separator line instead of an item. |
+| submenu | `ContextMenuItem[]` | - | Nested array of items to display in a submenu. |
+
+### Usage Examples
+#### playground
+```html
+
+const menuItems: ContextMenuItem[] = [
+  { id: 'edit', label: 'Edit', icon: ${this.showIcons ? "'ri-edit-line'" : 'undefined'} },
+  { id: 'copy', label: 'Copy', icon: ${this.showIcons ? "'ri-file-copy-line'" : 'undefined'} },
+  ${this.includeSubmenu ? `{ 
+    id: 'share', 
+    label: 'Share', 
+    submenu: [
+      { id: 'email', label: 'Email' },
+      { id: 'message', label: 'Message' }
+    ] 
+  },` : ''}
+  { separator: true },
+  { id: 'delete', label: 'Delete', destructive: true, disabled: ${this.disableDelete} }
+];
+
+// In template
+<div [tolleContextMenuTrigger]="menuItems">
+  Right click here
+</div>
+```
+
+
+
+---
+
+## Country-selector
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| placeholder | `string` | 'Select country' | Text to display when no country is selected. |
+| size | `'xs' | 'sm' | 'default' | 'lg'` | 'default' | The size of the selector. |
+| defaultCountryCode | `string` | 'GH' | The ISO alpha-2 code of the country to select by default. |
+| returnValue | `'isoAlpha2' | 'dialCode' | 'name' | 'object'` | 'isoAlpha2' | The format of the value emitted by ngModel. |
+| showName | `boolean` | true | Whether to show the country name in the trigger. |
+| disabled | `boolean` | false | Whether the component is disabled. |
+| readonly | `boolean` | false | Whether the component is readonly. |
+| class | `string` | '' | Additional CSS classes for the trigger. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-country-selector
+  [(ngModel)]="value"
+  [size]="${this.size}"
+  [returnValue]="${this.returnValue}"
+  [showName]="${this.showName}"
+  [disabled]="${this.disabled}"
+  [readonly]="${this.readonly}"
+></tolle-country-selector>
+```
+
+
+
+---
+
+## Data-table
+
+### Usage Examples
+#### column
+```typescript
+html
+```
+
+### API Reference
+#### dataTable Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| data | `any[]` | [] | The dataset to display in the table. |
+| columns | `TableColumn[]` | [] | Configuration for table columns. |
+| searchable | `boolean` | true | If true, shows a search input for filtering data. |
+| paginate | `boolean` | true | If true, enables pagination for the table. |
+| pageSize | `number` | 10 | The number of rows per page. |
+| pageSizeOptions | `number[]` | [] | Options for the user to select page size. |
+| size | `'xs' | 'sm' | 'default' | 'lg'` | 'default' | The size of the table (density). |
+| allowColumnHiding | `boolean` | true | If true, allows users to toggle column visibility. |
+| showSettings | `boolean` | true | If true, shows the settings button (e.g., for column hiding). |
+| expandable | `boolean` | false | If true, allows rows to be expanded to show more details. |
+| expandedTemplate | `TemplateRef<any>` | undefined | The template to render when a row is expanded. |
+| stickyHeader | `boolean` | false | If true, the table header stays fixed at the top while scrolling. |
+| maxHeight | `string` | undefined | Sets the maximum height of the table container, enabling vertical scrolling if content exceeds this value. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-data-table
+  [data]="data"
+  [columns]="columns"
+  [searchable]="${this.searchable}"
+  [paginate]="${this.paginate}"
+  [allowColumnHiding]="${this.allowColumnHiding}"
+  [expandable]="${this.expandable}"
+  size="${this.size}">
+
+  ${this.expandable ? `<ng-template #expandedTemplate let-row="row">
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div>
+        <span class="font-medium text-muted-foreground">ID:</span>
+        <span class="ml-2">{{ row.id }}</span>
+      </div>
+      <div>
+        <span class="font-medium text-muted-foreground">Role:</span>
+        <span class="ml-2">{{ row.role }}</span>
+      </div>
+    </div>
+  </ng-template>` : ''}
+</tolle-data-table>
+```
+
+### Usage Examples
+#### column
+```typescript
+html
+```
+
+### Usage Examples
+#### column
+```typescript
+html
+```
+
+
+
+---
+
+## Date-picker
+
+### API Reference
+#### datePicker Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| ngModel | `Date | null` | null | The selected date value. Supports two-way binding. |
+| placeholder | `string` | 'MM/DD/YYYY' (varies by mode) | Placeholder text for the input. |
+| disabled | `boolean` | false | Disables the input and prevents popup opening. |
+| disablePastDates | `boolean` | false | Prevents selection of dates before today. |
+| showClear | `boolean` | true | Shows a clear button when a value is selected. |
+| showQuickActions | `boolean` | true | Shows quick action buttons (Today, Yesterday, etc.) in the calendar. |
+| minDate | `Date` | undefined | The minimum allowable date. |
+| maxDate | `Date` | undefined | The maximum allowable date. |
+| mode | `'date' | 'month' | 'year'` | 'date' | The selection mode of the picker. |
+| formatMonthFn | `(date: Date) => string` | undefined | Custom function to format month display in header. |
+| formatYearFn | `(date: Date) => string` | undefined | Custom function to format year display in header. |
+| displayFormat | `(date: Date, mode: CalendarMode) => string` | undefined | Custom function to format the displayed value in the input. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-date-picker
+  [(ngModel)]="date"
+  mode="${this.mode}"
+  [disabled]="${this.disabled}"
+  [showClear]="${this.showClear}"
+  [disablePastDates]="${this.disablePastDates}"
+  [showQuickActions]="${this.showQuickActions}"
+></tolle-date-picker>
+```
+
+
+
+---
+
+## Date-range-picker
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| placeholder | `string` | 'Pick a date range' | The text to display when no date is selected. |
+| disabled | `boolean` | false | Whether the input is disabled. |
+| disablePastDates | `boolean` | false | Whether to visually disable and prevent selection of past dates. |
+| size | `'xs' | 'sm' | 'default' | 'lg'` | 'default' | The size of the input. |
+| class | `string` | '' | Additional CSS classes for the input. |
+
+
+
+---
+
+## Dropdown-menu
+
+### API Reference
+#### directive Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| tolleDropdownTrigger | `DropdownMenuComponent` | - | The dropdown menu instance to trigger. |
+
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| templateRef | `TemplateRef<any>` | - | Internal reference to the menu template. |
+
+
+
+---
+
+## Empty-state
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| title | `string` | 'No items found' | The main heading text. |
+| description | `string` | - | Optional helper text to provide context. |
+| variant | `'default' | 'minimal'` | 'default' | The visual style of the container. |
+| class | `string` | '' | Additional CSS classes. |
+
+
+
+---
+
+## Hover-card
+
+### Usage Examples
+#### playground
+```html
+<tolle-hover-card [openDelay]="${this.openDelay}" [closeDelay]="${this.closeDelay}">
+  <tolle-hover-card-trigger>
+    <button>@angular</button>
+  </tolle-hover-card-trigger>
+  <tolle-hover-card-content>
+    <div class="flex justify-between space-x-4">
+      <tolle-avatar>
+        <tolle-avatar-fallback>NG</tolle-avatar-fallback>
+      </tolle-avatar>
+      <div class="space-y-1">
+        <h4 class="text-sm font-semibold">@angular</h4>
+        <p class="text-sm">
+          The web framework for modern web applications.
+        </p>
+        <div class="flex items-center pt-2">
+          <span>Joined December 2021</span>
+        </div>
+      </div>
+    </div>
+  </tolle-hover-card-content>
+</tolle-hover-card>
+```
+
+#### usage
+```typescript
+<tolle-hover-card>
+  <tolle-hover-card-trigger>
+    <a href="https://github.com/angular" class="text-primary hover:underline">&#64;angular</a>
+  </tolle-hover-card-trigger>
+  <tolle-hover-card-content>
+    <div class="flex justify-between space-x-4">
+      <div class="space-y-1">
+        <h4 class="text-sm font-semibold">&#64;angular</h4>
+        <p class="text-sm">
+          The web framework for modern web applications.
+        </p>
+        <div class="flex items-center pt-2">
+          <span class="text-xs text-muted-foreground">
+            Joined December 2021
+          </span>
+        </div>
+      </div>
+    </div>
+  </tolle-hover-card-content>
+</tolle-hover-card>
+```
+
+
+
+---
+
+## Input
+
+### API Reference
+#### input Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| id | `string` | auto-generated | Unique identifier for the input element. Auto-generated if not provided. |
+| label | `string` | '' | Text label displayed above the input. |
+| placeholder | `string` | '' | Placeholder text displayed when input is empty. |
+| type | `string` | 'text' | HTML Input type (text, email, password, etc.). |
+| value | `any` | '' | Current value of the input. Supports bidirectional binding (ngModel). |
+| hint | `string` | '' | Helper text displayed below the input. |
+| errorMessage | `string` | '' | Error message displayed when [error] is true. |
+| size | `'xs' | 'sm' | 'default' | 'lg'` | 'default' | Size of the input component. |
+| disabled | `boolean` | false | Disables the input. |
+| readonly | `boolean` | false | Makes the input read-only. |
+| error | `boolean` | false | Sets the input state to error, changing border color and showing errorMessage if present. |
+| hideHintOnFocus | `boolean` | true | If true, hides the hint text when the input is focused. |
+| containerClass | `string` | '' | CSS class applied to the input container. |
+| class | `string` | '' | CSS class applied to the inner input element. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-input
+  label="${this.label}"
+  placeholder="${this.placeholder}"
+  type="${this.type}"
+  ${this.value ? `value="${this.value}"\n` : ''}  ${this.hint && !this.error ? `hint="${this.hint}"\n` : ''}  ${this.error ? `[error]="true"\n  errorMessage="${this.errorMessage}"\n` : ''}  ${this.disabled ? `[disabled]="true"\n` : ''}  ${this.readonly ? `[readonly]="true"\n` : ''}  ${this.size !== 'default' ? `size="${this.size}"` : ''}
+></tolle-input>
+```
+
+
+
+---
+
+## Label
+
+### API Reference
+#### label Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| for | `string` | undefined | The id of the form element the label is associated with. |
+| class | `string` | '' | Additional CSS classes to apply to the label. |
+
+### Usage Examples
+#### playground
+```html
+<div class="grid w-full max-w-sm items-center gap-1.5">
+  <tolle-label for="email">${this.label}</tolle-label>
+  <tolle-input type="email" id="email" placeholder="Email" />
+</div>
+```
+
+
+
+---
+
+## Masked-input
+
+### Usage Examples
+#### playground
+```html
+<tolle-masked-input
+  [(ngModel)]="inputValue"${inputs ? '\n  ' + inputs : ''}
+>${this.showPrefix ? '\n  <i prefix class="ri-phone-line"></i>' : ''}${this.showSuffix ? '\n  <i suffix class="ri-check-line"></i>' : ''}
+</tolle-masked-input>
+
+<!-- Value: {{ inputValue }} -->
+```
+
+
+
+---
+
+## Multi-select
+
+### Usage Examples
+#### playground
+```html
+<tolle-multi-select
+  [(ngModel)]="selectedValues"${inputs ? '\n  ' + inputs : ''}
+>
+  <tolle-select-item value="apple">Apple</tolle-select-item>
+  <tolle-select-item value="banana">Banana</tolle-select-item>
+  <tolle-select-item value="blueberry">Blueberry</tolle-select-item>
+  <tolle-select-item value="grapes">Grapes</tolle-select-item>
+  <tolle-select-item value="pineapple">Pineapple</tolle-select-item>
+</tolle-multi-select>
+
+<!-- Selected: {{ selectedValues | json }} -->
+```
+
+
+
+---
+
+## Otp
+
+### API Reference
+#### otp Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| length | `number` | 6 | Total number of characters. |
+| auto | `boolean` | false | Automated slot generation mode. |
+| disabled | `boolean` | false | Disables all inputs. |
+
+#### slot Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| char | `string` | '' | The character to display. |
+| isActive | `boolean` | false | Whether the slot is currently focused/active. |
+| isFirst | `boolean` | false | Applies left-rounded corners. |
+| isLast | `boolean` | false | Applies right-rounded corners. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-otp
+  [(ngModel)]="otpValue"${inputs ? '\n  ' + inputs : ''}
+></tolle-otp>
+```
+
+
+
+---
+
+## Pagination
+
+### API Reference
+#### pagination Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| totalRecords | `number` | 0 | Total number of records in the dataset. |
+| currentPage | `number` | 1 | The current active page index (1-based). |
+| currentPageSize | `number` | 10 | Number of items per page. |
+| pageSizeOptions | `number[]` | [10, 20, 30, 50] | Available options for page size selection. |
+| showPageLinks | `boolean` | true | Whether to show the individual page number buttons. |
+| showPageOptions | `boolean` | true | Whether to show the page size selector. |
+| showCurrentPageInfo | `boolean` | true | Whether to show the entry count report (e.g. "Showing 1 to 10"). |
+| currentPageInfoTemplate | `string` | undefined | Custom template string for the report. Tokens: {first}, {last}, {totalRecords}, {totalPages}, {currentPage}, {currentPageSize}. |
+| class | `string` | '' | Additional CSS classes for the container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-pagination${inputs ? '\n  ' + inputs : ''}
+></tolle-pagination>
+```
+
+
+
+---
+
+## Phone-number-input
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| placeholder | `string` | 'Phone number' | Text to display when the input is empty. |
+| size | `'xs' | 'sm' | 'default' | 'lg'` | 'default' | The size of the input. |
+| defaultCountryCode | `string` | 'GH' | The ISO alpha-2 code of the country to select by default. |
+| dataType | `'NumberOnly' | 'FullObject'` | 'FullObject' | The format of the value emitted by ngModel. |
+| mask | `string` | '(000) 000-0000' | The input mask for the phone number. |
+| disabled | `boolean` | false | Whether the component is disabled. |
+| readonly | `boolean` | false | Whether the component is readonly. |
+| class | `string` | '' | Additional CSS classes for the container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-phone-number-input
+  [(ngModel)]="phoneNumber"
+  [size]="${this.size}"
+  [dataType]="${this.dataType}"
+  [mask]="${this.mask}"
+  [disabled]="${this.disabled}"
+  [readonly]="${this.readonly}"
+></tolle-phone-number-input>
+```
+
+
+
+---
+
+## Popover
+
+### API Reference
+#### popover Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| placement | `'top' | 'bottom' | 'left' | 'right'` | 'bottom' | Desired placement of the popover relative to the trigger. |
+
+#### content Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes for the content container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-popover placement="${this.placement}">
+  <button tolle-button trigger variant="outline">Open Popover</button>
+  <tolle-popover-content>
+    <div>Rich Content Here</div>
+  </tolle-popover-content>
+</tolle-popover>
+```
+
+
+
+---
+
+## Progress
+
+### API Reference
+#### progress Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| value | `number` | 0 | The progress value. |
+| class | `string` | '' | Additional CSS classes to apply to the progress bar container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-progress [value]="${this.value}"></tolle-progress>
+```
+
+
+
+---
+
+## Radio-group
+
+### API Reference
+#### radioGroup Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| name | `string` | Generated ID | The name of the radio group. Submitted with its owning form as part of a name/value pair. |
+| disabled | `boolean` | false | When true, prevents the user from interacting with the radio group. |
+| class | `string` | '' | Optional CSS class to add to the container. |
+
+#### radioItem Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| value | `any` | - | The value to be emitted when this item is selected. |
+| disabled | `boolean` | false | When true, prevents the user from interacting with this specific radio item. |
+| class | `string` | '' | Optional CSS class to add to the item container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-radio-group
+  [(ngModel)]="selectedValue"${inputs ? '\n  ' + inputs : ''}
+>
+  <tolle-radio-item value="default">Default</tolle-radio-item>
+  <tolle-radio-item value="comfortable">Comfortable</tolle-radio-item>
+  <tolle-radio-item value="compact">Compact</tolle-radio-item>
+</tolle-radio-group>
+
+<!-- Selected: {{ selectedValue }} -->
+```
+
+
+
+---
+
+## Resizable
+
+### API Reference
+#### panel Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| direction | `'horizontal' | 'vertical'` | 'horizontal' | The direction of the layout. |
+| class | `string` | '' | Additional CSS classes for the container. |
+
+#### item Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| size | `number` | 1 | The relative size of the panel (flex value). |
+| minSize | `number` | 10 | The minimum size constraint. |
+| maxSize | `number` | undefined | The maximum size constraint. |
+| resizable | `boolean` | true | Whether the panel is resizable. |
+| class | `string` | '' | Additional CSS classes for the panel item. |
+
+#### box Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| width | `number` | 300 | Current width in pixels. |
+| height | `number` | 200 | Current height in pixels. |
+| minWidth | `number` | 50 | Minimum width in pixels. |
+| minHeight | `number` | 50 | Minimum height in pixels. |
+| maxWidth | `number` | undefined | Maximum width in pixels. |
+| maxHeight | `number` | undefined | Maximum height in pixels. |
+| resizable | `boolean` | true | Whether the element is resizable. |
+| directions | `('right' | 'bottom' | 'both')[]` | ['right', 'bottom', 'both'] | Active resize handles. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-resizable-panel direction="${this.direction}" class="h-[400px]">
+  <tolle-resizable-panel-item [size]="25">
+    <div>Panel 1</div>
+  </tolle-resizable-panel-item>
+  
+  <tolle-resizable-panel-item [size]="50">
+    <div>Panel 2</div>
+  </tolle-resizable-panel-item>
+  
+  <tolle-resizable-panel-item [size]="25">
+    <div>Panel 3</div>
+  </tolle-resizable-panel-item>
+</tolle-resizable-panel>
+```
+
+
+
+---
+
+## Scroll-area
+
+### API Reference
+#### scrollArea Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| height | `string` | '100%' | The height of the scrollable area. |
+| orientation | `'vertical' | 'horizontal' | 'both'` | 'both' | The scroll orientation allowed. |
+| class | `string` | '' | Additional CSS classes to apply to the container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-scroll-area class="h-72 w-48 rounded-md border">
+  <div class="p-4">
+    <h4 class="mb-4 text-sm font-medium leading-none">Tags</h4>
+    <div *ngFor="let tag of tags; let last = last">
+      <div class="text-sm">{{ tag }}</div>
+      <tolle-separator *ngIf="!last" class="my-2"></tolle-separator>
+    </div>
+  </div>
+</tolle-scroll-area>
+```
+
+
+
+---
+
+## Segment
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| items | `SegmentItem[]` | [] | Array of segment options. |
+| disabled | `boolean` | false | Disables the entire control. |
+| class | `string` | '' | Additional CSS classes for the container. |
+| itemTemplate | `TemplateRef<any>` | undefined | Custom template for rendering items. |
+
+#### type Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| label | `string` | - | Display text for the segment. |
+| value | `any` | - | Unique value associated with the segment. |
+| disabled | `boolean` | false | Disables specific segment item. |
+| icon | `string` | undefined | Icon class string (e.g. Remix Icon). |
+| class | `string` | undefined | Custom class for the item wrapper. |
+| data | `any` | undefined | Arbitrary data payload. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-segment
+  [items]="${this.dataSet === 'text' ? "[{...}]" : "items"}"
+  [(ngModel)]="value"${this.disabled ? '\n  [disabled]="true"' : ''}
+></tolle-segment>
+```
+
+
+
+---
+
+## Separator
+
+### API Reference
+#### separator Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| orientation | `'horizontal' | 'vertical'` | 'horizontal' | The orientation of the separator. |
+| decorative | `boolean` | true | Whether the element is purely decorative and should be hidden from assistive technology. |
+| class | `string` | '' | Additional CSS classes to apply to the separator. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-separator orientation="${this.orientation}"></tolle-separator>
+```
+
+
+
+---
+
+## Sheet
+
+### API Reference
+#### sheet Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| isOpen | `boolean` | false | The controlled open state of the sheet. |
+| hasBackdrop | `boolean` | true | Whether the sheet has a backdrop. |
+| isOpenChange | `EventEmitter<boolean>` | - | Event emitted when the open state changes. |
+
+#### content Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| side | `"top" | "bottom" | "left" | "right"` | "right" | The edge of the screen where the component will appear. |
+| rounded | `boolean` | false | Whether the sheet content has rounded corners on its inner side. |
+| class | `string` | '' | Additional CSS classes for styling. |
+
+#### service Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| open(config) | `(config: SheetConfig) => SheetRef` | - | Opens a sheet with the provided configuration. |
+
+#### config Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| content | `string | Type<any> | TemplateRef<any>` | - | The content to display (String, Component, or Template). |
+| title | `string` | - | Optional title for the standard header. |
+| description | `string` | - | Optional description for the standard header. |
+| side | `"top" | "bottom" | "left" | "right"` | "right" | The edge of the screen where the component will appear. |
+| hasBackdrop | `boolean` | true | Whether the sheet has a backdrop. |
+| backdropClose | `boolean` | true | If true, clicking the backdrop closes the sheet. |
+| showCloseButton | `boolean` | true | Whether to show the close button. |
+| rounded | `boolean` | false | Whether the sheet content has rounded corners on its inner side. |
+| data | `{ [key: string]: any }` | - | Data to pass to a Component content. |
+| context | `any` | - | Context to pass to a TemplateRef content. |
+| class | `string` | - | Additional CSS classes for the sheet content. |
+
+#### usage
+```typescript
+<tolle-sheet>
+  <tolle-sheet-trigger>Open</tolle-sheet-trigger>
+  <tolle-sheet-content>
+    <tolle-sheet-header>
+      <tolle-sheet-title>Edit profile</tolle-sheet-title>
+      <tolle-sheet-description>
+        Make changes to your profile here. Click save when you're done.
+      </tolle-sheet-description>
+    </tolle-sheet-header>
+  </tolle-sheet-content>
+</tolle-sheet>
+```
+
+
+
+---
+
+## Sidebar
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| items | `SidebarGroup[]` | [] | Array of sidebar groups and items. |
+| collapsed | `boolean` | false | Whether the sidebar is in collapsed (mini) mode. |
+| variant | `'default' | 'secondary' | 'ghost' | 'outline'` | 'default' | Visual style for active and hover states. |
+| class | `string` | '' | Additional CSS classes for the container. |
+
+#### group Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| title | `string` | - | Display label for the group section. |
+| items | `SidebarItem[]` | - | List of individual items within the group. |
+| id | `string` | undefined | Optional unique identifier. |
+
+#### item Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| title | `string` | - | Display text for the item. |
+| url | `string` | undefined | Router link path. |
+| icon | `string` | 'ri-circle-fill' | Icon class string (Remix Icon). |
+| expanded | `boolean` | false | Initial expansion state for submenus. |
+| items | `SidebarItem[]` | undefined | Nested children items for submenus. |
+| id | `string` | undefined | Optional unique identifier. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-sidebar
+  [items]="items"
+  [collapsed]="${this.collapsed}"
+  variant="${this.variant}"
+>
+  <div header>My App</div>
+</tolle-sidebar>
+```
+
+
+
+---
+
+## Skeleton
+
+### API Reference
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| variant | `'rect' | 'circle' | 'pill'` | 'rect' | The visual shape of the skeleton. |
+| class | `string` | '' | Additional CSS classes to apply (used for sizing). |
+
+### Usage Examples
+#### playground
+```html
+<tolle-skeleton variant="${this.variant}" class="${this.variant === 'circle' ? 'h-12 w-12' : 'h-4 w-[250px]'}" />
+```
+
+
+
+---
+
+## Slider
+
+### API Reference
+#### slider Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| ngModel / value | `number` | 0 | The current value of the slider. |
+| min | `number` | 0 | The minimum value of the slider. |
+| max | `number` | 100 | The maximum value of the slider. |
+| step | `number` | 1 | The step increment of the slider. |
+| disabled | `boolean` | false | Whether the slider is disabled. |
+| class | `string` | '' | Additional CSS classes to apply to the slider container. |
+
+### Usage Examples
+#### playground
+```html
+// In component:
+value = ${valueStr};
+
+// In template:
+<tolle-slider [(ngModel)]="value"${minAttr}${maxAttr}${stepAttr}${disabledAttr}></tolle-slider>
+```
+
+
+
+---
+
+## Switch
+
+### Usage Examples
+#### playground
+```html
+<tolle-switch
+  [(ngModel)]="checked"${inputs ? '\n  ' + inputs : ''}
+></tolle-switch>
+```
+
+
+
+---
+
+## Tabs
+
+### API Reference
+#### tabs Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| defaultValue | `string` | undefined | The value of the tab that should be active by default. |
+| value | `string` | undefined | The controlled value of the active tab. |
+| valueChange | `EventEmitter<string>` | - | Event emitted when the active tab changes. |
+| class | `string` | '' | Additional CSS classes to apply to the container. |
+
+#### tabsList Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| class | `string` | '' | Additional CSS classes to apply to the list. |
+
+#### tabsTrigger Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| value | `string` | undefined | A unique value for the tab. |
+| class | `string` | '' | Additional CSS classes to apply to the trigger. |
+
+#### tabsContent Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| value | `string` | undefined | A unique value that associates the content with a trigger. |
+| class | `string` | '' | Additional CSS classes to apply to the content panel. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-tabs defaultValue="account" class="w-[400px]">
+  <tolle-tabs-list${variantAttr} class="grid w-full${gridColsClass}">
+    <tolle-tabs-trigger value="account">Account</tolle-tabs-trigger>
+    <tolle-tabs-trigger value="password">Password</tolle-tabs-trigger>
+  </tolle-tabs-list>
+  <tolle-tabs-content value="account">
+    <tolle-card class="p-6">
+      <div class="space-y-4">
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold leading-none tracking-tight">Account</h3>
+          <p class="text-sm text-muted-foreground">Make changes to your account here.</p>
+        </div>
+        <div class="space-y-2">
+          <tolle-label for="name">Name</tolle-label>
+          <tolle-input id="name" defaultValue="Pedro Duarte" />
+        </div>
+        <div class="pt-2">
+          <tolle-button class="w-full">Save changes</tolle-button>
+        </div>
+      </div>
+    </tolle-card>
+  </tolle-tabs-content>
+  <tolle-tabs-content value="password">
+    <tolle-card class="p-6">
+      <div class="space-y-4">
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold leading-none tracking-tight">Password</h3>
+          <p class="text-sm text-muted-foreground">Change your password here.</p>
+        </div>
+        <div class="space-y-2">
+          <tolle-label for="new">New password</tolle-label>
+          <tolle-input id="new" type="password" />
+        </div>
+        <div class="pt-2">
+          <tolle-button class="w-full">Save password</tolle-button>
+        </div>
+      </div>
+    </tolle-card>
+  </tolle-tabs-content>
+</tolle-tabs>
+```
+
+
+
+---
+
+## Textarea
+
+### Usage Examples
+#### playground
+```html
+<tolle-textarea
+  ${inputs}
+></tolle-textarea>
+```
+
+
+
+---
+
+## Theming
+
+### Usage Examples
+#### appConfig
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideTolleConfig } from '@tolle_/tolle-ui'; // Import
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    
+    // Provide Tolle UI Configuration
+    provideTolleConfig({
+      primaryColor: '#8b5cf6', // Your brand color
+      radius: '0.5rem',        // Default border radius
+      darkByDefault: false     // Toggle initial dark mode
+    })
+  ]
+};
+```
+
+### Usage Examples
+#### globalStyles
+```typescript
+{
+  "styles": [
+    "src/styles.css",
+    "node_modules/@tolle_/tolle-ui/theme.css" 
+  ]
+}
+```
+
+#### tailwindConfig
+```typescript
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: 'class',
+  presets: [
+    require('@tolle_/tolle-ui/preset') // Point to your library preset
+  ],
+  content: [
+    "./src/**/*.{html,ts}",
+    "./node_modules/@tolle_/tolle-ui/**/*.{html,ts,mjs,html}"
+  ],
+  plugins: [],
+};
+```
+
+
+
+---
+
+## Toaster
+
+### API Reference
+#### service Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| title | `string` | - | The title displayed at the top of the toast. |
+| description | `string` | - | The main message content. |
+| variant | `'default' | 'success' | 'destructive'` | 'default' | Determines the color scheme and icon theme. |
+| duration | `number` | 3000 | Display time in milliseconds before auto-dismissal. |
+
+#### component Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| position | `'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'` | 'bottom-right' | The fixed quadrant where notifications will accumulate. |
+
+### Usage Examples
+#### generated
+```typescript
+// 1. Call the service in your component
+this.toastService.show({
+  title: '${this.title}',
+  description: '${this.description}',
+  variant: '${this.variant}',
+  duration: ${this.duration}
+});
+
+// 2. Pair with a button in your template
+<tolle-button (click)="trigger()">
+  Show Notification
+</tolle-button>
+
+<!-- 3. Ensure the container is in your root template -->
+<tolle-toaster position="${this.position}"></tolle-toaster>
+```
+
+
+
+---
+
+## Toggle
+
+### API Reference
+#### toggle Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| pressed | `boolean` | false | The pressed state of the toggle. |
+| variant | `'default' | 'outline'` | 'default' | The visual style of the toggle. |
+| size | `'default' | 'sm' | 'lg'` | 'default' | The size of the toggle. |
+| disabled | `boolean` | false | Whether the toggle is disabled. |
+| class | `string` | '' | Additional CSS classes to apply to the toggle container. |
+
+### Usage Examples
+#### playground
+```html
+<tolle-toggle[(pressed)]="isPressed"${variantAttr}${sizeAttr}>
+  <icon-bold class="h-4 w-4" />
+</tolle-toggle>
+```
+
+
+
+---
+
+## Toggle-group
+
+### Usage Examples
+#### playground
+```html
+<tolle-toggle-group${typeAttr}${variantAttr}${sizeAttr}>
+  <tolle-toggle-group-item value="bold">B</tolle-toggle-group-item>
+  <tolle-toggle-group-item value="italic">I</tolle-toggle-group-item>
+  <tolle-toggle-group-item value="underline">U</tolle-toggle-group-item>
+</tolle-toggle-group>
+```
+
+#### usage
+```typescript
+<tolle-toggle-group type="single">
+  <tolle-toggle-group-item value="bold" aria-label="Toggle bold">
+    <lucide-icon name="bold" class="h-4 w-4" />
+  </tolle-toggle-group-item>
+  <tolle-toggle-group-item value="italic" aria-label="Toggle italic">
+    <lucide-icon name="italic" class="h-4 w-4" />
+  </tolle-toggle-group-item>
+  <tolle-toggle-group-item value="underline" aria-label="Toggle underline">
+    <lucide-icon name="underline" class="h-4 w-4" />
+  </tolle-toggle-group-item>
+</tolle-toggle-group>
+```
+
+
+
+---
+
+## Tooltip
+
+### API Reference
+#### tooltip Properties
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| tolleTooltip | `string` | - | The content to be displayed within the tooltip. |
+| placement | `'top' | 'bottom' | 'left' | 'right'` | 'top' | The preferred placement of the tooltip relative to its trigger. |
+
+### Usage Examples
+#### playground
+```html
+
+<button 
+  tolleTooltip="${this.content}" 
+  placement="${this.placement}"
+  class="...">
+  Hover over me
+</button>
+    `.trim()
+```
+
+
+</section>

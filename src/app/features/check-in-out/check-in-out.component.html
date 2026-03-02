@@ -1,85 +1,314 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
-    <div class="flex gap-2">
-      <tolle-button variant="default">
-        <i class="ri-login-box-line mr-2"></i>
-        Check In
+<div class="flex h-full bg-background">
+  <div class="flex-1 p-6 overflow-auto">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Control Unit</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Check In / Out</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Check In / Check Out</h1>
+        <p class="text-muted-foreground mt-2">Real-time attendance tracking for all security staff</p>
+      </div>
+      <div class="flex gap-2">
+        <tolle-button variant="default">
+          <i class="ri-login-box-line mr-2"></i>
+          Check In
+        </tolle-button>
+        <tolle-button variant="outline">
+          <i class="ri-logout-box-line mr-2"></i>
+          Check Out
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-lg border border-border p-6">
+        <div class="flex items-center justify-between mb-2">
+          <div class="p-2 bg-green-100 rounded-lg">
+            <i class="ri-login-box-line text-green-600"></i>
+          </div>
+          <span class="text-sm text-green-600 font-medium">Present</span>
+        </div>
+        <h3 class="text-2xl font-bold">{{presentCount}}</h3>
+        <p class="text-sm text-muted-foreground">Staff Present</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-border p-6">
+        <div class="flex items-center justify-between mb-2">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <i class="ri-logout-box-line text-blue-600"></i>
+          </div>
+          <span class="text-sm text-blue-600 font-medium">Left</span>
+        </div>
+        <h3 class="text-2xl font-bold">{{leftCount}}</h3>
+        <p class="text-sm text-muted-foreground">Checked Out</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-border p-6">
+        <div class="flex items-center justify-between mb-2">
+          <div class="p-2 bg-orange-100 rounded-lg">
+            <i class="ri-time-line text-orange-600"></i>
+          </div>
+          <span class="text-sm text-orange-600 font-medium">Late</span>
+        </div>
+        <h3 class="text-2xl font-bold">{{lateCount}}</h3>
+        <p class="text-sm text-muted-foreground">Late Arrivals</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-border p-6">
+        <div class="flex items-center justify-between mb-2">
+          <div class="p-2 bg-red-100 rounded-lg">
+            <i class="ri-user-line text-red-600"></i>
+          </div>
+          <span class="text-sm text-red-600 font-medium">Absent</span>
+        </div>
+        <h3 class="text-2xl font-bold">{{absentCount}}</h3>
+        <p class="text-sm text-muted-foreground">Not Present</p>
+      </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex-1 max-w-md">
+        <tolle-input
+          placeholder="Search by name, ID, site, role..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>
+          Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>
+          Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>
+          Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-4 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFiltersAndPagination()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Present">Present</tolle-select-item>
+          <tolle-select-item value="Left">Left</tolle-select-item>
+          <tolle-select-item value="Late">Late</tolle-select-item>
+          <tolle-select-item value="Absent">Absent</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>
+        Clear
       </tolle-button>
-      <tolle-button variant="outline">
-        <i class="ri-logout-box-line mr-2"></i>
-        Check Out
-      </tolle-button>
     </div>
-  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-green-100 rounded-lg">
-          <i class="ri-login-box-line text-green-600"></i>
-        </div>
-        <span class="text-sm text-green-600 font-medium">Checked In</span>
-      </div>
-      <h3 class="text-2xl font-bold">18</h3>
-      <p class="text-sm text-muted-foreground">Staff Present</p>
-    </div>
-    
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-red-100 rounded-lg">
-          <i class="ri-logout-box-line text-red-600"></i>
-        </div>
-        <span class="text-sm text-red-600 font-medium">Checked Out</span>
-      </div>
-      <h3 class="text-2xl font-bold">6</h3>
-      <p class="text-sm text-muted-foreground">Staff Left</p>
-    </div>
-    
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-orange-100 rounded-lg">
-          <i class="ri-time-line text-orange-600"></i>
-        </div>
-        <span class="text-sm text-orange-600 font-medium">Late</span>
-      </div>
-      <h3 class="text-2xl font-bold">2</h3>
-      <p class="text-sm text-muted-foreground">Late Arrivals</p>
-    </div>
-    
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex items-center justify-between mb-2">
-        <div class="p-2 bg-blue-100 rounded-lg">
-          <i class="ri-user-line text-blue-600"></i>
-        </div>
-        <span class="text-sm text-blue-600 font-medium">Absent</span>
-      </div>
-      <h3 class="text-2xl font-bold">3</h3>
-      <p class="text-sm text-muted-foreground">Not Present</p>
-    </div>
-  </div>
+    <!-- Attendance Table -->
+    <tolle-card class="w-full overflow-hidden">
+      <tolle-card-content class="p-0">
 
-  <div class="bg-white rounded-lg border border-border">
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">Today's Attendance</h3>
-        <div class="flex gap-2">
-          <tolle-button variant="outline" size="sm">
-            <i class="ri-filter-line mr-2"></i>
-            Filter
-          </tolle-button>
-          <tolle-button variant="outline" size="sm">
-            <i class="ri-download-line mr-2"></i>
-            Export
-          </tolle-button>
+        <div class="overflow-x-auto" *ngIf="displayedRecords.length > 0">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-border bg-muted/5">
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Staff</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Staff ID</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Site</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Check In</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Check Out</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Hours</th>
+                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
+                <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of displayedRecords"
+                  class="border-b border-border hover:bg-muted/30 transition-colors">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                      {{record.name.charAt(0)}}
+                    </div>
+                    <div>
+                      <p class="font-medium">{{record.name}}</p>
+                      <p class="text-xs text-muted-foreground">{{record.role}}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span class="text-sm font-mono bg-muted/60 px-2 py-0.5 rounded">{{record.staffId}}</span>
+                </td>
+                <td class="p-4">
+                  <div class="flex items-center gap-1">
+                    <i class="ri-map-pin-line text-muted-foreground text-xs"></i>
+                    <span class="text-sm">{{record.site}}</span>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span *ngIf="record.checkIn" class="text-sm font-medium text-green-600">
+                    <i class="ri-login-box-line mr-1"></i>{{record.checkIn}}
+                  </span>
+                  <span *ngIf="!record.checkIn" class="text-sm text-muted-foreground">—</span>
+                </td>
+                <td class="p-4">
+                  <span *ngIf="record.checkOut" class="text-sm font-medium">
+                    <i class="ri-logout-box-line mr-1 text-muted-foreground"></i>{{record.checkOut}}
+                  </span>
+                  <span *ngIf="!record.checkOut" class="text-sm text-muted-foreground">—</span>
+                </td>
+                <td class="p-4">
+                  <span *ngIf="record.hoursWorked" class="text-sm font-medium">{{record.hoursWorked}}</span>
+                  <span *ngIf="!record.hoursWorked" class="text-sm text-muted-foreground">—</span>
+                </td>
+                <td class="p-4">
+                  <tolle-badge size="sm"
+                    [style.background]="getStatusBg(record.status)"
+                    [style.color]="getStatusFg(record.status)">
+                    {{record.status}}
+                  </tolle-badge>
+                </td>
+                <td class="p-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <tolle-button variant="ghost" size="icon-sm"
+                      tolleTooltip="View details" placement="top"
+                      (click)="viewRecord(record)">
+                      <i class="ri-eye-line"></i>
+                    </tolle-button>
+                    <div class="relative">
+                      <tolle-button variant="ghost" size="icon-sm"
+                        tolleTooltip="More actions" placement="top"
+                        [tolleDropdownTrigger]="actionMenu">
+                        <i class="ri-more-2-fill"></i>
+                      </tolle-button>
+                      <tolle-dropdown-menu #actionMenu>
+                        <div class="flex flex-col p-1">
+                          <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground rounded-sm transition-colors">
+                            <i class="ri-edit-line"></i>
+                            Edit Record
+                          </button>
+                          <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground rounded-sm transition-colors">
+                            <i class="ri-printer-line"></i>
+                            Print Slip
+                          </button>
+                          <div class="my-1 h-px bg-border"></div>
+                          <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors">
+                            <i class="ri-delete-bin-line"></i>
+                            Remove
+                          </button>
+                        </div>
+                      </tolle-dropdown-menu>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <!-- Attendance Table Placeholder -->
-      <div class="text-center py-12 text-muted-foreground">
-        <i class="ri-time-line text-4xl mb-4 block"></i>
-        <p>No attendance records for today</p>
-        <p class="text-sm">Check-in/check-out records will appear here</p>
-      </div>
-    </div>
+        <!-- Empty State -->
+        <div *ngIf="displayedRecords.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+          <tolle-empty-state
+            title="No attendance records found"
+            description="Try adjusting your search or filter criteria"
+            variant="default">
+            <i icon class="ri-time-line text-4xl"></i>
+            <div class="mt-4">
+              <tolle-button variant="outline" size="sm" (click)="clearFilters()">
+                Clear Filters
+              </tolle-button>
+            </div>
+          </tolle-empty-state>
+        </div>
+
+        <!-- Pagination -->
+        <div class="border-t border-border p-4 flex items-center justify-between"
+             *ngIf="displayedRecords.length > 0 || filteredRecords.length > 0">
+          <div class="flex items-center gap-2">
+            <tolle-select placeholder="10 per page" size="sm" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+              <tolle-select-item value="5">5 per page</tolle-select-item>
+              <tolle-select-item value="10">10 per page</tolle-select-item>
+              <tolle-select-item value="25">25 per page</tolle-select-item>
+            </tolle-select>
+            <span class="text-sm text-muted-foreground">
+              Showing {{startIndex + 1}}–{{endIndex}} of {{filteredRecords.length}}
+            </span>
+          </div>
+          <tolle-pagination
+            [totalRecords]="filteredRecords.length"
+            [currentPage]="currentPage"
+            [currentPageSize]="pageSize"
+            [showPageOptions]="false"
+            (pageChange)="onPageChange($event)">
+          </tolle-pagination>
+        </div>
+
+      </tolle-card-content>
+    </tolle-card>
+
   </div>
 </div>
+
+<!-- Attendance record detail modal -->
+<ng-template #recordModal let-record="record">
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+        {{ record.name.charAt(0) }}
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ record.name }}</h4>
+        <p class="text-sm text-muted-foreground">{{ record.role }} · {{ record.staffId }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Site</p>
+        <p class="font-medium mt-1">{{ record.site }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Status</p>
+        <p class="font-medium mt-1">{{ record.status }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Check In</p>
+        <p class="font-medium mt-1">{{ record.checkIn ?? '—' }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Check Out</p>
+        <p class="font-medium mt-1">{{ record.checkOut ?? '—' }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Hours Worked</p>
+        <p class="font-medium mt-1">{{ record.hoursWorked ?? '—' }}</p>
+      </div>
+    </div>
+  </div>
+</ng-template>

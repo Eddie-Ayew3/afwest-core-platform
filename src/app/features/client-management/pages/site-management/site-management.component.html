@@ -1,6 +1,6 @@
 <div class="flex h-full bg-background">
   <!-- Main Content Area -->
-  <div class="flex-1 p-8 overflow-auto">
+  <div class="flex-1 p-6 overflow-auto">
     <!-- Breadcrumb Navigation -->
     <tolle-breadcrumb class="mb-6">
       <tolle-breadcrumb-item>
@@ -336,3 +336,56 @@
     </tolle-card>
   </div>
 </div>
+
+<!-- New site modal -->
+<ng-template #newSiteModal>
+  <div class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium mb-2">Site Name</label>
+      <input type="text" placeholder="Enter site name" class="w-full p-2 border rounded-md bg-background">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Site Code</label>
+      <input type="text" placeholder="e.g. SITE-001" class="w-full p-2 border rounded-md bg-background">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Site Type</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Select type</option>
+        <option value="Commercial">Commercial</option>
+        <option value="Residential">Residential</option>
+        <option value="Industrial">Industrial</option>
+        <option value="Government">Government</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Region</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Select region</option>
+        <option value="Greater Accra">Greater Accra</option>
+        <option value="Ashanti">Ashanti</option>
+        <option value="Western">Western</option>
+        <option value="Central">Central</option>
+        <option value="Eastern">Eastern</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">City / Town</label>
+      <input type="text" placeholder="Enter city or town" class="w-full p-2 border rounded-md bg-background">
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Address</label>
+      <textarea rows="2" placeholder="Enter full address" class="w-full p-2 border rounded-md bg-background resize-none"></textarea>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Security Level</label>
+      <select class="w-full p-2 border rounded-md bg-background">
+        <option value="">Select level</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </div>
+  </div>
+</ng-template>

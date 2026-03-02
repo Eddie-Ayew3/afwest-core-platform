@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { 
   SidebarComponent, 
   SidebarGroup,
@@ -13,13 +13,25 @@ import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { AppHeaderComponent } from '../app-header/app-header.component';
 
+const CLIENT_NAMES: Record<string, string> = {
+  CLT001: 'GoldFields Ghana Ltd.',
+  CLT002: 'Accra Mall Management',
+  CLT003: 'Kumasi Hive Ventures',
+  CLT004: 'KNUST Research Institute',
+  CLT005: 'Takoradi Harbour Authority',
+  CLT006: 'Ahanta West Municipal',
+  CLT007: 'Cape Coast Teaching Hospital',
+  CLT008: 'Volta River Authority',
+};
+
 @Component({
   selector: 'app-client-dashboard-layout',
   standalone: true,
   imports: [
     AppHeaderComponent,
-    SidebarComponent, 
+    SidebarComponent,
     RouterOutlet,
+    RouterLink,
     CommonModule
   ],
   templateUrl: './client-dashboard-layout.component.html',
@@ -30,6 +42,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
     pageTitle: string = 'Client Dashboard';
     pageSubtitle: string = 'Client overview and management.';
     clientId: string = '';
+    clientName: string = '';
     
     // Client-specific sidebar items
     clientSidebarItems: SidebarGroup[] = [
@@ -104,46 +117,48 @@ export class ClientDashboardLayoutComponent implements OnInit {
       private router: Router,
       private route: ActivatedRoute
     ) {
-      this.updateBreadcrumb();
-      
+      // Listen for future navigations
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe(() => {
+        // clientId lives on the child route (e.g. dashboard/:id), not on /client
+        this.clientId = this.route.firstChild?.snapshot.paramMap.get('id') || '';
+        this.clientName = CLIENT_NAMES[this.clientId] ?? this.clientId;
+        this.updateSidebarUrls();
         this.updateBreadcrumb();
       });
     }
-    
+
     ngOnInit(): void {
-      // Get client ID from route parameters
-      this.route.paramMap.subscribe(params => {
-        this.clientId = params.get('id') || '';
-        this.updateBreadcrumb();
-        this.updateSidebarUrls();
-      });
+      // Initial load — child route is already activated by the time ngOnInit runs
+      this.clientId = this.route.firstChild?.snapshot.paramMap.get('id') || '';
+      this.clientName = CLIENT_NAMES[this.clientId] ?? this.clientId;
+      this.updateSidebarUrls();
+      this.updateBreadcrumb();
     }
     
     updateSidebarUrls(): void {
-      // Update sidebar URLs to include client ID
-      const baseUrl = `/client/${this.clientId}`;
-      
-      this.clientSidebarItems[0].items[0].url = `${baseUrl}/dashboard`;
-      this.clientSidebarItems[0].items[1].url = `${baseUrl}/shift`;
-      this.clientSidebarItems[0].items[2].url = `${baseUrl}/request`;
-      this.clientSidebarItems[0].items[3].url = `${baseUrl}/site`;
-      this.clientSidebarItems[0].items[4].url = `${baseUrl}/guard`;
-      
-      // Update other sidebar items to include client ID for consistency
-      this.clientSidebarItems[1].items[0].url = `${baseUrl}/usage`;
-      this.clientSidebarItems[1].items[1].url = `${baseUrl}/generate-access-key`;
-      this.clientSidebarItems[1].items[2].url = `${baseUrl}/contacts`;
-      
-      this.clientSidebarItems[2].items[0].url = `${baseUrl}/invoices`;
-      this.clientSidebarItems[2].items[1].url = `${baseUrl}/payments`;
+      // Routes are defined as /client/<section>/:id, e.g. /client/dashboard/123
+      const id = this.clientId;
+
+      this.clientSidebarItems[0].items[0].url = `/client/dashboard/${id}`;
+      this.clientSidebarItems[0].items[1].url = `/client/shift/${id}`;
+      this.clientSidebarItems[0].items[2].url = `/client/request/${id}`;
+      this.clientSidebarItems[0].items[3].url = `/client/site/${id}`;
+      this.clientSidebarItems[0].items[4].url = `/client/guard/${id}`;
+
+      this.clientSidebarItems[1].items[0].url = `/client/usage/${id}`;
+      this.clientSidebarItems[1].items[1].url = `/client/generate-access-key/${id}`;
+      this.clientSidebarItems[1].items[2].url = `/client/contacts/${id}`;
+
+      this.clientSidebarItems[2].items[0].url = `/client/invoices/${id}`;
+      this.clientSidebarItems[2].items[1].url = `/client/payments/${id}`;
     }
     
     private updateBreadcrumb() {
       const url = this.router.url;
-      const clientBaseUrl = this.clientId ? `/client/${this.clientId}` : '/client';
+      // Back-link to the dashboard tab for this client, matches route /client/dashboard/:id
+      const clientDashboardUrl = this.clientId ? `/client/dashboard/${this.clientId}` : '/client/dashboard';
       
       if (url.includes('/client/dashboard')) {
         this.breadcrumbItems = [
@@ -157,7 +172,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Request Management', active: true }
         ];
         this.pageTitle = 'Request Management';
@@ -166,7 +181,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Shift Management', active: true }
         ];
         this.pageTitle = 'Shift Management';
@@ -175,7 +190,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Site Management', active: true }
         ];
         this.pageTitle = 'Site Management';
@@ -184,7 +199,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Guard Management', active: true }
         ];
         this.pageTitle = 'Guard Management';
@@ -193,7 +208,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Usage Statistics', active: true }
         ];
         this.pageTitle = 'Usage Statistics';
@@ -202,7 +217,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Access Keys', active: true }
         ];
         this.pageTitle = 'Access Keys';
@@ -211,7 +226,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Contacts', active: true }
         ];
         this.pageTitle = 'Contacts';
@@ -220,7 +235,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Invoices', active: true }
         ];
         this.pageTitle = 'Invoices';
@@ -229,7 +244,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
         this.breadcrumbItems = [
           { label: 'Home', url: '/dashboard' },
           { label: 'Client Management', url: '/hr/client-management' },
-          { label: 'Client Dashboard', url: clientBaseUrl + '/dashboard' },
+          { label: 'Client Dashboard', url: clientDashboardUrl },
           { label: 'Payments', active: true }
         ];
         this.pageTitle = 'Payments';

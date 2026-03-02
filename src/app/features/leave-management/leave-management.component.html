@@ -1,6 +1,6 @@
 <div class="flex h-full bg-background">
   <!-- Main Content Area -->
-  <div class="flex-1 p-8 overflow-auto">
+  <div class="flex-1 p-6 overflow-auto">
     <!-- Breadcrumb Navigation -->
     <tolle-breadcrumb class="mb-6">
       <tolle-breadcrumb-item>
@@ -258,3 +258,62 @@
     </div>
   </tolle-sheet-content>
 </tolle-sheet>
+
+<!-- Leave request detail modal -->
+<ng-template #requestModal let-request="request">
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+        {{ request.employee.charAt(0) }}
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ request.employee }}</h4>
+        <p class="text-sm text-muted-foreground">{{ request.department }}</p>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+        <div>
+          <p class="text-xs text-muted-foreground uppercase font-semibold">Leave Type</p>
+          <p class="font-medium mt-1">{{ request.type }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-muted-foreground uppercase font-semibold">Manager</p>
+          <p class="font-medium mt-1">{{ request.manager }}</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+        <div>
+          <p class="text-xs text-muted-foreground uppercase font-semibold">Start Date</p>
+          <p class="font-medium mt-1">{{ formatDate(request.start) }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-muted-foreground uppercase font-semibold">End Date</p>
+          <p class="font-medium mt-1">{{ formatDate(request.end) }}</p>
+        </div>
+      </div>
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Total Duration</p>
+        <p class="font-medium mt-1">{{ calculateRequestDays(request) }} days</p>
+      </div>
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Status</p>
+        <p class="font-medium mt-1 flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full"
+                [ngClass]="{ 'bg-green-500': request.status === 'Approved', 'bg-orange-500': request.status === 'Pending', 'bg-red-500': request.status === 'Rejected' }">
+          </span>
+          {{ request.status }}
+        </p>
+      </div>
+    </div>
+    <div class="p-4 bg-muted/50 rounded-lg">
+      <p class="text-xs text-muted-foreground uppercase font-semibold mb-2">Comments</p>
+      <p class="text-sm text-muted-foreground italic">{{ request.reason || 'No comments provided' }}</p>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Leave submitted success modal -->
+<ng-template #leaveSuccessModal>
+  <p class="text-sm text-muted-foreground">Your leave request has been submitted successfully. You will receive a notification when it is reviewed.</p>
+</ng-template>

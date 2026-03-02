@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterLink} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { PermissionsService } from '../../../../core/services/permissions.service';
 import { FormsModule } from '@angular/forms';
 import { 
   CardComponent,
@@ -69,13 +70,21 @@ interface Client {
 })
 export class ClientManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  private permissions = inject(PermissionsService);
+  private router = inject(Router);
+  @ViewChild('newClientModal') newClientModal!: TemplateRef<any>;
+
+  public isHrSection: boolean = false;
 
   clients: Client[] = [
-    { id: 'CLT001', name: 'Acme Corp.', contactPerson: 'John Smith', contactEmail: 'john.smith@acme.com', status: 'Active', contractEnd: new Date('2024-12-31'), region: 'North America' },
-    { id: 'CLT002', name: 'Beta Industries', contactPerson: 'Sarah Johnson', contactEmail: 'sarah.j@betaind.com', status: 'Suspended', contractEnd: new Date('2024-10-15'), region: 'Europe' },
-    { id: 'CLT003', name: 'Gamma Logistics', contactPerson: 'Mike Chen', contactEmail: 'm.chen@gammalogistics.com', status: 'Active', contractEnd: new Date('2025-03-20'), region: 'Asia-Pacific' },
-    { id: 'CLT004', name: 'Delta Solutions', contactPerson: 'Emily Rodriguez', contactEmail: 'emily.r@delta.com', status: 'Active', contractEnd: new Date('2024-06-30'), region: 'South America' },
-    { id: 'CLT005', name: 'Epsilon Tech', contactPerson: 'David Kim', contactEmail: 'd.kim@epsilontech.com', status: 'Suspended', contractEnd: new Date('2024-11-01'), region: 'North America' }
+    { id: 'CLT001', name: 'GoldFields Ghana Ltd.',       contactPerson: 'Kwame Asante',    contactEmail: 'k.asante@goldfields.com.gh',    status: 'Active',    contractEnd: new Date('2025-12-31'), region: 'Greater Accra' },
+    { id: 'CLT002', name: 'Accra Mall Management',       contactPerson: 'Ama Boateng',      contactEmail: 'a.boateng@accramall.com',        status: 'Active',    contractEnd: new Date('2026-06-30'), region: 'Greater Accra' },
+    { id: 'CLT003', name: 'Kumasi Hive Ventures',        contactPerson: 'Kofi Acheampong',  contactEmail: 'k.acheampong@khi.com.gh',        status: 'Active',    contractEnd: new Date('2025-09-15'), region: 'Ashanti' },
+    { id: 'CLT004', name: 'KNUST Research Institute',    contactPerson: 'Abena Frimpong',   contactEmail: 'a.frimpong@knust.edu.gh',        status: 'Suspended', contractEnd: new Date('2025-03-01'), region: 'Ashanti' },
+    { id: 'CLT005', name: 'Takoradi Harbour Authority',  contactPerson: 'Yaw Entsie',       contactEmail: 'y.entsie@tha.gov.gh',            status: 'Active',    contractEnd: new Date('2026-01-31'), region: 'Western' },
+    { id: 'CLT006', name: 'Ahanta West Municipal',       contactPerson: 'Efua Mensah',      contactEmail: 'e.mensah@ahantawest.gov.gh',     status: 'Active',    contractEnd: new Date('2025-11-30'), region: 'Western' },
+    { id: 'CLT007', name: 'Cape Coast Teaching Hospital',contactPerson: 'Nana Arhin',       contactEmail: 'n.arhin@ccth.gov.gh',            status: 'Active',    contractEnd: new Date('2025-08-31'), region: 'Central' },
+    { id: 'CLT008', name: 'Volta River Authority',       contactPerson: 'Ekow Asante',      contactEmail: 'e.asante@vra.com.gh',            status: 'Active',    contractEnd: new Date('2026-03-31'), region: 'Volta' },
   ];
 
   filteredClients: Client[] = [];
@@ -96,6 +105,8 @@ export class ClientManagementComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this.isHrSection = this.router.url.startsWith('/hr/');
+    this.clients = this.permissions.filterByRegion(this.clients);
     this.applyFilters();
   }
 
@@ -173,49 +184,23 @@ export class ClientManagementComponent implements OnInit {
   openNewClientDialog(): void {
     const modalRef = this.modalService.open({
       title: 'Add New Client',
-      content: `
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">Client Name</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter client name">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Contact Person</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter contact person">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Contact Email</label>
-            <input type="email" class="w-full p-2 border rounded-md" placeholder="Enter email address">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Region</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select region</option>
-              <option value="North America">North America</option>
-              <option value="Europe">Europe</option>
-              <option value="Asia-Pacific">Asia-Pacific</option>
-              <option value="South America">South America</option>
-            </select>
-          </div>
-        </div>
-      `,
+      content: this.newClientModal,
       size: 'default'
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {
       if (result?.success) {
         console.log('New client added successfully');
-        // Here you would typically refresh the client list
       }
     });
   }
 
-  editClient(client: Client): void {
-    console.log('Edit client:', client);
+  navigateToClient(client: Client): void {
+    this.router.navigate(['/client/dashboard', client.id]);
   }
 
-  viewClient(client: Client): void {
-    console.log('View client:', client);
+  editClient(client: Client): void {
+    console.log('Edit client:', client);
   }
 
   onPageSizeChange(): void {

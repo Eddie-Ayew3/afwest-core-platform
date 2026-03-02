@@ -1,0 +1,35 @@
+/* Permission type legend colors */
+.permission-legend-view {
+  background: rgba(33, 150, 243, 0.2);
+  border: 1px solid #2196F3;
+}
+
+.permission-legend-create {
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid #4CAF50;
+}
+
+.permission-legend-approve {
+  background: rgba(156, 39, 176, 0.2);
+  border: 1px solid #9C27B0;
+}
+
+/* Escalation note styles */
+.escalation-note {
+  color: #9C27B0;
+}
+
+.escalation-note-modal {
+  background: rgba(156, 39, 176, 0.08);
+  border-color: #9C27B0;
+  color: #9C27B0;
+}
+
+/* Permission status colors */
+.permission-status-enabled {
+  color: #4CAF50;
+}
+
+.permission-status-disabled {
+  color: #9e9e9e;
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -69,6 +69,7 @@ export interface GuardRequest {
 })
 export class RequestManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  @ViewChild('newRequestModal') newRequestModal!: TemplateRef<any>;
 
   requests: GuardRequest[] = [
     {
@@ -274,54 +275,13 @@ export class RequestManagementComponent implements OnInit {
   openNewRequestDialog(): void {
     const modalRef = this.modalService.open({
       title: 'New Guard Request',
-      content: `
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">Guard Name</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter guard name">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Request Type</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select request type</option>
-              <option value="uniform">Uniform</option>
-              <option value="petty-cash">Petty Cash</option>
-              <option value="equipment">Equipment</option>
-              <option value="transportation">Transportation</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Title</label>
-            <input type="text" class="w-full p-2 border rounded-md" placeholder="Enter request title">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Description</label>
-            <textarea class="w-full p-2 border rounded-md" rows="3" placeholder="Enter request description"></textarea>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Urgency</label>
-            <select class="w-full p-2 border rounded-md">
-              <option value="">Select urgency</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Expected Cost ($)</label>
-            <input type="number" class="w-full p-2 border rounded-md" placeholder="0.00">
-          </div>
-        </div>
-      `,
+      content: this.newRequestModal,
       size: 'default'
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {
       if (result?.success) {
         console.log('New request added successfully');
-        // Here you would typically refresh the request list
       }
     });
   }
