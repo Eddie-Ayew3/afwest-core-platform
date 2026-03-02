@@ -3,17 +3,15 @@
   <!-- Main Content Area -->
   <div class="flex flex-1 overflow-hidden">
     <tolle-sidebar [items]="clientSidebarItems" [collapsed]="false" size="lg" variant="default" expanded="false" class="w-50">
-      <div header class="flex items-center gap-2 w-full overflow-hidden">
-        <img src="/Progress_1.png" class="w-9 h-9 shrink-0" alt="AFWest logo">
-        <span class="text-sm font-bold truncate text-foreground">AFWest Security</span>
+      <div header class="flex items-start gap-2 w-full overflow-hidden">
+        <img src="/Progress_1.png" class="w-9 h-9 shrink-0 mt-1" alt="AFWest logo">
+        <div class="flex-1 min-w-0">
+          <span class="text-sm font-bold truncate text-foreground block">{{ clientName }}</span>
+          <p class="text-xs text-muted-foreground mt-1">{{ clientId }}</p>
+        </div>
       </div>
 
-      <div footer class="border-t border-border" style="white-space: normal">
-        <div class="px-4 py-3">
-          <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Active Client</p>
-          <p class="text-sm font-bold text-foreground mt-1 leading-snug">{{ clientName }}</p>
-          <p class="text-xs text-muted-foreground mt-0.5">{{ clientId }}</p>
-        </div>
+      <div footer class="border-t border-border footer-normal-whitespace">
         <div class="px-2 pb-3">
           <a routerLink="/hr/client-management" class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
             <i class="ri-arrow-left-line shrink-0"></i>

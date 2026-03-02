@@ -48,6 +48,7 @@ export class ClientDashboardLayoutComponent implements OnInit {
     clientSidebarItems: SidebarGroup[] = [
         {
             title: 'Client Operations',
+            
             items: [
                 {
                     title: 'Dashboard',
