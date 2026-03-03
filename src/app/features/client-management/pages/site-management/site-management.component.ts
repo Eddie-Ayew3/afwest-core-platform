@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   CardComponent,
-  CardHeaderComponent,
-  CardTitleComponent,
+
   CardContentComponent,
   ButtonComponent,
   InputComponent,
+  TextareaComponent,
   BadgeComponent,
   SelectComponent,
   SelectItemComponent,
@@ -76,6 +76,7 @@ export interface Region {
     CardContentComponent,
     ButtonComponent,
     InputComponent,
+    TextareaComponent,
     BadgeComponent,
     SelectComponent,
     SelectItemComponent,
@@ -87,7 +88,8 @@ export interface Region {
     BreadcrumbComponent,
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent
+    BreadcrumbSeparatorComponent,
+    LabelComponent,
   ],
   templateUrl: './site-management.component.html',
   styleUrls: ['./site-management.component.css']
@@ -409,11 +411,14 @@ export class SiteManagementComponent implements OnInit {
     }
   }
 
-  openNewSiteDialog(): void {
+  openNewSiteDialog(){
     const modalRef = this.modalService.open({
       title: 'Add New Site',
       content: this.newSiteModal,
-      size: 'default'
+      size: 'lg',
+      showCloseButton: true,
+      backdropClose: true,
+
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {

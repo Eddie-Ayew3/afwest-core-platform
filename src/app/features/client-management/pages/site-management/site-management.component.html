@@ -339,53 +339,62 @@
 
 <!-- New site modal -->
 <ng-template #newSiteModal>
-  <div class="space-y-4">
+  <div class="space-y-4 p-4">
     <div>
-      <label class="block text-sm font-medium mb-2">Site Name</label>
-      <input type="text" placeholder="Enter site name" class="w-full p-2 border rounded-md bg-background">
+      <tolle-input
+        label="Site Name"
+        placeholder="Enter site name"
+        type="text">
+      </tolle-input>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Site Code</label>
-      <input type="text" placeholder="e.g. SITE-001" class="w-full p-2 border rounded-md bg-background">
+      <tolle-input
+        label="Site Code"
+        placeholder="e.g. SITE-001"
+        type="text">
+      </tolle-input>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Site Type</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Select type</option>
-        <option value="Commercial">Commercial</option>
-        <option value="Residential">Residential</option>
-        <option value="Industrial">Industrial</option>
-        <option value="Government">Government</option>
-      </select>
+      <tolle-label for="siteType">Site Type</tolle-label>
+      <tolle-select id="siteType" placeholder="Select type">
+        <tolle-select-item value="Commercial">Commercial</tolle-select-item>
+        <tolle-select-item value="Residential">Residential</tolle-select-item>
+        <tolle-select-item value="Industrial">Industrial</tolle-select-item>
+        <tolle-select-item value="Government">Government</tolle-select-item>
+      </tolle-select>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Region</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Select region</option>
-        <option value="Greater Accra">Greater Accra</option>
-        <option value="Ashanti">Ashanti</option>
-        <option value="Western">Western</option>
-        <option value="Central">Central</option>
-        <option value="Eastern">Eastern</option>
-      </select>
+      <tolle-label for="region">Region</tolle-label>
+      <tolle-select id="region" placeholder="Select region">
+        <tolle-select-item value="Greater Accra">Greater Accra</tolle-select-item>
+        <tolle-select-item value="Ashanti">Ashanti</tolle-select-item>
+        <tolle-select-item value="Western">Western</tolle-select-item>
+        <tolle-select-item value="Central">Central</tolle-select-item>
+        <tolle-select-item value="Eastern">Eastern</tolle-select-item>
+      </tolle-select>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">City / Town</label>
-      <input type="text" placeholder="Enter city or town" class="w-full p-2 border rounded-md bg-background">
+      <tolle-input
+        label="City / Town"
+        placeholder="Enter city or town"
+        type="text">
+      </tolle-input>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Address</label>
-      <textarea rows="2" placeholder="Enter full address" class="w-full p-2 border rounded-md bg-background resize-none"></textarea>
+      <tolle-textarea
+        label="Address"
+        placeholder="Enter full address"
+        [rows]="2">
+      </tolle-textarea>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Security Level</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Select level</option>
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-        <option value="Critical">Critical</option>
-      </select>
+      <tolle-label for="securityLevel">Security Level</tolle-label>
+      <tolle-select id="securityLevel" placeholder="Select level">
+        <tolle-select-item value="Low">Low</tolle-select-item>
+        <tolle-select-item value="Medium">Medium</tolle-select-item>
+        <tolle-select-item value="High">High</tolle-select-item>
+        <tolle-select-item value="Critical">Critical</tolle-select-item>
+      </tolle-select>
     </div>
   </div>
 </ng-template>
