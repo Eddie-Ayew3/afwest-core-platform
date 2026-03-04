@@ -15,7 +15,7 @@ import { PettyCashManagementComponent } from './features/petty-cash-management/p
 import { ResetPasswordComponent } from './features/auth/pages/reset-password/reset-password.component';
 import { ClientDashboardLayoutComponent } from './layout/client-dashboard-layout/client-dashboard-layout.component';
 import { DashboardLayoutComponent } from './layout/main-dashboard-layout/dashboard-layout.component';
-import { LeaveManagementComponent } from './features/leave-management/leave-management.component';
+import { LeaveManagementComponent } from './features/leave-management/pages/all-leaves/leave-management.component';
 import { PermissionsManagementComponent } from './features/permissions-management/permissions-management.component';
 import { authGuard } from './guards/auth.guard';
 import { globalOnlyGuard, notGuardRoleGuard } from './core/guards/role.guard';
@@ -104,10 +104,6 @@ export const routes: Routes = [
                     {
                         path: 'client-management/new-client',
                         component: NewClientManagementComponent
-                    },
-                    {
-                        path: 'client-management/view-client/:id',
-                        component: ViewClientComponent
                     },
                     {
                         path: 'leave-management',
