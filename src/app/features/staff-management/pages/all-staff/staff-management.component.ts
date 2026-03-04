@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   CardComponent,
   CardContentComponent,
@@ -17,16 +18,12 @@ import {
   BreadcrumbComponent,
   BreadcrumbItemComponent,
   BreadcrumbLinkComponent,
-  BreadcrumbSeparatorComponent,
-  TabsComponent,
-  TabsListComponent,
-  TabsTriggerComponent,
-  TabsContentComponent
+  BreadcrumbSeparatorComponent
 } from '@tolle_/tolle-ui';
-import { PermissionsService } from '../../core/services/permissions.service';
-import { GhanaSite } from '../../core/models/rbac.models';
+import { GhanaSite } from '../../../../core/models/rbac.models';
+import { PermissionsService } from '../../../../core/services/permissions.service';
 
-interface Person {
+interface StaffMember {
   id: string;
   name: string;
   role: string;
@@ -56,26 +53,22 @@ interface Person {
     BreadcrumbComponent,
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent,
-    TabsComponent,
-    TabsListComponent,
-    TabsTriggerComponent,
-    TabsContentComponent
+    BreadcrumbSeparatorComponent
   ],
   templateUrl: './staff-management.component.html',
   styleUrls: ['./staff-management.component.css']
 })
 export class StaffManagementComponent implements OnInit {
   private permissions = inject(PermissionsService);
+  private router = inject(Router);
 
-  searchQuery: string = '';
-  activeFilterCount: number = 0;
-  filterPanelOpen: boolean = false;
-  pageSize: number = 10;
-  currentPage: number = 1;
-  activeTab: string = 'staff';
+  searchQuery = '';
+  activeFilterCount = 0;
+  filterPanelOpen = false;
+  pageSize = 10;
+  currentPage = 1;
 
-  staff: Person[] = [
+  staff: StaffMember[] = [
     { id: 'ST001', name: 'Kwame Mensah',    role: 'Operations Manager',  status: 'Active',    contact: 'k.mensah@afwest.com.gh',    site: 'Head Office – Accra' },
     { id: 'ST002', name: 'Ama Boateng',     role: 'HR Assistant',        status: 'Active',    contact: 'a.boateng@afwest.com.gh',   site: 'Kumasi Branch' },
     { id: 'ST003', name: 'Kofi Asante',     role: 'Zone Coordinator',    status: 'Suspended', contact: 'k.asante@afwest.com.gh',    site: 'Head Office – Accra' },
@@ -90,46 +83,20 @@ export class StaffManagementComponent implements OnInit {
     { id: 'ST012', name: 'Akua Tetteh',     role: 'Admin Coordinator',   status: 'Suspended', contact: 'a.tetteh@afwest.com.gh',    site: 'Takoradi Branch' },
   ];
 
-  guards: Person[] = [
-    { id: 'GD001', name: 'Kwesi Owusu',       role: 'Senior Guard',       status: 'Active',    contact: 'k.owusu@afwest.com.gh',     site: 'Head Office – Accra' },
-    { id: 'GD002', name: 'Esi Mensah',         role: 'Guard Supervisor',   status: 'Active',    contact: 'e.mensah@afwest.com.gh',    site: 'Kumasi Branch' },
-    { id: 'GD003', name: 'Fiifi Aidoo',        role: 'Guard',              status: 'Active',    contact: 'f.aidoo@afwest.com.gh',     site: 'Head Office – Accra' },
-    { id: 'GD004', name: 'Afia Nyarko',        role: 'Guard',              status: 'Suspended', contact: 'a.nyarko@afwest.com.gh',    site: 'Tema Industrial' },
-    { id: 'GD005', name: 'Yoofi Entsie',       role: 'Guard',              status: 'Active',    contact: 'y.entsie@afwest.com.gh',    site: 'Cape Coast Post' },
-    { id: 'GD006', name: 'Maame Serwaa',       role: 'Senior Guard',       status: 'Active',    contact: 'm.serwaa@afwest.com.gh',    site: 'Head Office – Accra' },
-    { id: 'GD007', name: 'Nii Armah',          role: 'Guard',              status: 'Active',    contact: 'n.armah@afwest.com.gh',     site: 'Kumasi Branch' },
-    { id: 'GD008', name: 'Akosua Agyare',      role: 'Guard Supervisor',   status: 'Inactive',  contact: 'a.agyare@afwest.com.gh',    site: 'Takoradi Branch' },
-    { id: 'GD009', name: 'Kofi Tawiah',        role: 'Guard',              status: 'Active',    contact: 'k.tawiah@afwest.com.gh',    site: 'Head Office – Accra' },
-    { id: 'GD010', name: 'Abena Boampong',     role: 'Senior Guard',       status: 'Active',    contact: 'a.boampong@afwest.com.gh',  site: 'Tema Industrial' },
-    { id: 'GD011', name: 'Ato Hagan',          role: 'Guard',              status: 'Active',    contact: 'a.hagan@afwest.com.gh',     site: 'Kumasi Branch' },
-    { id: 'GD012', name: 'Ewuraba Piesie',     role: 'Guard',              status: 'Active',    contact: 'e.piesie@afwest.com.gh',    site: 'Cape Coast Post' },
-  ];
-
-  filteredStaff: Person[] = [];
-  filteredGuards: Person[] = [];
-  displayedStaff: Person[] = [];
-  displayedGuards: Person[] = [];
+  filteredStaff: StaffMember[] = [];
+  displayedStaff: StaffMember[] = [];
 
   ngOnInit(): void {
-    this.staff  = this.permissions.filterBySite(this.staff);
-    this.guards = this.permissions.filterBySite(this.guards);
+    this.staff = this.permissions.filterBySite(this.staff);
     this.applyFilters();
   }
 
   get staffStartIndex(): number { return (this.currentPage - 1) * this.pageSize; }
   get staffEndIndex(): number   { return Math.min(this.staffStartIndex + this.pageSize, this.filteredStaff.length); }
-  get guardStartIndex(): number { return (this.currentPage - 1) * this.pageSize; }
-  get guardEndIndex(): number   { return Math.min(this.guardStartIndex + this.pageSize, this.filteredGuards.length); }
 
   applyFilters(): void {
     const query = this.searchQuery.toLowerCase();
     this.filteredStaff = this.staff.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.role.toLowerCase().includes(query) ||
-      p.id.toLowerCase().includes(query) ||
-      p.contact.toLowerCase().includes(query)
-    );
-    this.filteredGuards = this.guards.filter(p =>
       p.name.toLowerCase().includes(query) ||
       p.role.toLowerCase().includes(query) ||
       p.id.toLowerCase().includes(query) ||
@@ -141,15 +108,12 @@ export class StaffManagementComponent implements OnInit {
 
   updateDisplayedData(): void {
     const start = (this.currentPage - 1) * this.pageSize;
-    this.displayedStaff  = this.filteredStaff.slice(start, start + this.pageSize);
-    this.displayedGuards = this.filteredGuards.slice(start, start + this.pageSize);
+    this.displayedStaff = this.filteredStaff.slice(start, start + this.pageSize);
   }
 
   onSearch(): void { this.applyFilters(); }
-
   toggleFilterPanel(): void { this.filterPanelOpen = !this.filterPanelOpen; }
-
-  viewPerson(person: Person): void { console.log('View person:', person); }
+  viewPerson(person: StaffMember): void { console.log('View staff:', person); }
 
   clearFilters(): void {
     this.searchQuery = '';
@@ -163,12 +127,11 @@ export class StaffManagementComponent implements OnInit {
   }
 
   onPageChange(event: any): void {
-    this.currentPage = event?.page ?? event;
+    this.currentPage = (event as any).detail || (event as any).page || event;
     this.updateDisplayedData();
   }
 
-  onTabChange(tabId: string): void {
-    this.activeTab = tabId;
-    this.currentPage = 1;
+  navigateToNewStaff(): void {
+    this.router.navigate(['/hr/staff-management/new-staff']);
   }
 }

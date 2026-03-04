@@ -73,22 +73,13 @@ describe('StaffManagementComponent', () => {
     expect(component.displayedStaff.length).toBeGreaterThan(0);
   });
 
-  it('should display guards data', () => {
-    expect(component.guards.length).toBeGreaterThan(0);
-    expect(component.displayedGuards.length).toBeGreaterThan(0);
-  });
-
   it('should filter staff on search', () => {
     component.searchQuery = 'John';
     component.onSearch();
     expect(component.filteredStaff.length).toBeGreaterThan(0);
   });
 
-  it('should filter guards on search', () => {
-    component.searchQuery = 'Security';
-    component.onSearch();
-    expect(component.filteredGuards.length).toBeGreaterThan(0);
-  });
+
 
   it('should have pagination controls', () => {
     const pagination = fixture.debugElement.query(By.css('tolle-pagination'));

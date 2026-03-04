@@ -104,6 +104,7 @@ export class DashboardLayoutComponent {
   private formatSectionName(section: string): string {
     const sectionMap: { [key: string]: string } = {
       'staff-management':      'Staff Management',
+      'guard-management':      'Guard Management',
       'client-management':     'Client Management',
       'leave-management':      'Leave Management',
       'user-management':       'User Management',

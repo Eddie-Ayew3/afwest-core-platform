@@ -266,37 +266,40 @@
 
 <!-- Assign role modal -->
 <ng-template #assignRoleModal>
-  <div class="space-y-4">
+  <div class="space-y-4 p-4">
     <div>
-      <label class="block text-sm font-medium mb-2">Select User</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Choose a user</option>
-        <option value="USR001">Sarah Chen</option>
-        <option value="USR002">Mike Johnson</option>
-        <option value="USR003">Emily Davis</option>
-      </select>
+      <tolle-label class="block text-sm font-medium mb-2">Select User</tolle-label>
+      <tolle-select class="w-full p-2 border rounded-md bg-background">
+        <tolle-select-item value="">Choose a user</tolle-select-item>
+        <tolle-select-item value="USR001">Sarah Chen</tolle-select-item>
+        <tolle-select-item value="USR002">Mike Johnson</tolle-select-item>
+        <tolle-select-item value="USR003">Emily Davis</tolle-select-item>
+      </tolle-select>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Role</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Select role</option>
-        <option value="HR Admin">HR Admin</option>
-        <option value="Security Supervisor">Security Supervisor</option>
-        <option value="Operations Manager">Operations Manager</option>
-      </select>
+      <tolle-label class="block text-sm font-medium mb-2">Role</tolle-label>
+      <tolle-select class="w-full p-2 border rounded-md bg-background">
+        <tolle-select-item value="">Select role</tolle-select-item>
+        <tolle-select-item value="HR Admin">HR Admin</tolle-select-item>
+        <tolle-select-item value="Security Supervisor">Security Supervisor</tolle-select-item>
+        <tolle-select-item value="Operations Manager">Operations Manager</tolle-select-item>
+      </tolle-select>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-2">Permissions</label>
+      <tolle-label class="block text-sm font-medium mb-2">Permissions</tolle-label>
       <div class="space-y-2">
-        <label class="flex items-center gap-2">
-          <input type="checkbox" class="rounded border-border"> Full Access
-        </label>
-        <label class="flex items-center gap-2">
-          <input type="checkbox" class="rounded border-border"> View-only
-        </label>
-        <label class="flex items-center gap-2">
-          <input type="checkbox" class="rounded border-border"> Approval Rights
-        </label>
+        <div class="flex items-center gap-2">
+          <tolle-checkbox id="full-access" />
+          <label for="full-access" class="text-sm font-medium leading-none">Full Access</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <tolle-checkbox id="view-only" />
+          <label for="view-only" class="text-sm font-medium leading-none">View-only</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <tolle-checkbox id="approval-rights" />
+          <label for="approval-rights" class="text-sm font-medium leading-none">Approval Rights</label>
+        </div>
       </div>
     </div>
   </div>

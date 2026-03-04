@@ -17,6 +17,8 @@ import {
   BreadcrumbItemComponent,
   BreadcrumbLinkComponent,
   BreadcrumbSeparatorComponent,
+  CheckboxComponent,
+  LabelComponent,
   ModalService
 } from '@tolle_/tolle-ui';
 
@@ -50,6 +52,8 @@ interface User {
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
     BreadcrumbSeparatorComponent,
+    CheckboxComponent,
+    LabelComponent,
   ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.css']

@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { SignInComponent } from './features/auth/pages/sign-in/sign-in.component';
 import { DashBoardComponent } from './features/dashboard/pages/dashboard.component';
-import { StaffManagementComponent } from './features/staff-management/staff-management.component';
-import { ClientManagementComponent } from './features/client-management/pages/all-client/client-management.component';
+import { GuardManagementComponent} from './features/client-management/pages/guard-management/all-guards/guard-management.component';
+import { ClientManagementComponent } from './features/client-management/pages/client-management/all-clients/client-management.component';
 import { RequestManagementComponent } from './features/client-management/pages/request-management/request-management.component';
 import { SiteManagementComponent } from './features/client-management/pages/site-management/site-management.component';
 import { ClientDashboardComponent } from './features/client-management/pages/client-dashboard/client-dashboard.component';
@@ -19,6 +19,13 @@ import { LeaveManagementComponent } from './features/leave-management/leave-mana
 import { PermissionsManagementComponent } from './features/permissions-management/permissions-management.component';
 import { authGuard } from './guards/auth.guard';
 import { globalOnlyGuard, notGuardRoleGuard } from './core/guards/role.guard';
+import { PermissionsService } from './core/services/permissions.service';
+import { StaffManagementComponent } from './features/staff-management/pages/all-staff/staff-management.component';
+import { NewClientManagementComponent } from './features/client-management/pages/client-management/new-client/new-client-management.component';
+import { NewStaffManagementComponent } from './features/staff-management/pages/new-staff/new-staff-management.component';
+import { NewGuardComponent } from './features/client-management/pages/guard-management/new-guard/new-guard.component';
+import { ViewGuardComponent } from './features/client-management/pages/guard-management/view-guard/view-guard.component';
+import { ViewClientComponent } from './features/client-management/pages/client-management/view-client/view-client.component';
 
 export const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: '/sign-in' },
@@ -49,7 +56,7 @@ export const routes: Routes = [
             },
             {
                 path: 'guard/:id',
-                component: StaffManagementComponent
+                component: GuardManagementComponent
             }
         ]
     },
@@ -75,8 +82,32 @@ export const routes: Routes = [
                         component: StaffManagementComponent
                     },
                     {
+                        path: 'staff-management/new-staff',
+                        component: NewStaffManagementComponent
+                    },
+                    {
+                        path: 'guard-management',
+                        component: GuardManagementComponent
+                    },
+                    {
+                        path: 'guard-management/new-guard',
+                        component: NewGuardComponent
+                    },
+                    {
+                        path: 'guard-management/view-guard/:id',
+                        component: ViewGuardComponent
+                    },
+                    {
                         path: 'client-management',
                         component: ClientManagementComponent
+                    },
+                    {
+                        path: 'client-management/new-client',
+                        component: NewClientManagementComponent
+                    },
+                    {
+                        path: 'client-management/view-client/:id',
+                        component: ViewClientComponent
                     },
                     {
                         path: 'leave-management',

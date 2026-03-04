@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { PermissionsService } from '../../../../core/services/permissions.service';
+import { PermissionsService } from '../../../../../core/services/permissions.service';
 import { FormsModule } from '@angular/forms';
 import { 
   CardComponent,
@@ -51,7 +51,6 @@ interface Client {
     ButtonComponent,
     InputComponent,
     BadgeComponent,
-   
     SelectComponent,
     SelectItemComponent,
     EmptyStateComponent,
@@ -69,10 +68,10 @@ interface Client {
   styleUrls: ['./client-management.component.css']
 })
 export class ClientManagementComponent implements OnInit {
-  private modalService = inject(ModalService);
+
   private permissions = inject(PermissionsService);
   private router = inject(Router);
-  @ViewChild('newClientModal') newClientModal!: TemplateRef<any>;
+
 
   public isHrSection: boolean = false;
 
@@ -181,22 +180,21 @@ export class ClientManagementComponent implements OnInit {
     return endDate <= thirtyDaysFromNow && endDate >= today;
   }
 
-  openNewClientDialog(): void {
-    const modalRef = this.modalService.open({
-      title: 'Add New Client',
-      content: this.newClientModal,
-      size: 'default'
-    });
 
-    modalRef.afterClosed$.subscribe((result: any) => {
-      if (result?.success) {
-        console.log('New client added successfully');
-      }
-    });
-  }
 
   navigateToClient(client: Client): void {
     this.router.navigate(['/client/dashboard', client.id]);
+  }
+
+  navigateToViewClient(client: Client): void {
+    this.router.navigate(['/hr/client-management/view-client', client.id]);
+  }
+
+  navigateToNewClient(): void {
+    if(this.isHrSection){
+      this.router.navigate(['/hr/client-management/new-client']);
+    }
+    
   }
 
   editClient(client: Client): void {

@@ -8,6 +8,7 @@ import {
   CardContentComponent,
   ButtonComponent,
   InputComponent,
+  TextareaComponent,
   BadgeComponent,
   SelectComponent,
   SelectItemComponent,
@@ -51,6 +52,7 @@ export interface GuardRequest {
     CardContentComponent,
     ButtonComponent,
     InputComponent,
+    TextareaComponent,
     BadgeComponent,
     SelectComponent,
     SelectItemComponent,
@@ -58,6 +60,7 @@ export interface GuardRequest {
     PaginationComponent,
     TooltipDirective,
     DropdownTriggerDirective,
+    LabelComponent,
     DropdownMenuComponent,
     BreadcrumbComponent,
     BreadcrumbItemComponent,
@@ -276,7 +279,8 @@ export class RequestManagementComponent implements OnInit {
     const modalRef = this.modalService.open({
       title: 'New Guard Request',
       content: this.newRequestModal,
-      size: 'default'
+      showCloseButton: true,
+      size: 'lg'
     });
 
     modalRef.afterClosed$.subscribe((result: any) => {

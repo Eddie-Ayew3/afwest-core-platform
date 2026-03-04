@@ -290,43 +290,58 @@
 
 <!-- New request modal -->
 <ng-template #newRequestModal>
-  <div class="space-y-4">
+  <div class="space-y-4 p-4">
     <div>
-      <label class="block text-sm font-medium mb-2">Guard Name</label>
-      <input type="text" placeholder="Enter guard name" class="w-full p-2 border rounded-md bg-background">
+      <tolle-input
+        label="Guard Name"
+        placeholder="Enter guard name"
+        type="text">
+      </tolle-input>
     </div>
+    
     <div>
-      <label class="block text-sm font-medium mb-2">Request Type</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Select type</option>
-        <option value="Equipment">Equipment</option>
-        <option value="Uniform">Uniform</option>
-        <option value="Training">Training</option>
-        <option value="Maintenance">Maintenance</option>
-        <option value="Other">Other</option>
-      </select>
+      <tolle-label for="requestType">Request Type</tolle-label>
+      <tolle-select id="requestType" placeholder="Select type">
+        <tolle-select-item value="Equipment">Equipment</tolle-select-item>
+        <tolle-select-item value="Uniform">Uniform</tolle-select-item>
+        <tolle-select-item value="Training">Training</tolle-select-item>
+        <tolle-select-item value="Maintenance">Maintenance</tolle-select-item>
+        <tolle-select-item value="Other">Other</tolle-select-item>
+      </tolle-select>
     </div>
+   
     <div>
-      <label class="block text-sm font-medium mb-2">Title</label>
-      <input type="text" placeholder="Enter request title" class="w-full p-2 border rounded-md bg-background">
+      <tolle-input
+        label="Title"
+        placeholder="Enter request title"
+        type="text">
+      </tolle-input>
     </div>
+   
     <div>
-      <label class="block text-sm font-medium mb-2">Description</label>
-      <textarea rows="3" placeholder="Describe the request..." class="w-full p-2 border rounded-md bg-background resize-none"></textarea>
+      <tolle-textarea
+        label="Description"
+        placeholder="Describe the request..."
+        [rows]="2">
+      </tolle-textarea>
     </div>
+    
     <div>
-      <label class="block text-sm font-medium mb-2">Urgency</label>
-      <select class="w-full p-2 border rounded-md bg-background">
-        <option value="">Select urgency</option>
-        <option value="Low">Low</option>
-        <option value="Medium">Medium</option>
-        <option value="High">High</option>
-        <option value="Critical">Critical</option>
-      </select>
+      <tolle-label for="urgency">Urgency</tolle-label>
+      <tolle-select id="urgency" placeholder="Select urgency">
+        <tolle-select-item value="Low">Low</tolle-select-item>
+        <tolle-select-item value="Medium">Medium</tolle-select-item>
+        <tolle-select-item value="High">High</tolle-select-item>
+        <tolle-select-item value="Critical">Critical</tolle-select-item>
+      </tolle-select>
     </div>
+    
     <div>
-      <label class="block text-sm font-medium mb-2">Estimated Cost (GHS)</label>
-      <input type="number" placeholder="0.00" class="w-full p-2 border rounded-md bg-background">
+      <tolle-input
+        label="Estimated Cost (GHS)"
+        placeholder="0.00"
+        type="number">
+      </tolle-input>
     </div>
   </div>
 </ng-template>

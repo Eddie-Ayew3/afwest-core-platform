@@ -1,0 +1,37 @@
+.a4-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    width: 210mm;
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-wrapper {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  .a4-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+}

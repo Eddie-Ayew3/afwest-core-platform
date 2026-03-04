@@ -1,0 +1,558 @@
+<div class="flex h-full bg-background">
+  <div class="flex-1 p-8 overflow-auto">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <button type="button" (click)="onCancel()" class="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-3 transition-colors">
+        <i class="ri-arrow-left-line"></i>
+        Back to Client Management
+      </button>
+      <h1 class="text-2xl font-bold text-foreground">Add New Client</h1>
+      <p class="text-sm text-muted-foreground mt-1">{{ stepTitles[currentStep] }} — Step {{ currentStep + 1 }} of {{ totalSteps }}</p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="mb-8">
+      <div class="flex items-center mb-4">
+        @for (title of stepTitles; track $index; let i = $index) {
+          <!-- Step circle -->
+          <button
+            type="button"
+            (click)="goToStep(i)"
+            [disabled]="i >= currentStep"
+            class="flex flex-col items-center shrink-0 group"
+            [attr.aria-label]="'Go to step ' + (i + 1)">
+            <div [class]="'w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all ' +
+              (i < currentStep
+                ? 'bg-primary border-primary text-primary-foreground cursor-pointer'
+                : i === currentStep
+                  ? 'border-primary text-primary bg-primary/10'
+                  : 'border-border text-muted-foreground bg-background cursor-default')">
+              @if (i < currentStep) {
+                <i class="ri-check-line text-base"></i>
+              } @else {
+                {{ i + 1 }}
+              }
+            </div>
+            <span [class]="'text-xs mt-1.5 whitespace-nowrap hidden sm:block ' +
+              (i === currentStep ? 'text-primary font-medium' : i < currentStep ? 'text-foreground' : 'text-muted-foreground')">
+              {{ title }}
+            </span>
+          </button>
+
+          <!-- Connector line -->
+          @if (i < totalSteps - 1) {
+            <div [class]="'flex-1 h-0.5 mx-2 mb-5 transition-colors ' + (i < currentStep ? 'bg-primary' : 'bg-border')"></div>
+          }
+        }
+      </div>
+      <tolle-progress [value]="progressValue"></tolle-progress>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+
+      <!-- ── Step 0: Basic Information ── -->
+      @if (currentStep === 0) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-building-line text-primary"></i>
+              Basic Information
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Enter the client's name and identifier.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Client Name <span class="text-destructive">*</span></tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="clientName"
+                  placeholder="e.g. Accra Commercial Bank"
+                  class="w-full">
+                </tolle-input>
+                @if (isFieldInvalid('clientName')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('clientName') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Client ID</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="clientId"
+                  class="w-full opacity-70">
+                  <i suffix class="ri-lock-line text-muted-foreground"></i>
+                </tolle-input>
+                <p class="text-xs text-muted-foreground">Auto-generated — not editable</p>
+              </div>
+            </div>
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="ghost" (click)="onCancel()">Cancel</tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+      <!-- ── Step 1: Contact Information ── -->
+      @if (currentStep === 1) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-user-line text-primary"></i>
+              Contact Information
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Primary contact person for this client.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Contact Person <span class="text-destructive">*</span></tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="contactPerson"
+                  placeholder="e.g. Kwame Mensah"
+                  class="w-full">
+                </tolle-input>
+                @if (isFieldInvalid('contactPerson')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('contactPerson') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Job Title</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="jobTitle"
+                  placeholder="e.g. Operations Manager"
+                  class="w-full">
+                </tolle-input>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Email Address <span class="text-destructive">*</span></tolle-label>
+                <tolle-input
+                  type="email"
+                  formControlName="email"
+                  placeholder="e.g. kwame@accrabank.com"
+                  class="w-full">
+                  <i prefix class="ri-mail-line"></i>
+                </tolle-input>
+                @if (isFieldInvalid('email')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('email') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Phone Number <span class="text-destructive">*</span></tolle-label>
+                <tolle-input
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="e.g. 024 000 0000"
+                  class="w-full">
+                  <i prefix class="ri-phone-line"></i>
+                </tolle-input>
+                @if (isFieldInvalid('phone')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('phone') }}</p>
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Phone Extension</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="phoneExtension"
+                  placeholder="e.g. 205"
+                  class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Alternative Phone</tolle-label>
+                <tolle-input
+                  type="tel"
+                  formControlName="alternativePhone"
+                  placeholder="e.g. 020 000 0000"
+                  class="w-full">
+                </tolle-input>
+              </div>
+            </div>
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+      <!-- ── Step 2: Address Information ── -->
+      @if (currentStep === 2) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-map-pin-line text-primary"></i>
+              Address Information
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Physical location of the client's site.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-4">
+            <div class="space-y-1.5">
+              <tolle-label>Physical Address <span class="text-destructive">*</span></tolle-label>
+              <tolle-input
+                type="text"
+                formControlName="physicalAddress"
+                placeholder="e.g. 14 Independence Avenue"
+                class="w-full">
+                <i prefix class="ri-map-2-line"></i>
+              </tolle-input>
+              @if (isFieldInvalid('physicalAddress')) {
+                <p class="text-destructive text-xs">{{ getErrorMessage('physicalAddress') }}</p>
+              }
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>City / Town <span class="text-destructive">*</span></tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="city"
+                  placeholder="e.g. Accra"
+                  class="w-full">
+                </tolle-input>
+                @if (isFieldInvalid('city')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('city') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Region <span class="text-destructive">*</span></tolle-label>
+                <tolle-select formControlName="region" class="w-full" placeholder="Select region">
+                  <tolle-select-item value="Greater Accra">Greater Accra</tolle-select-item>
+                  <tolle-select-item value="Ashanti">Ashanti</tolle-select-item>
+                  <tolle-select-item value="Western">Western</tolle-select-item>
+                  <tolle-select-item value="Central">Central</tolle-select-item>
+                  <tolle-select-item value="Eastern">Eastern</tolle-select-item>
+                  <tolle-select-item value="Volta">Volta</tolle-select-item>
+                  <tolle-select-item value="Northern">Northern</tolle-select-item>
+                  <tolle-select-item value="Upper East">Upper East</tolle-select-item>
+                  <tolle-select-item value="Upper West">Upper West</tolle-select-item>
+                </tolle-select>
+                @if (isFieldInvalid('region')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('region') }}</p>
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Postal Code</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="postalCode"
+                  placeholder="e.g. GA-123-4567"
+                  class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>GPS Address</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="gpsAddress"
+                  placeholder="e.g. GA-123-4567"
+                  class="w-full">
+                  <i prefix class="ri-navigation-line"></i>
+                </tolle-input>
+              </div>
+            </div>
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+      <!-- ── Step 3: Business Information ── -->
+      @if (currentStep === 3) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-briefcase-line text-primary"></i>
+              Business Information
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Company registration and sector details (optional).</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Business Type</tolle-label>
+                <tolle-select formControlName="businessType" class="w-full" placeholder="Select business type">
+                  <tolle-select-item value="Corporate">Corporate</tolle-select-item>
+                  <tolle-select-item value="Government">Government</tolle-select-item>
+                  <tolle-select-item value="Educational">Educational</tolle-select-item>
+                  <tolle-select-item value="Healthcare">Healthcare</tolle-select-item>
+                  <tolle-select-item value="Retail">Retail</tolle-select-item>
+                  <tolle-select-item value="Industrial">Industrial</tolle-select-item>
+                  <tolle-select-item value="Residential">Residential</tolle-select-item>
+                </tolle-select>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Industry Sector</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="industrySector"
+                  placeholder="e.g. Banking & Finance"
+                  class="w-full">
+                </tolle-input>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>TIN Number</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="tinNumber"
+                  placeholder="e.g. C0000000000"
+                  class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Registration Number</tolle-label>
+                <tolle-input
+                  type="text"
+                  formControlName="registrationNumber"
+                  placeholder="e.g. CS-000000000"
+                  class="w-full">
+                </tolle-input>
+              </div>
+            </div>
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+      <!-- ── Step 4: Contract Information ── -->
+      @if (currentStep === 4) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-file-text-line text-primary"></i>
+              Contract Information
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Service contract terms and billing preferences.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Contract Start Date <span class="text-destructive">*</span></tolle-label>
+                <tolle-date-picker
+                  [(ngModel)]="contractStartDateObj"
+                  (ngModelChange)="onStartDateChange($event)"
+                  placeholder="Select start date"
+                  class="w-full">
+                </tolle-date-picker>
+                @if (isFieldInvalid('contractStartDate')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('contractStartDate') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Contract End Date <span class="text-destructive">*</span></tolle-label>
+                <tolle-date-picker
+                  [(ngModel)]="contractEndDateObj"
+                  (ngModelChange)="onEndDateChange($event)"
+                  placeholder="Select end date"
+                  class="w-full">
+                </tolle-date-picker>
+                @if (isFieldInvalid('contractEndDate')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('contractEndDate') }}</p>
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Service Type</tolle-label>
+                <tolle-select formControlName="serviceType" class="w-full" placeholder="Select service type">
+                  <tolle-select-item value="Security Guards">Security Guards</tolle-select-item>
+                  <tolle-select-item value="CCTV Surveillance">CCTV Surveillance</tolle-select-item>
+                  <tolle-select-item value="Access Control">Access Control</tolle-select-item>
+                  <tolle-select-item value="Alarm Systems">Alarm Systems</tolle-select-item>
+                  <tolle-select-item value="Mobile Patrol">Mobile Patrol</tolle-select-item>
+                  <tolle-select-item value="Event Security">Event Security</tolle-select-item>
+                  <tolle-select-item value="Comprehensive">Comprehensive Security</tolle-select-item>
+                </tolle-select>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Billing Cycle</tolle-label>
+                <tolle-select formControlName="billingCycle" class="w-full" placeholder="Select billing cycle">
+                  <tolle-select-item value="Monthly">Monthly</tolle-select-item>
+                  <tolle-select-item value="Quarterly">Quarterly</tolle-select-item>
+                  <tolle-select-item value="Semi-Annually">Semi-Annually</tolle-select-item>
+                  <tolle-select-item value="Annually">Annually</tolle-select-item>
+                </tolle-select>
+              </div>
+            </div>
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+      <!-- ── Step 5: Review & Submit ── -->
+      @if (currentStep === 5) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-check-double-line text-primary"></i>
+              Review & Submit
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Confirm the details below before saving.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-6">
+
+            <!-- Summary: Basic -->
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                <i class="ri-building-line"></i> Basic Information
+              </h4>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Client Name</span>
+                  <p class="font-medium">{{ formValues.clientName || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Client ID</span>
+                  <p class="font-medium font-mono">{{ formValues.clientId || '—' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Summary: Contact -->
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                <i class="ri-user-line"></i> Contact Information
+              </h4>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Contact Person</span>
+                  <p class="font-medium">{{ formValues.contactPerson || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Job Title</span>
+                  <p class="font-medium">{{ formValues.jobTitle || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Email</span>
+                  <p class="font-medium">{{ formValues.email || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Phone</span>
+                  <p class="font-medium">{{ formValues.phone || '—' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Summary: Address -->
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                <i class="ri-map-pin-line"></i> Address Information
+              </h4>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div class="col-span-2">
+                  <span class="text-muted-foreground">Physical Address</span>
+                  <p class="font-medium">{{ formValues.physicalAddress || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">City</span>
+                  <p class="font-medium">{{ formValues.city || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Region</span>
+                  <p class="font-medium">{{ formValues.region || '—' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Summary: Contract -->
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                <i class="ri-file-text-line"></i> Contract Information
+              </h4>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Start Date</span>
+                  <p class="font-medium">{{ contractStartDateObj ? (contractStartDateObj | date:'mediumDate') : '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">End Date</span>
+                  <p class="font-medium">{{ contractEndDateObj ? (contractEndDateObj | date:'mediumDate') : '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Service Type</span>
+                  <p class="font-medium">{{ formValues.serviceType || '—' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Billing Cycle</span>
+                  <p class="font-medium">{{ formValues.billingCycle || '—' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Additional Notes -->
+            <div class="space-y-1.5">
+              <tolle-label>Additional Notes</tolle-label>
+              <tolle-textarea
+                formControlName="additionalNotes"
+                placeholder="Enter any additional notes or special requirements..."
+                class="w-full">
+              </tolle-textarea>
+            </div>
+
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <div class="flex items-center gap-3">
+              <tolle-button type="button" variant="ghost" (click)="onCancel()" [disabled]="isSubmitting">
+                Cancel
+              </tolle-button>
+              <tolle-button type="submit" [busy]="isSubmitting" [disabled]="isSubmitting">
+                <i class="ri-save-line mr-1"></i>
+                Save Client
+              </tolle-button>
+            </div>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+    </form>
+  </div>
+</div>

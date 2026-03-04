@@ -5,6 +5,7 @@ import { GhanaRegion, GhanaSite, LS, REGION_SITES, UserRole, UserScope } from '.
 export type NavFeature =
   | 'overview'
   | 'hr_staff'
+  | 'hr_guard'
   | 'hr_client'
   | 'hr_leave'
   | 'hr_user'
@@ -14,9 +15,9 @@ export type NavFeature =
   | 'procurement';
 
 const NAV_PERMISSIONS: Record<UserScope, NavFeature[]> = {
-  global:   ['overview', 'hr_staff', 'hr_client', 'hr_leave', 'hr_user', 'hr_permissions', 'control_shift', 'control_checkin', 'procurement'],
-  regional: ['overview', 'hr_staff', 'hr_client', 'hr_leave', 'control_shift', 'control_checkin'],
-  site:     ['overview', 'hr_staff', 'control_shift', 'control_checkin']
+  global:   ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_user', 'hr_permissions', 'control_shift', 'control_checkin', 'procurement'],
+  regional: ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'control_shift', 'control_checkin'],
+  site:     ['overview', 'hr_staff', 'hr_guard', 'control_shift', 'control_checkin']
 };
 
 const GUARD_FEATURES: NavFeature[] = ['overview', 'control_checkin'];
@@ -82,7 +83,8 @@ export class PermissionsService {
 
     // HR
     const hrItems: any[] = [];
-    if (this.canSee('hr_staff'))  hrItems.push({ title: 'Staff/Guard Management', url: '/hr/staff-management' });
+    if (this.canSee('hr_staff'))  hrItems.push({ title: 'Staff Management', url: '/hr/staff-management' });
+    if (this.canSee('hr_guard'))  hrItems.push({ title: 'Guard Management',  url: '/hr/guard-management' });
     if (this.canSee('hr_client')) hrItems.push({ title: 'Client Management',       url: '/hr/client-management' });
     if (this.canSee('hr_leave'))  hrItems.push({ title: 'Leave Management',        url: '/hr/leave-management' });
     if (this.canSee('hr_user'))        hrItems.push({ title: 'User Management',        url: '/hr/user-management' });
