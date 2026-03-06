@@ -1,24 +1,19 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  CardComponent,
-  CardContentComponent,
   ButtonComponent,
-  InputComponent,
   BadgeComponent,
-  SelectComponent,
-  SelectItemComponent,
-  EmptyStateComponent,
-  PaginationComponent,
   TooltipDirective,
   DropdownTriggerDirective,
   DropdownMenuComponent,
   BreadcrumbComponent,
   BreadcrumbItemComponent,
   BreadcrumbLinkComponent,
-  BreadcrumbSeparatorComponent
+  BreadcrumbSeparatorComponent,
+  DataTableComponent,
+  TolleCellDirective,
+  TableColumn
 } from '@tolle_/tolle-ui';
 import { PermissionsService } from '../../../../../core/services/permissions.service';
 import { GhanaSite } from '../../../../../core/models/rbac.models';
@@ -37,23 +32,17 @@ interface Guard {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    CardComponent,
-    CardContentComponent,
     ButtonComponent,
-    InputComponent,
     BadgeComponent,
-    SelectComponent,
-    SelectItemComponent,
-    EmptyStateComponent,
-    PaginationComponent,
     TooltipDirective,
     DropdownTriggerDirective,
     DropdownMenuComponent,
     BreadcrumbComponent,
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent
+    BreadcrumbSeparatorComponent,
+    DataTableComponent,
+    TolleCellDirective
   ],
   templateUrl: './guard-management.component.html',
   styleUrls: ['./guard-management.component.css']
@@ -62,14 +51,15 @@ export class GuardManagementComponent implements OnInit {
   private permissions = inject(PermissionsService);
   private router = inject(Router);
 
-  // true when accessed from /hr/guard-management, false when from client/guard/:id
   isHrContext = false;
 
-  searchQuery = '';
-  activeFilterCount = 0;
-  filterPanelOpen = false;
-  pageSize = 10;
-  currentPage = 1;
+  columns: TableColumn[] = [
+    { key: 'name', label: 'Guard Name' },
+    { key: 'role', label: 'Role' },
+    { key: 'status', label: 'Status' },
+    { key: 'contact', label: 'Contact' },
+    { key: 'actions', label: '' },
+  ];
 
   guards: Guard[] = [
     { id: 'GD001', name: 'Kwesi Owusu',    role: 'Senior Guard',     status: 'Active',    contact: 'k.owusu@afwest.com.gh',    site: 'Head Office – Accra' },
@@ -86,57 +76,15 @@ export class GuardManagementComponent implements OnInit {
     { id: 'GD012', name: 'Ewuraba Piesie', role: 'Guard',            status: 'Active',    contact: 'e.piesie@afwest.com.gh',   site: 'Cape Coast Post' },
   ];
 
-  filteredGuards: Guard[] = [];
-  displayedGuards: Guard[] = [];
-
   ngOnInit(): void {
     this.isHrContext = this.router.url.startsWith('/hr/');
     this.guards = this.permissions.filterBySite(this.guards);
-    this.applyFilters();
   }
 
-  get guardStartIndex(): number { return (this.currentPage - 1) * this.pageSize; }
-  get guardEndIndex(): number   { return Math.min(this.guardStartIndex + this.pageSize, this.filteredGuards.length); }
-
-  applyFilters(): void {
-    const query = this.searchQuery.toLowerCase();
-    this.filteredGuards = this.guards.filter(g =>
-      g.name.toLowerCase().includes(query) ||
-      g.role.toLowerCase().includes(query) ||
-      g.id.toLowerCase().includes(query) ||
-      g.contact.toLowerCase().includes(query)
-    );
-    this.currentPage = 1;
-    this.updateDisplayedData();
-  }
-
-  updateDisplayedData(): void {
-    const start = (this.currentPage - 1) * this.pageSize;
-    this.displayedGuards = this.filteredGuards.slice(start, start + this.pageSize);
-  }
-
-  onSearch(): void { this.applyFilters(); }
-  toggleFilterPanel(): void { this.filterPanelOpen = !this.filterPanelOpen; }
   viewGuard(guard: Guard): void {
     if (this.isHrContext) {
       this.router.navigate(['/hr/guard-management/view-guard', guard.id]);
     }
-  }
-
-  clearFilters(): void {
-    this.searchQuery = '';
-    this.applyFilters();
-    this.activeFilterCount = 0;
-  }
-
-  onPageSizeChange(): void {
-    this.currentPage = 1;
-    this.updateDisplayedData();
-  }
-
-  onPageChange(event: any): void {
-    this.currentPage = (event as any).detail || (event as any).page || event;
-    this.updateDisplayedData();
   }
 
   navigateToNewGuard(): void {

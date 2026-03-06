@@ -1,12 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DataTableComponent, TableColumn, TolleCellDirective, BadgeComponent } from '@tolle_/tolle-ui';
 
 @Component({
   selector: 'app-main-dashboard',
   standalone: true,
   imports: [
     CommonModule,
+    DataTableComponent,
+    BadgeComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
@@ -19,6 +22,50 @@ export class DashBoardComponent implements OnInit {
   activeProjects = 12;
   completedTasks = 892;
   pendingReviews = 127;
+
+  // Projects data for table
+  projects = [
+    {
+      name: 'Design System',
+      status: 'Active',
+      progress: 75,
+      team: [
+        { initials: 'JD', color: 'bg-blue-500' },
+        { initials: 'SC', color: 'bg-green-500' },
+        { initials: 'MR', color: 'bg-purple-500' }
+      ],
+      dueDate: 'Dec 15, 2023'
+    },
+    {
+      name: 'Mobile App',
+      status: 'In Review',
+      progress: 45,
+      team: [
+        { initials: 'AK', color: 'bg-red-500' },
+        { initials: 'PL', color: 'bg-indigo-500' }
+      ],
+      dueDate: 'Jan 5, 2024'
+    },
+    {
+      name: 'Marketing Website',
+      status: 'Planning',
+      progress: 20,
+      team: [
+        { initials: 'LN', color: 'bg-teal-500' },
+        { initials: 'KW', color: 'bg-pink-500' },
+        { initials: 'RJ', color: 'bg-cyan-500' }
+      ],
+      dueDate: 'Feb 28, 2024'
+    }
+  ];
+
+  columns: TableColumn[] = [
+    { key: 'name', label: 'Project Name' },
+    { key: 'status', label: 'Status' },
+    { key: 'progress', label: 'Progress' },
+    { key: 'team', label: 'Team' },
+    { key: 'dueDate', label: 'Due Date' }
+  ];
   recentActivity = [
     {
       id: 1,
@@ -55,37 +102,6 @@ export class DashBoardComponent implements OnInit {
       time: '5 hours ago',
       icon: 'ri-chat-1-line',
       color: 'text-orange-600'
-    }
-  ];
-
-  // Projects data
-  projects = [
-    {
-      id: 1,
-      name: 'Design System',
-      status: 'active',
-      progress: 75,
-      team: ['Sarah Chen', 'Mike Ross', 'David Kim'],
-      dueDate: new Date('2024-03-15'),
-      priority: 'high'
-    },
-    {
-      id: 2,
-      name: 'Mobile App',
-      status: 'in-review',
-      progress: 45,
-      team: ['John Doe', 'Jane Smith'],
-      dueDate: new Date('2024-03-20'),
-      priority: 'medium'
-    },
-    {
-      id: 3,
-      name: 'Marketing Website',
-      status: 'completed',
-      progress: 100,
-      team: ['Alice Johnson', 'Bob Wilson'],
-      dueDate: new Date('2024-02-28'),
-      priority: 'low'
     }
   ];
 

@@ -176,118 +176,116 @@
       <tolle-card-content class="p-0">
 
         <!-- TABLE -->
-        <div class="overflow-x-auto" *ngIf="displayedSites.length > 0">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-border bg-muted/5">
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Site Info</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Location</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Contact</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Staff</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Security</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
-                <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let site of displayedSites"
-                  class="border-b border-border hover:bg-muted/30 transition-colors">
-                <td class="p-4">
-                  <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                      <i [class]="getSiteTypeIcon(site.type)"></i>
-                    </div>
-                    <div>
-                      <p class="font-medium">{{site.name}}</p>
-                      <p class="text-xs text-muted-foreground">ID: {{site.id}}</p>
-                      <tolle-badge variant="secondary" size="xs" class="mt-1">
-                        {{site.type.replace('-', ' ')}}
-                      </tolle-badge>
-                    </div>
-                  </div>
-                </td>
-                <td class="p-4">
-                  <div>
-                    <p class="text-sm font-medium">{{site.city}}, {{site.region}}</p>
-                    <p class="text-xs text-muted-foreground">{{site.address}}</p>
-                    <p class="text-xs text-muted-foreground mt-1" *ngIf="site.coordinates">
-                      <i class="ri-map-pin-2-line"></i>
-                      {{site.coordinates.latitude.toFixed(4)}}, {{site.coordinates.longitude.toFixed(4)}}
-                    </p>
-                  </div>
-                </td>
-                <td class="p-4">
-                  <div>
-                    <p class="text-sm font-medium">{{site.contact.manager}}</p>
-                    <p class="text-xs text-muted-foreground">{{site.contact.phone}}</p>
-                    <p class="text-xs text-muted-foreground">{{site.contact.email}}</p>
-                  </div>
-                </td>
-                <td class="p-4">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2 text-sm">
-                      <i class="ri-user-line text-muted-foreground"></i>
-                      <span>{{site.staffCount}} Staff</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-sm">
-                      <i class="ri-shield-user-line text-muted-foreground"></i>
-                      <span>{{site.guardCount}} Guards</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="p-4">
-                  <tolle-badge 
-                    [variant]="'default'"
-                    size="sm">
-                    {{site.securityLevel}}
+        <div class="min-h-0" *ngIf="displayedSites.length > 0">
+          <tolle-data-table 
+            [data]="displayedSites"
+            [columns]="columns"
+            [stickyHeader]="true"
+            [paginate]="false"
+            [searchable]="false"
+            [showSettings]="false">
+
+            <ng-template tolleCell="siteInfo" let-row="row">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  <i [class]="getSiteTypeIcon(row.type)"></i>
+                </div>
+                <div>
+                  <p class="font-medium">{{row.name}}</p>
+                  <p class="text-xs text-muted-foreground">ID: {{row.id}}</p>
+                  <tolle-badge variant="secondary" size="xs" class="mt-1">
+                    {{row.type.replace('-', ' ')}}
                   </tolle-badge>
-                  <p class="text-xs text-muted-foreground mt-1" *ngIf="site.zonalCommander">
-                    {{site.zonalCommander}}
-                  </p>
-                </td>
-                <td class="p-4">
-                  <tolle-badge 
-                    [variant]="'default'"
-                    size="sm">
-                    {{site.status}}
-                  </tolle-badge>
-                </td>
-                <td class="p-4 text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewSiteDetails(site)">
-                      <i class="ri-eye-line"></i>
-                    </tolle-button>
-                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View on map" placement="top" (click)="viewSiteOnMap(site)" *ngIf="site.coordinates">
-                      <i class="ri-map-line"></i>
-                    </tolle-button>
-                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit site" placement="top" (click)="editSite(site)">
-                      <i class="ri-edit-line"></i>
-                    </tolle-button>
-                    <div class="relative">
-                      <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
-                        <i class="ri-more-2-fill"></i>
-                      </tolle-button>
-                      <tolle-dropdown-menu #actionMenu>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
-                          <i class="ri-printer-line"></i> Print Site Info
-                        </button>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
-                          <i class="ri-mail-line"></i> Email Manager
-                        </button>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
-                          <i class="ri-calendar-line"></i> Schedule Inspection
-                        </button>
-                        <div class="h-px bg-border my-1"></div>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
-                          <i class="ri-delete-bin-line"></i> Delete Site
-                        </button>
-                      </tolle-dropdown-menu>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="location" let-row="row">
+              <div>
+                <p class="text-sm font-medium">{{row.city}}, {{row.region}}</p>
+                <p class="text-xs text-muted-foreground">{{row.address}}</p>
+                <p class="text-xs text-muted-foreground mt-1" *ngIf="row.coordinates">
+                  <i class="ri-map-pin-2-line"></i>
+                  {{row.coordinates.latitude.toFixed(4)}}, {{row.coordinates.longitude.toFixed(4)}}
+                </p>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="contact" let-row="row">
+              <div>
+                <p class="text-sm font-medium">{{row.contact.manager}}</p>
+                <p class="text-xs text-muted-foreground">{{row.contact.phone}}</p>
+                <p class="text-xs text-muted-foreground">{{row.contact.email}}</p>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="staff" let-row="row">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 text-sm">
+                  <i class="ri-user-line text-muted-foreground"></i>
+                  <span>{{row.staffCount}} Staff</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <i class="ri-shield-user-line text-muted-foreground"></i>
+                  <span>{{row.guardCount}} Guards</span>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="security" let-row="row">
+              <tolle-badge 
+                [variant]="'default'"
+                size="sm">
+                {{row.securityLevel}}
+              </tolle-badge>
+              <p class="text-xs text-muted-foreground mt-1" *ngIf="row.zonalCommander">
+                {{row.zonalCommander}}
+              </p>
+            </ng-template>
+
+            <ng-template tolleCell="status" let-row="row">
+              <tolle-badge 
+                [variant]="'default'"
+                size="sm">
+                {{row.status}}
+              </tolle-badge>
+            </ng-template>
+
+            <ng-template tolleCell="actions" let-row="row">
+              <div class="flex items-center justify-end gap-2">
+                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewSiteDetails(row)">
+                  <i class="ri-eye-line"></i>
+                </tolle-button>
+                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View on map" placement="top" (click)="viewSiteOnMap(row)" *ngIf="row.coordinates">
+                  <i class="ri-map-line"></i>
+                </tolle-button>
+                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit site" placement="top" (click)="editSite(row)">
+                  <i class="ri-edit-line"></i>
+                </tolle-button>
+                <div class="relative">
+                  <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                    <i class="ri-more-2-fill"></i>
+                  </tolle-button>
+                  <tolle-dropdown-menu #actionMenu>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                      <i class="ri-printer-line"></i> Print Site Info
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                      <i class="ri-mail-line"></i> Email Manager
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                      <i class="ri-calendar-line"></i> Schedule Inspection
+                    </button>
+                    <div class="h-px bg-border my-1"></div>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                      <i class="ri-delete-bin-line"></i> Delete Site
+                    </button>
+                  </tolle-dropdown-menu>
+                </div>
+              </div>
+            </ng-template>
+
+          </tolle-data-table>
         </div>
 
         <!-- EMPTY STATE -->

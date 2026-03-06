@@ -33,3 +33,30 @@
 .permission-status-disabled {
   color: #9e9e9e;
 }
+
+/* Accordion styles */
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.permission-content {
+  /* Ensures smooth transitions for the content inside accordion */
+  will-change: transform;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Smooth height transitions for accordion */
+.overflow-hidden {
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Hover effects for accordion headers */
+.cursor-pointer:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Ensure chevron icon transitions smoothly */
+.ri-arrow-down-s-line {
+  transition: transform 0.2s ease-in-out;
+}

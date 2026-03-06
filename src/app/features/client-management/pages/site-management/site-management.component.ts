@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   CardComponent,
-
   CardContentComponent,
   ButtonComponent,
   InputComponent,
@@ -21,7 +20,10 @@ import {
   BreadcrumbItemComponent,
   BreadcrumbLinkComponent,
   BreadcrumbSeparatorComponent,
-  ModalService
+  ModalService,
+  DataTableComponent,
+  TolleCellDirective,
+  TableColumn
 } from '@tolle_/tolle-ui';
 
 export interface Site {
@@ -90,6 +92,7 @@ export interface Region {
     BreadcrumbLinkComponent,
     BreadcrumbSeparatorComponent,
     LabelComponent,
+    DataTableComponent,
   ],
   templateUrl: './site-management.component.html',
   styleUrls: ['./site-management.component.css']
@@ -256,6 +259,16 @@ export class SiteManagementComponent implements OnInit {
   displayedSites: Site[] = [];
   currentUserRole: 'head-office' | 'zonal-commander' = 'head-office'; // This would come from auth service
   currentUserRegion?: string; // Would be set based on logged-in user
+
+  columns: TableColumn[] = [
+    { key: 'siteInfo', label: 'Site Info' },
+    { key: 'location', label: 'Location' },
+    { key: 'contact', label: 'Contact' },
+    { key: 'staff', label: 'Staff' },
+    { key: 'security', label: 'Security' },
+    { key: 'status', label: 'Status' },
+    { key: 'actions', label: '' }
+  ];
 
   searchQuery: string = '';
   showFilterPanel: boolean = false;

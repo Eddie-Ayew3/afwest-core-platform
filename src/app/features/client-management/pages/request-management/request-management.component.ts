@@ -23,7 +23,10 @@ import {
   BreadcrumbItemComponent,
   BreadcrumbLinkComponent,
   BreadcrumbSeparatorComponent,
-  ModalService
+  ModalService,
+  DataTableComponent,
+  TolleCellDirective,
+  TableColumn
 } from '@tolle_/tolle-ui';
 
 export interface GuardRequest {
@@ -65,7 +68,8 @@ export interface GuardRequest {
     BreadcrumbComponent,
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent
+    BreadcrumbSeparatorComponent,
+    DataTableComponent
   ],
   templateUrl: './request-management.component.html',
   styleUrls: ['./request-management.component.css']
@@ -133,6 +137,18 @@ export class RequestManagementComponent implements OnInit {
 
   filteredRequests: GuardRequest[] = [];
   displayedRequests: GuardRequest[] = [];
+
+  columns: TableColumn[] = [
+    { key: 'requestId', label: 'Request ID' },
+    { key: 'guardInfo', label: 'Guard Info' },
+    { key: 'requestDetails', label: 'Request Details' },
+    { key: 'type', label: 'Type' },
+    { key: 'urgency', label: 'Urgency' },
+    { key: 'status', label: 'Status' },
+    { key: 'cost', label: 'Cost' },
+    { key: 'requestedDate', label: 'Requested Date' },
+    { key: 'actions', label: '' }
+  ];
 
   searchQuery: string = '';
   showFilterPanel: boolean = false;

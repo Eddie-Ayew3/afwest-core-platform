@@ -2,12 +2,12 @@ import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  ButtonComponent, BadgeComponent, InputComponent,
-  SelectComponent, SelectItemComponent, PaginationComponent,
+  ButtonComponent, BadgeComponent,
+  SelectComponent, SelectItemComponent,
   DropdownMenuComponent, DropdownTriggerDirective, TooltipDirective,
-  CardComponent, CardContentComponent, EmptyStateComponent,
   BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
-  SheetComponent, SheetContentComponent, LabelComponent, ModalService
+  SheetComponent, SheetContentComponent, LabelComponent, ModalService,
+  DataTableComponent, TolleCellDirective, TableColumn
 } from '@tolle_/tolle-ui';
 import { PermissionsService } from '../../core/services/permissions.service';
 
@@ -31,12 +31,12 @@ interface Shift {
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    ButtonComponent, BadgeComponent, InputComponent,
-    SelectComponent, SelectItemComponent, PaginationComponent,
+    ButtonComponent, BadgeComponent,
+    SelectComponent, SelectItemComponent,
     DropdownMenuComponent, DropdownTriggerDirective, TooltipDirective,
-    CardComponent, CardContentComponent, EmptyStateComponent,
     BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
-    SheetComponent, SheetContentComponent, LabelComponent
+    SheetComponent, SheetContentComponent, LabelComponent,
+    DataTableComponent, TolleCellDirective,
   ],
   templateUrl: './shift-management.component.html',
   styleUrl: './shift-management.component.css'
@@ -46,50 +46,46 @@ export class ShiftManagementComponent implements OnInit {
   @ViewChild('shiftModal') shiftModal!: TemplateRef<any>;
   private permissions = inject(PermissionsService);
 
+  columns: TableColumn[] = [
+    { key: 'shift', label: 'Shift' },
+    { key: 'type', label: 'Type' },
+    { key: 'site', label: 'Site' },
+    { key: 'datetime', label: 'Date & Time' },
+    { key: 'supervisor', label: 'Supervisor' },
+    { key: 'guards', label: 'Guards' },
+    { key: 'status', label: 'Status' },
+    { key: 'actions', label: '' },
+  ];
+
   shifts: Shift[] = [
-    { id: 1,  shiftCode: 'SH-001', shiftName: 'Morning Alpha',    site: 'Head Office – Accra',  date: '2025-03-01', startTime: '06:00', endTime: '14:00', supervisor: 'Kofi Asante',      guardsAssigned: 5, guardsPresent: 5, type: 'Morning',   status: 'Active' },
-    { id: 2,  shiftCode: 'SH-002', shiftName: 'Afternoon Bravo',  site: 'Kumasi Branch',        date: '2025-03-01', startTime: '14:00', endTime: '22:00', supervisor: 'Akosua Frimpong',  guardsAssigned: 4, guardsPresent: 3, type: 'Afternoon', status: 'Active' },
-    { id: 3,  shiftCode: 'SH-003', shiftName: 'Night Charlie',    site: 'Tema Industrial',      date: '2025-03-01', startTime: '22:00', endTime: '06:00', supervisor: 'Kweku Baffoe',     guardsAssigned: 3, guardsPresent: 3, type: 'Night',     status: 'Active' },
-    { id: 4,  shiftCode: 'SH-004', shiftName: 'Morning Delta',    site: 'Takoradi Branch',      date: '2025-03-01', startTime: '06:00', endTime: '14:00', supervisor: 'Kwame Mensah',     guardsAssigned: 4, guardsPresent: 2, type: 'Morning',   status: 'Active' },
-    { id: 5,  shiftCode: 'SH-005', shiftName: 'Afternoon Echo',   site: 'Cape Coast Post',      date: '2025-03-01', startTime: '14:00', endTime: '22:00', supervisor: 'Nana Acheampong',  guardsAssigned: 2, guardsPresent: 0, type: 'Afternoon', status: 'Upcoming' },
-    { id: 6,  shiftCode: 'SH-006', shiftName: 'Morning Foxtrot',  site: 'Head Office – Accra',  date: '2025-03-01', startTime: '06:00', endTime: '14:00', supervisor: 'Akua Tetteh',      guardsAssigned: 6, guardsPresent: 6, type: 'Morning',   status: 'Active' },
-    { id: 7,  shiftCode: 'SH-007', shiftName: 'Night Golf',       site: 'Kumasi Branch',        date: '2025-02-28', startTime: '22:00', endTime: '06:00', supervisor: 'Yaw Darko',        guardsAssigned: 3, guardsPresent: 3, type: 'Night',     status: 'Completed' },
-    { id: 8,  shiftCode: 'SH-008', shiftName: 'Morning Hotel',    site: 'Tema Industrial',      date: '2025-02-28', startTime: '06:00', endTime: '14:00', supervisor: 'Adwoa Kyei',       guardsAssigned: 4, guardsPresent: 4, type: 'Morning',   status: 'Completed' },
-    { id: 9,  shiftCode: 'SH-009', shiftName: 'Afternoon India',  site: 'Takoradi Branch',      date: '2025-02-28', startTime: '14:00', endTime: '22:00', supervisor: 'Ama Boateng',      guardsAssigned: 3, guardsPresent: 2, type: 'Afternoon', status: 'Completed' },
-    { id: 10, shiftCode: 'SH-010', shiftName: 'Morning Juliet',   site: 'Cape Coast Post',      date: '2025-03-02', startTime: '06:00', endTime: '14:00', supervisor: 'Kojo Agyemang',    guardsAssigned: 3, guardsPresent: 0, type: 'Morning',   status: 'Upcoming' },
+    { id: 1,  shiftCode: 'SH-001', shiftName: 'Morning Alpha',   site: 'Head Office – Accra', date: '2025-03-01', startTime: '06:00', endTime: '14:00', supervisor: 'Kofi Asante',     guardsAssigned: 5, guardsPresent: 5, type: 'Morning',   status: 'Active' },
+    { id: 2,  shiftCode: 'SH-002', shiftName: 'Afternoon Bravo', site: 'Kumasi Branch',       date: '2025-03-01', startTime: '14:00', endTime: '22:00', supervisor: 'Akosua Frimpong', guardsAssigned: 4, guardsPresent: 3, type: 'Afternoon', status: 'Active' },
+    { id: 3,  shiftCode: 'SH-003', shiftName: 'Night Charlie',   site: 'Tema Industrial',     date: '2025-03-01', startTime: '22:00', endTime: '06:00', supervisor: 'Kweku Baffoe',    guardsAssigned: 3, guardsPresent: 3, type: 'Night',     status: 'Active' },
+    { id: 4,  shiftCode: 'SH-004', shiftName: 'Morning Delta',   site: 'Takoradi Branch',     date: '2025-03-01', startTime: '06:00', endTime: '14:00', supervisor: 'Kwame Mensah',    guardsAssigned: 4, guardsPresent: 2, type: 'Morning',   status: 'Active' },
+    { id: 5,  shiftCode: 'SH-005', shiftName: 'Afternoon Echo',  site: 'Cape Coast Post',     date: '2025-03-01', startTime: '14:00', endTime: '22:00', supervisor: 'Nana Acheampong', guardsAssigned: 2, guardsPresent: 0, type: 'Afternoon', status: 'Upcoming' },
+    { id: 6,  shiftCode: 'SH-006', shiftName: 'Morning Foxtrot', site: 'Head Office – Accra', date: '2025-03-01', startTime: '06:00', endTime: '14:00', supervisor: 'Akua Tetteh',     guardsAssigned: 6, guardsPresent: 6, type: 'Morning',   status: 'Active' },
+    { id: 7,  shiftCode: 'SH-007', shiftName: 'Night Golf',      site: 'Kumasi Branch',       date: '2025-02-28', startTime: '22:00', endTime: '06:00', supervisor: 'Yaw Darko',       guardsAssigned: 3, guardsPresent: 3, type: 'Night',     status: 'Completed' },
+    { id: 8,  shiftCode: 'SH-008', shiftName: 'Morning Hotel',   site: 'Tema Industrial',     date: '2025-02-28', startTime: '06:00', endTime: '14:00', supervisor: 'Adwoa Kyei',      guardsAssigned: 4, guardsPresent: 4, type: 'Morning',   status: 'Completed' },
+    { id: 9,  shiftCode: 'SH-009', shiftName: 'Afternoon India', site: 'Takoradi Branch',     date: '2025-02-28', startTime: '14:00', endTime: '22:00', supervisor: 'Ama Boateng',     guardsAssigned: 3, guardsPresent: 2, type: 'Afternoon', status: 'Completed' },
+    { id: 10, shiftCode: 'SH-010', shiftName: 'Morning Juliet',  site: 'Cape Coast Post',     date: '2025-03-02', startTime: '06:00', endTime: '14:00', supervisor: 'Kojo Agyemang',   guardsAssigned: 3, guardsPresent: 0, type: 'Morning',   status: 'Upcoming' },
   ];
 
   filteredShifts: Shift[] = [];
-  displayedShifts: Shift[] = [];
-
-  searchQuery = '';
-  searchTimeout: any;
-  filterStatus: 'All' | 'Active' | 'Upcoming' | 'Completed' | 'Cancelled' = 'All';
-  filterType: 'All' | 'Morning' | 'Afternoon' | 'Night' = 'All';
   showFilterPanel = false;
   showCreateSheet = false;
   creating = false;
 
-  newShift = {
-    site: '',
-    date: '',
-    type: 'Morning',
-    supervisor: '',
-    guardsAssigned: 2
-  };
+  filterStatus: 'All' | 'Active' | 'Upcoming' | 'Completed' | 'Cancelled' = 'All';
+  filterType: 'All' | 'Morning' | 'Afternoon' | 'Night' = 'All';
 
-  currentPage = 1;
-  pageSize = 10;
-  startIndex = 0;
-  endIndex = 0;
+  newShift = { site: '', date: '', type: 'Morning', supervisor: '', guardsAssigned: 2 };
 
-  get activeCount()    { return this.shifts.filter(s => s.status === 'Active').length; }
-  get upcomingCount()  { return this.shifts.filter(s => s.status === 'Upcoming').length; }
-  get onDutyCount()    { return this.shifts.filter(s => s.status === 'Active').reduce((acc, s) => acc + s.guardsPresent, 0); }
+  get activeCount()   { return this.shifts.filter(s => s.status === 'Active').length; }
+  get upcomingCount() { return this.shifts.filter(s => s.status === 'Upcoming').length; }
+  get onDutyCount()   { return this.shifts.filter(s => s.status === 'Active').reduce((acc, s) => acc + s.guardsPresent, 0); }
 
   get activeFilterCount(): number {
     let count = 0;
-    if (this.searchQuery.trim()) count++;
     if (this.filterStatus !== 'All') count++;
     if (this.filterType !== 'All') count++;
     return count;
@@ -97,61 +93,22 @@ export class ShiftManagementComponent implements OnInit {
 
   ngOnInit() {
     this.shifts = this.permissions.filterBySite(this.shifts);
-    this.applyFiltersAndPagination();
+    this.applyFilter();
   }
 
-  onSearch() {
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => this.applyFiltersAndPagination(), 300);
-  }
-
-  applyFiltersAndPagination() {
+  applyFilter() {
     let result = [...this.shifts];
-
-    if (this.searchQuery.trim()) {
-      const q = this.searchQuery.toLowerCase();
-      result = result.filter(s =>
-        s.shiftName.toLowerCase().includes(q) ||
-        s.shiftCode.toLowerCase().includes(q) ||
-        s.site.toLowerCase().includes(q) ||
-        s.supervisor.toLowerCase().includes(q)
-      );
-    }
-
-    if (this.filterStatus !== 'All') {
-      result = result.filter(s => s.status === this.filterStatus);
-    }
-
-    if (this.filterType !== 'All') {
-      result = result.filter(s => s.type === this.filterType);
-    }
-
+    if (this.filterStatus !== 'All') result = result.filter(s => s.status === this.filterStatus);
+    if (this.filterType !== 'All') result = result.filter(s => s.type === this.filterType);
     this.filteredShifts = result;
-    this.startIndex = (this.currentPage - 1) * this.pageSize;
-    this.endIndex = Math.min(this.startIndex + this.pageSize, this.filteredShifts.length);
-    this.displayedShifts = this.filteredShifts.slice(this.startIndex, this.endIndex);
   }
 
-  onPageChange(event: Event | number) {
-    const page = typeof event === 'number' ? event : (event as any).detail || (event as any).page || 1;
-    this.currentPage = page;
-    this.applyFiltersAndPagination();
-  }
-
-  onPageSizeChange() {
-    this.currentPage = 1;
-    this.applyFiltersAndPagination();
-  }
+  toggleFilterPanel() { this.showFilterPanel = !this.showFilterPanel; }
 
   clearFilters() {
-    this.searchQuery = '';
     this.filterStatus = 'All';
     this.filterType = 'All';
-    this.applyFiltersAndPagination();
-  }
-
-  toggleFilterPanel() {
-    this.showFilterPanel = !this.showFilterPanel;
+    this.applyFilter();
   }
 
   openCreateSheet() {
@@ -178,7 +135,7 @@ export class ShiftManagementComponent implements OnInit {
         type: this.newShift.type as 'Morning' | 'Afternoon' | 'Night',
         status: 'Upcoming'
       });
-      this.applyFiltersAndPagination();
+      this.applyFilter();
       this.showCreateSheet = false;
       this.creating = false;
     }, 600);

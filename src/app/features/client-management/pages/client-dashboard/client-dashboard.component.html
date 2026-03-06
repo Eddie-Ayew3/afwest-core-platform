@@ -152,79 +152,43 @@
         <h3 class="text-lg font-semibold">Recent Projects</h3>
         <button class="text-sm text-primary hover:underline">View All Projects</button>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead>
-            <tr class="text-left text-sm text-muted-foreground border-b border-border">
-              <th class="pb-3 font-medium">Project Name</th>
-              <th class="pb-3 font-medium">Status</th>
-              <th class="pb-3 font-medium">Progress</th>
-              <th class="pb-3 font-medium">Team</th>
-              <th class="pb-3 font-medium">Due Date</th>
-            </tr>
-          </thead>
-          <tbody class="text-sm">
-            <tr class="border-b border-border">
-              <td class="py-3 font-medium">Design System</td>
-              <td class="py-3"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Active</span></td>
-              <td class="py-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div class="h-full bg-green-500 progress-75"></div>
-                  </div>
-                  <span>75%</span>
-                </div>
-              </td>
-              <td class="py-3">
-                <div class="flex -space-x-2">
-                  <div class="h-8 w-8 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white text-xs">JD</div>
-                  <div class="h-8 w-8 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-white text-xs">SC</div>
-                  <div class="h-8 w-8 rounded-full bg-purple-500 border-2 border-white flex items-center justify-center text-white text-xs">MR</div>
-                </div>
-              </td>
-              <td class="py-3">Dec 15, 2023</td>
-            </tr>
-            <tr class="border-b border-border">
-              <td class="py-3 font-medium">Mobile App</td>
-              <td class="py-3"><span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">In Review</span></td>
-              <td class="py-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div class="h-full bg-yellow-500 progress-45"></div>
-                  </div>
-                  <span>45%</span>
-                </div>
-              </td>
-              <td class="py-3">
-                <div class="flex -space-x-2">
-                  <div class="h-8 w-8 rounded-full bg-red-500 border-2 border-white flex items-center justify-center text-white text-xs">AK</div>
-                  <div class="h-8 w-8 rounded-full bg-indigo-500 border-2 border-white flex items-center justify-center text-white text-xs">PL</div>
-                </div>
-              </td>
-              <td class="py-3">Jan 5, 2024</td>
-            </tr>
-            <tr>
-              <td class="py-3 font-medium">Marketing Website</td>
-              <td class="py-3"><span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Planning</span></td>
-              <td class="py-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div class="h-full bg-blue-500 progress-20"></div>
-                  </div>
-                  <span>20%</span>
-                </div>
-              </td>
-              <td class="py-3">
-                <div class="flex -space-x-2">
-                  <div class="h-8 w-8 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-white text-xs">LN</div>
-                  <div class="h-8 w-8 rounded-full bg-pink-500 border-2 border-white flex items-center justify-center text-white text-xs">KW</div>
-                  <div class="h-8 w-8 rounded-full bg-cyan-500 border-2 border-white flex items-center justify-center text-white text-xs">RJ</div>
-                </div>
-              </td>
-              <td class="py-3">Feb 28, 2024</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="min-h-0">
+        <tolle-data-table 
+          [data]="projects"
+          [columns]="columns"
+          [stickyHeader]="true"
+          [paginate]="false"
+          [searchable]="false"
+          [showSettings]="false">
+
+          <ng-template tolleCell="status" let-row="row">
+            <tolle-badge 
+              [variant]="row.status === 'Active' ? 'default' : row.status === 'In Review' ? 'secondary' : 'outline'" 
+              size="sm">
+              {{row.status}}
+            </tolle-badge>
+          </ng-template>
+
+          <ng-template tolleCell="progress" let-row="row">
+            <div class="flex items-center gap-2">
+              <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-green-500" [style.width.%]="row.progress"></div>
+              </div>
+              <span>{{row.progress}}%</span>
+            </div>
+          </ng-template>
+
+          <ng-template tolleCell="team" let-row="row">
+            <div class="flex -space-x-2">
+              <div *ngFor="let member of row.team" 
+                   class="h-8 w-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
+                   [class]="member.color">
+                {{member.initials}}
+              </div>
+            </div>
+          </ng-template>
+
+        </tolle-data-table>
       </div>
     </div>
 </div>

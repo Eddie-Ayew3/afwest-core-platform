@@ -1,24 +1,19 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  CardComponent,
-  CardContentComponent,
   ButtonComponent,
-  InputComponent,
   BadgeComponent,
-  SelectComponent,
-  SelectItemComponent,
-  EmptyStateComponent,
-  PaginationComponent,
   TooltipDirective,
   DropdownTriggerDirective,
   DropdownMenuComponent,
   BreadcrumbComponent,
   BreadcrumbItemComponent,
   BreadcrumbLinkComponent,
-  BreadcrumbSeparatorComponent
+  BreadcrumbSeparatorComponent,
+  DataTableComponent,
+  TolleCellDirective,
+  TableColumn
 } from '@tolle_/tolle-ui';
 import { GhanaSite } from '../../../../core/models/rbac.models';
 import { PermissionsService } from '../../../../core/services/permissions.service';
@@ -37,23 +32,17 @@ interface StaffMember {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    CardComponent,
-    CardContentComponent,
     ButtonComponent,
-    InputComponent,
     BadgeComponent,
-    SelectComponent,
-    SelectItemComponent,
-    EmptyStateComponent,
-    PaginationComponent,
     TooltipDirective,
     DropdownTriggerDirective,
     DropdownMenuComponent,
     BreadcrumbComponent,
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent
+    BreadcrumbSeparatorComponent,
+    DataTableComponent,
+    TolleCellDirective
   ],
   templateUrl: './staff-management.component.html',
   styleUrls: ['./staff-management.component.css']
@@ -62,11 +51,13 @@ export class StaffManagementComponent implements OnInit {
   private permissions = inject(PermissionsService);
   private router = inject(Router);
 
-  searchQuery = '';
-  activeFilterCount = 0;
-  filterPanelOpen = false;
-  pageSize = 10;
-  currentPage = 1;
+  columns: TableColumn[] = [
+    { key: 'name', label: 'Staff Name' },
+    { key: 'role', label: 'Role' },
+    { key: 'status', label: 'Status' },
+    { key: 'contact', label: 'Contact' },
+    { key: 'actions', label: '' },
+  ];
 
   staff: StaffMember[] = [
     { id: 'ST001', name: 'Kwame Mensah',    role: 'Operations Manager',  status: 'Active',    contact: 'k.mensah@afwest.com.gh',    site: 'Head Office – Accra' },
@@ -83,53 +74,11 @@ export class StaffManagementComponent implements OnInit {
     { id: 'ST012', name: 'Akua Tetteh',     role: 'Admin Coordinator',   status: 'Suspended', contact: 'a.tetteh@afwest.com.gh',    site: 'Takoradi Branch' },
   ];
 
-  filteredStaff: StaffMember[] = [];
-  displayedStaff: StaffMember[] = [];
-
   ngOnInit(): void {
     this.staff = this.permissions.filterBySite(this.staff);
-    this.applyFilters();
   }
 
-  get staffStartIndex(): number { return (this.currentPage - 1) * this.pageSize; }
-  get staffEndIndex(): number   { return Math.min(this.staffStartIndex + this.pageSize, this.filteredStaff.length); }
-
-  applyFilters(): void {
-    const query = this.searchQuery.toLowerCase();
-    this.filteredStaff = this.staff.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.role.toLowerCase().includes(query) ||
-      p.id.toLowerCase().includes(query) ||
-      p.contact.toLowerCase().includes(query)
-    );
-    this.currentPage = 1;
-    this.updateDisplayedData();
-  }
-
-  updateDisplayedData(): void {
-    const start = (this.currentPage - 1) * this.pageSize;
-    this.displayedStaff = this.filteredStaff.slice(start, start + this.pageSize);
-  }
-
-  onSearch(): void { this.applyFilters(); }
-  toggleFilterPanel(): void { this.filterPanelOpen = !this.filterPanelOpen; }
   viewPerson(person: StaffMember): void { console.log('View staff:', person); }
-
-  clearFilters(): void {
-    this.searchQuery = '';
-    this.applyFilters();
-    this.activeFilterCount = 0;
-  }
-
-  onPageSizeChange(): void {
-    this.currentPage = 1;
-    this.updateDisplayedData();
-  }
-
-  onPageChange(event: any): void {
-    this.currentPage = (event as any).detail || (event as any).page || event;
-    this.updateDisplayedData();
-  }
 
   navigateToNewStaff(): void {
     this.router.navigate(['/hr/staff-management/new-staff']);

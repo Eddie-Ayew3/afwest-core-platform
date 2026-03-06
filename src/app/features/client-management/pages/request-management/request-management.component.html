@@ -125,120 +125,118 @@
       <tolle-card-content class="p-0">
 
         <!-- TABLE - only shown when there is data -->
-        <div class="overflow-x-auto" *ngIf="displayedRequests.length > 0">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-border bg-muted/5">
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Request ID</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Guard Info</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Request Details</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Type</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Urgency</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Cost</th>
-                <th class="text-left p-4 text-sm font-medium text-muted-foreground">Requested Date</th>
-                <th class="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let request of displayedRequests"
-                  class="border-b border-border hover:bg-muted/30 transition-colors">
-                <td class="p-4">
-                  <div class="font-mono text-sm">{{request.id}}</div>
-                </td>
-                <td class="p-4">
-                  <div>
-                    <p class="font-medium">{{request.guardName}}</p>
-                    <p class="text-xs text-muted-foreground">ID: {{request.guardId}}</p>
+        <div class="min-h-0" *ngIf="displayedRequests.length > 0">
+          <tolle-data-table 
+            [data]="displayedRequests"
+            [columns]="columns"
+            [stickyHeader]="true"
+            [paginate]="false"
+            [searchable]="false"
+            [showSettings]="false">
+
+            <ng-template tolleCell="requestId" let-row="row">
+              <div class="font-mono text-sm">{{row.id}}</div>
+            </ng-template>
+
+            <ng-template tolleCell="guardInfo" let-row="row">
+              <div>
+                <p class="font-medium">{{row.guardName}}</p>
+                <p class="text-xs text-muted-foreground">ID: {{row.guardId}}</p>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="requestDetails" let-row="row">
+              <div>
+                <p class="font-medium text-sm">{{row.title}}</p>
+                <p class="text-xs text-muted-foreground mt-1">{{row.description}}</p>
+                <div *ngIf="row.items && row.items.length > 0" class="mt-2">
+                  <p class="text-xs text-muted-foreground">Items:</p>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    <span *ngFor="let item of row.items" 
+                          class="text-xs bg-muted px-2 py-1 rounded">{{item}}</span>
                   </div>
-                </td>
-                <td class="p-4">
-                  <div>
-                    <p class="font-medium text-sm">{{request.title}}</p>
-                    <p class="text-xs text-muted-foreground mt-1">{{request.description}}</p>
-                    <div *ngIf="request.items && request.items.length > 0" class="mt-2">
-                      <p class="text-xs text-muted-foreground">Items:</p>
-                      <div class="flex flex-wrap gap-1 mt-1">
-                        <span *ngFor="let item of request.items" 
-                              class="text-xs bg-muted px-2 py-1 rounded">{{item}}</span>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="p-4">
-                  <div class="flex items-center gap-2">
-                    <i [class]="getRequestTypeIcon(request.requestType)" class="text-muted-foreground"></i>
-                    <span class="text-sm capitalize">{{request.requestType.replace('-', ' ')}}</span>
-                  </div>
-                </td>
-                <td class="p-4">
-                  <tolle-badge 
-                    [variant]="'default'"
-                    size="sm">
-                    {{request.urgency}}
-                  </tolle-badge>
-                </td>
-                <td class="p-4">
-                  <tolle-badge 
-                    [variant]="'default'"
-                    size="sm">
-                    {{request.status}}
-                  </tolle-badge>
-                </td>
-                <td class="p-4">
-                  <span class="text-sm font-medium" *ngIf="request.cost">
-                    ${{request.cost.toFixed(2)}}
-                  </span>
-                  <span class="text-sm text-muted-foreground" *ngIf="!request.cost">-</span>
-                </td>
-                <td class="p-4">
-                  <div class="text-sm">{{request.requestedDate | date:'MMM d, y'}}</div>
-                </td>
-                <td class="p-4 text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewRequestDetails(request)">
-                      <i class="ri-eye-line"></i>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="type" let-row="row">
+              <div class="flex items-center gap-2">
+                <i [class]="getRequestTypeIcon(row.requestType)" class="text-muted-foreground"></i>
+                <span class="text-sm capitalize">{{row.requestType.replace('-', ' ')}}</span>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="urgency" let-row="row">
+              <tolle-badge 
+                [variant]="'default'"
+                size="sm">
+                {{row.urgency}}
+              </tolle-badge>
+            </ng-template>
+
+            <ng-template tolleCell="status" let-row="row">
+              <tolle-badge 
+                [variant]="'default'"
+                size="sm">
+                {{row.status}}
+              </tolle-badge>
+            </ng-template>
+
+            <ng-template tolleCell="cost" let-row="row">
+              <span class="text-sm font-medium" *ngIf="row.cost">
+                ${{row.cost.toFixed(2)}}
+              </span>
+              <span class="text-sm text-muted-foreground" *ngIf="!row.cost">-</span>
+            </ng-template>
+
+            <ng-template tolleCell="requestedDate" let-row="row">
+              <div class="text-sm">{{row.requestedDate | date:'MMM d, y'}}</div>
+            </ng-template>
+
+            <ng-template tolleCell="actions" let-row="row">
+              <div class="flex items-center justify-end gap-2">
+                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewRequestDetails(row)">
+                  <i class="ri-eye-line"></i>
+                </tolle-button>
+                
+                <!-- Action buttons based on status -->
+                <ng-container [ngSwitch]="row.status">
+                  <ng-container *ngSwitchCase="'pending'">
+                    <tolle-button variant="default" size="xs" (click)="approveRequest(row)">
+                      Approve
                     </tolle-button>
-                    
-                    <!-- Action buttons based on status -->
-                    <ng-container [ngSwitch]="request.status">
-                      <ng-container *ngSwitchCase="'pending'">
-                        <tolle-button variant="default" size="xs" (click)="approveRequest(request)">
-                          Approve
-                        </tolle-button>
-                        <tolle-button variant="destructive" size="xs" (click)="rejectRequest(request)">
-                          Reject
-                        </tolle-button>
-                      </ng-container>
-                      <ng-container *ngSwitchCase="'approved'">
-                        <tolle-button variant="default" size="xs" (click)="completeRequest(request)">
-                          Complete
-                        </tolle-button>
-                      </ng-container>
-                    </ng-container>
-                    
-                    <div class="relative">
-                      <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
-                        <i class="ri-more-2-fill"></i>
-                      </tolle-button>
-                      <tolle-dropdown-menu #actionMenu>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
-                          <i class="ri-printer-line"></i> Print Request
-                        </button>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
-                          <i class="ri-mail-line"></i> Email Guard
-                        </button>
-                        <div class="h-px bg-border my-1"></div>
-                        <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
-                          <i class="ri-delete-bin-line"></i> Delete
-                        </button>
-                      </tolle-dropdown-menu>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    <tolle-button variant="destructive" size="xs" (click)="rejectRequest(row)">
+                      Reject
+                    </tolle-button>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'approved'">
+                    <tolle-button variant="default" size="xs" (click)="completeRequest(row)">
+                      Complete
+                    </tolle-button>
+                  </ng-container>
+                </ng-container>
+                
+                <div class="relative">
+                  <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                    <i class="ri-more-2-fill"></i>
+                  </tolle-button>
+                  <tolle-dropdown-menu #actionMenu>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                      <i class="ri-printer-line"></i> Print Request
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 rounded-sm">
+                      <i class="ri-mail-line"></i> Email Guard
+                    </button>
+                    <div class="h-px bg-border my-1"></div>
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                      <i class="ri-delete-bin-line"></i> Delete
+                    </button>
+                  </tolle-dropdown-menu>
+                </div>
+              </div>
+            </ng-template>
+
+          </tolle-data-table>
         </div>
 
         <!-- EMPTY STATE - completely outside the table -->

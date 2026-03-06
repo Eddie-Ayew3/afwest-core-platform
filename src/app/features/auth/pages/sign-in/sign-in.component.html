@@ -36,6 +36,7 @@
       <div class="w-2/3 p-3 border border-dashed border-gray-300 rounded-md text-left">
         <p class="text-xs font-semibold text-gray-400 mb-2">Quick Sign-In (Dev)</p>
         <select class="w-full text-sm p-1.5 border border-gray-300 rounded bg-white"
+                aria-label="Select demo account for quick sign-in"
                 [(ngModel)]="selectedDemoId" name="demoSelect" (change)="selectDemo()">
           <option value="">-- Select a demo account --</option>
           <option *ngFor="let a of demoAccounts" [value]="a.staffId">{{ a.label }}</option>

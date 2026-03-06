@@ -1,11 +1,12 @@
-import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   ButtonComponent, BadgeComponent,
   CardComponent, CardContentComponent,
   BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent,
-  BreadcrumbSeparatorComponent, TooltipDirective, ModalService
+  BreadcrumbSeparatorComponent, TooltipDirective, SwitchComponent,
+  HoverCardComponent, HoverCardTriggerComponent, HoverCardContentComponent
 } from '@tolle_/tolle-ui';
 import { UserRole, UserScope } from '../../core/models/rbac.models';
 
@@ -223,21 +224,20 @@ const ROLE_CONFIGS: RoleConfig[] = [
     ButtonComponent, BadgeComponent,
     CardComponent, CardContentComponent,
     BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent,
-    BreadcrumbSeparatorComponent, TooltipDirective
+    BreadcrumbSeparatorComponent, TooltipDirective, SwitchComponent,
+    HoverCardComponent, HoverCardTriggerComponent, HoverCardContentComponent
   ],
   templateUrl: './permissions-management.component.html',
   styleUrl: './permissions-management.component.css'
 })
 export class PermissionsManagementComponent implements OnInit {
-  private modalService = inject(ModalService);
-  @ViewChild('permInfoModal') permInfoModal!: TemplateRef<any>;
-
   readonly allPermissions = ALL_PERMISSIONS;
   roleConfigs: RoleConfig[] = JSON.parse(JSON.stringify(ROLE_CONFIGS));
   selectedRole: UserRole = 'Admin';
   unsaved = false;
   savedIndicatorVisible = false;
   categories: string[] = [];
+  expandedCategories: Set<string> = new Set();
 
   get selectedRoleConfig(): RoleConfig {
     return this.roleConfigs.find(r => r.role === this.selectedRole)!;
@@ -245,6 +245,9 @@ export class PermissionsManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.categories = [...new Set(ALL_PERMISSIONS.map(p => p.category))];
+    
+    // Initialize all categories as expanded
+    this.categories.forEach(cat => this.expandedCategories.add(cat));
 
     const saved = localStorage.getItem('rolePermissions');
     if (saved) {
@@ -376,18 +379,28 @@ export class PermissionsManagementComponent implements OnInit {
     return map[scope];
   }
 
-  viewPermissionInfo(perm: AppPermission): void {
-    this.modalService.open({
-      title: perm.action,
-      backdropClose: true,
-      size: 'default',
-      showCloseButton: true,
-      content: this.permInfoModal,
-      context: { perm }
-    });
-  }
 
   trackCategory(i: number, cat: string): string {
     return cat;
+  }
+
+  toggleCategory(category: string): void {
+    if (this.expandedCategories.has(category)) {
+      this.expandedCategories.delete(category);
+    } else {
+      this.expandedCategories.add(category);
+    }
+  }
+
+  isCategoryExpanded(category: string): boolean {
+    return this.expandedCategories.has(category);
+  }
+
+  expandAllCategories(): void {
+    this.categories.forEach(cat => this.expandedCategories.add(cat));
+  }
+
+  collapseAllCategories(): void {
+    this.expandedCategories.clear();
   }
 }
