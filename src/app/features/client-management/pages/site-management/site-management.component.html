@@ -335,6 +335,15 @@
   </div>
 </div>
 
+<!-- Map Sheet -->
+<tolle-sheet [(isOpen)]="showMapSheet" side="right">
+  <tolle-sheet-content>
+    <ng-container *ngIf="selectedSite && showMapSheet">
+      <!-- Map functionality temporarily removed -->
+    </ng-container>
+  </tolle-sheet-content>
+</tolle-sheet>
+
 <!-- New site modal -->
 <ng-template #newSiteModal>
   <div class="space-y-4 p-4">

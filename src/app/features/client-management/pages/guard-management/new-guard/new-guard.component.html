@@ -26,7 +26,10 @@
     <div class="mb-8">
       <div class="flex items-center mb-4">
         @for (title of stepTitles; track $index; let i = $index) {
-          <button type="button" (click)="goToStep(i)" [disabled]="i >= currentStep"
+          <button
+            type="button"
+            (click)="goToStep(i)"
+            [disabled]="i >= currentStep"
             class="flex flex-col items-center shrink-0">
             <div [class]="'w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all ' +
               (i < currentStep
@@ -53,6 +56,7 @@
       <tolle-progress [value]="progressValue"></tolle-progress>
     </div>
 
+    <!-- Form -->
     <form [formGroup]="guardForm" (ngSubmit)="onSubmit()">
 
       <!-- ── Step 0: Personal Information ── -->
@@ -69,6 +73,7 @@
 
             <!-- Photo Upload -->
             <div class="flex items-start gap-6">
+              <!-- Preview -->
               <div class="shrink-0">
                 <div class="w-24 h-24 rounded-full border-2 border-dashed border-border bg-muted flex items-center justify-center overflow-hidden">
                   @if (profilePhotoPreview) {
@@ -78,6 +83,7 @@
                   }
                 </div>
               </div>
+              <!-- Upload Control -->
               <div class="flex-1 space-y-1.5">
                 <tolle-label>Profile Photo</tolle-label>
                 <label class="flex items-center gap-3 cursor-pointer">
@@ -90,18 +96,22 @@
                 </label>
                 @if (profilePhotoPreview) {
                   <button type="button" (click)="profilePhotoPreview = null"
-                    class="text-xs text-destructive hover:underline">Remove photo</button>
+                    class="text-xs text-destructive hover:underline">
+                    Remove photo
+                  </button>
                 }
               </div>
             </div>
 
             <div class="border-t border-border"></div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Name + Guard ID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="space-y-1.5">
                 <tolle-label>Full Name <span class="text-destructive">*</span></tolle-label>
                 <tolle-input type="text" formControlName="fullName"
-                  placeholder="e.g. Kwesi Owusu" class="w-full"></tolle-input>
+                  placeholder="e.g. Kwame Mensah" class="w-full">
+                </tolle-input>
                 @if (isFieldInvalid('fullName')) {
                   <p class="text-destructive text-xs">{{ getErrorMessage('fullName') }}</p>
                 }
@@ -115,7 +125,8 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- DOB + Gender + Nationality + Marital Status -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div class="space-y-1.5">
                 <tolle-label>Date of Birth</tolle-label>
                 <tolle-date-picker
@@ -134,9 +145,58 @@
                   <tolle-select-item value="Prefer not to say">Prefer not to say</tolle-select-item>
                 </tolle-select>
               </div>
+              <div class="space-y-1.5">
+                <tolle-label>Nationality</tolle-label>
+                <tolle-select formControlName="nationality" class="w-full" placeholder="Select nationality">
+                  @for (nationality of nationalities; track nationality) {
+                    <tolle-select-item [value]="nationality">{{ nationality }}</tolle-select-item>
+                  }
+                </tolle-select>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Marital Status</tolle-label>
+                <tolle-select formControlName="maritalStatus" class="w-full" placeholder="Select status">
+                  @for (status of maritalStatuses; track status) {
+                    <tolle-select-item [value]="status">{{ status }}</tolle-select-item>
+                  }
+                </tolle-select>
+              </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Place of Birth + Region of Birth + Height + SNET -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="space-y-1.5">
+                <tolle-label>Place of Birth</tolle-label>
+                <tolle-input type="text" formControlName="placeOfBirth"
+                  placeholder="e.g. Accra" class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Region of Birth</tolle-label>
+                <tolle-select formControlName="regionOfBirth" class="w-full" placeholder="Select region">
+                  @for (region of ghanaianRegions; track region) {
+                    <tolle-select-item [value]="region">{{ region }}</tolle-select-item>
+                  }
+                </tolle-select>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Height</tolle-label>
+                <tolle-input type="text" formControlName="height"
+                  placeholder="e.g. 5'10&quot; or 178 cm" class="w-full">
+                  <i prefix class="ri-ruler-line"></i>
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>SNET Number</tolle-label>
+                <tolle-input type="text" formControlName="snetNumber"
+                  placeholder="e.g. SNET123456" class="w-full">
+                  <i prefix class="ri-number-1"></i>
+                </tolle-input>
+              </div>
+            </div>
+
+            <!-- National ID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="space-y-1.5">
                 <tolle-label>Ghana Card / National ID</tolle-label>
                 <tolle-input type="text" formControlName="nationalId"
@@ -168,11 +228,12 @@
           </tolle-card-header>
           <tolle-card-content class="pt-4 space-y-4">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Email + Phone + Telephone + Alternative Phone -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div class="space-y-1.5">
-                <tolle-label>Email Address <span class="text-destructive">*</span></tolle-label>
+                <tolle-label>Email <span class="text-destructive">*</span></tolle-label>
                 <tolle-input type="email" formControlName="email"
-                  placeholder="e.g. k.owusu@afwest.com.gh" class="w-full">
+                  placeholder="e.g. kwame.mensah@afwest.com.gh" class="w-full">
                   <i prefix class="ri-mail-line"></i>
                 </tolle-input>
                 @if (isFieldInvalid('email')) {
@@ -180,7 +241,7 @@
                 }
               </div>
               <div class="space-y-1.5">
-                <tolle-label>Phone Number <span class="text-destructive">*</span></tolle-label>
+                <tolle-label>Phone <span class="text-destructive">*</span></tolle-label>
                 <tolle-input type="tel" formControlName="phone"
                   placeholder="e.g. 024 000 0000" class="w-full">
                   <i prefix class="ri-phone-line"></i>
@@ -189,45 +250,56 @@
                   <p class="text-destructive text-xs">{{ getErrorMessage('phone') }}</p>
                 }
               </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <tolle-label>Telephone</tolle-label>
+                <tolle-input type="tel" formControlName="telephone"
+                  placeholder="e.g. 030 000 0000" class="w-full">
+                  <i prefix class="ri-phone-line"></i>
+                </tolle-input>
+              </div>
               <div class="space-y-1.5">
                 <tolle-label>Alternative Phone</tolle-label>
                 <tolle-input type="tel" formControlName="alternativePhone"
-                  placeholder="e.g. 020 000 0000" class="w-full"></tolle-input>
+                  placeholder="e.g. 020 000 0000" class="w-full">
+                </tolle-input>
               </div>
             </div>
 
-            <div class="space-y-1.5">
-              <tolle-label>Residential Address <span class="text-destructive">*</span></tolle-label>
-              <tolle-input type="text" formControlName="residentialAddress"
-                placeholder="e.g. 12 Osu Badu Street, Accra" class="w-full">
-                <i prefix class="ri-home-3-line"></i>
-              </tolle-input>
-              @if (isFieldInvalid('residentialAddress')) {
-                <p class="text-destructive text-xs">{{ getErrorMessage('residentialAddress') }}</p>
-              }
+            <!-- Residential Address + Postal Address -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <tolle-label>Residential Address <span class="text-destructive">*</span></tolle-label>
+                <tolle-input type="text" formControlName="residentialAddress"
+                  placeholder="e.g. 42 Kanda Highway, Accra" class="w-full">
+                  <i prefix class="ri-home-3-line"></i>
+                </tolle-input>
+                @if (isFieldInvalid('residentialAddress')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('residentialAddress') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Postal Address</tolle-label>
+                <tolle-input type="text" formControlName="postalAddress"
+                  placeholder="e.g. P.O. Box GP 12345, Accra" class="w-full">
+                  <i prefix class="ri-mail-send-line"></i>
+                </tolle-input>
+              </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- City + Region -->
+            <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
               <div class="space-y-1.5">
                 <tolle-label>City / Town</tolle-label>
                 <tolle-input type="text" formControlName="city"
-                  placeholder="e.g. Accra" class="w-full"></tolle-input>
+                  placeholder="e.g. Accra" class="w-full">
+                </tolle-input>
               </div>
               <div class="space-y-1.5">
                 <tolle-label>Region</tolle-label>
                 <tolle-select formControlName="region" class="w-full" placeholder="Select region">
-                  <tolle-select-item value="Greater Accra">Greater Accra</tolle-select-item>
-                  <tolle-select-item value="Ashanti">Ashanti</tolle-select-item>
-                  <tolle-select-item value="Western">Western</tolle-select-item>
-                  <tolle-select-item value="Central">Central</tolle-select-item>
-                  <tolle-select-item value="Eastern">Eastern</tolle-select-item>
-                  <tolle-select-item value="Volta">Volta</tolle-select-item>
-                  <tolle-select-item value="Northern">Northern</tolle-select-item>
-                  <tolle-select-item value="Upper East">Upper East</tolle-select-item>
-                  <tolle-select-item value="Upper West">Upper West</tolle-select-item>
+                  @for (region of ghanaianRegions; track region) {
+                    <tolle-select-item [value]="region">{{ region }}</tolle-select-item>
+                  }
                 </tolle-select>
               </div>
             </div>
@@ -244,19 +316,20 @@
         </tolle-card>
       }
 
-      <!-- ── Step 2: Security Details ── -->
+      <!-- ── Step 2: Security Details & Banking ── -->
       @if (currentStep === 2) {
         <tolle-card>
           <tolle-card-header>
             <tolle-card-title class="flex items-center gap-2">
               <i class="ri-shield-check-line text-primary"></i>
-              Security Details
+              Security Details & Banking
             </tolle-card-title>
-            <p class="text-sm text-muted-foreground">Guard role, credentials, and deployment.</p>
+            <p class="text-sm text-muted-foreground">Guard role, credentials, and banking information.</p>
           </tolle-card-header>
-          <tolle-card-content class="pt-4 space-y-4">
+          <tolle-card-content class="pt-4 space-y-6">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Guard Role + License + Certification + Shift -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div class="space-y-1.5">
                 <tolle-label>Guard Role <span class="text-destructive">*</span></tolle-label>
                 <tolle-select formControlName="guardRole" class="w-full" placeholder="Select role">
@@ -275,9 +348,6 @@
                   <i prefix class="ri-award-line"></i>
                 </tolle-input>
               </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="space-y-1.5">
                 <tolle-label>Security Certification</tolle-label>
                 <tolle-select formControlName="certification" class="w-full" placeholder="Select certification">
@@ -299,7 +369,8 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Site Assignment + Start Date + Reporting Supervisor -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div class="space-y-1.5">
                 <tolle-label>Site Assignment <span class="text-destructive">*</span></tolle-label>
                 <tolle-select formControlName="site" class="w-full" placeholder="Select site">
@@ -324,15 +395,49 @@
                   <p class="text-destructive text-xs">{{ getErrorMessage('startDate') }}</p>
                 }
               </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="space-y-1.5">
                 <tolle-label>Reporting Supervisor</tolle-label>
                 <tolle-input type="text" formControlName="supervisor"
                   placeholder="e.g. Esi Mensah" class="w-full">
                   <i prefix class="ri-user-settings-line"></i>
                 </tolle-input>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Banking Details -->
+            <div>
+              <h4 class="text-sm font-semibold text-foreground mb-4">Banking Information</h4>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="space-y-1.5">
+                  <tolle-label>Bank Name</tolle-label>
+                  <tolle-input type="text" formControlName="bankName"
+                    placeholder="e.g. Ecobank Ghana" class="w-full">
+                    <i prefix class="ri-bank-line"></i>
+                  </tolle-input>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Bank Account Number</tolle-label>
+                  <tolle-input type="text" formControlName="bankAccountNumber"
+                    placeholder="e.g. 1234567890" class="w-full">
+                    <i prefix class="ri-account-pin-box-line"></i>
+                  </tolle-input>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Mobile Money Name</tolle-label>
+                  <tolle-input type="text" formControlName="momoName"
+                    placeholder="e.g. Kwame Mensah" class="w-full">
+                    <i prefix class="ri-smartphone-line"></i>
+                  </tolle-input>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Mobile Money Number</tolle-label>
+                  <tolle-input type="tel" formControlName="momoNumber"
+                    placeholder="e.g. 024 000 0000" class="w-full">
+                    <i prefix class="ri-smartphone-line"></i>
+                  </tolle-input>
+                </div>
               </div>
             </div>
 
@@ -356,8 +461,316 @@
         </tolle-card>
       }
 
-      <!-- ── Step 3: Emergency Contact & Review ── -->
+      <!-- ── Step 3: Family Information ── -->
       @if (currentStep === 3) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-group-line text-primary"></i>
+              Family Information
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Children and parents details.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-6">
+
+            <!-- Children Section -->
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-sm font-semibold text-foreground">Children Information</h4>
+                <div class="flex items-center gap-2">
+                  <tolle-label>Number of Children</tolle-label>
+                  <tolle-input type="number" formControlName="numberOfChildren" 
+                    class="w-20 text-center" (change)="updateChildrenCount()">
+                  </tolle-input>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                @for (child of children.controls; track $index; let i = $index) {
+                  <div class="p-4 border border-border rounded-lg bg-muted/30">
+                    <div class="flex items-center justify-between mb-3">
+                      <h5 class="text-sm font-medium">Child {{ i + 1 }}</h5>
+                      @if (children.length > 1) {
+                        <tolle-button type="button" variant="ghost" size="icon-sm" (click)="removeChild(i)">
+                          <i class="ri-delete-bin-line text-destructive"></i>
+                        </tolle-button>
+                      }
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div class="space-y-1.5">
+                        <tolle-label>Child's Name <span class="text-destructive">*</span></tolle-label>
+                        <tolle-input type="text" [formControl]="getChildControl(i, 'name')" 
+                          placeholder="Enter child's name" class="w-full">
+                        </tolle-input>
+                      </div>
+                      <div class="space-y-1.5">
+                        <tolle-label>Address</tolle-label>
+                        <tolle-input type="text" [formControl]="getChildControl(i, 'address')" 
+                          placeholder="Residential address" class="w-full">
+                        </tolle-input>
+                      </div>
+                      <div class="space-y-1.5">
+                        <tolle-label>Telephone</tolle-label>
+                        <tolle-input type="tel" [formControl]="getChildControl(i, 'telephone')" 
+                          placeholder="Phone number" class="w-full">
+                        </tolle-input>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              @if (children.length < (guardForm.get('numberOfChildren')?.value || 0)) {
+                <tolle-button type="button" variant="outline" (click)="addChild()">
+                  <i class="ri-add-line mr-2"></i>Add Child
+                </tolle-button>
+              }
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Parents Section -->
+            <div>
+              <h4 class="text-sm font-semibold text-foreground mb-4">Parents Information</h4>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Father Information -->
+                <div class="space-y-3">
+                  <h5 class="text-sm font-medium text-muted-foreground">Father's Details</h5>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="space-y-1.5">
+                      <tolle-label>Father's Name</tolle-label>
+                      <tolle-input type="text" formControlName="fatherName" 
+                        placeholder="Enter father's name" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Address</tolle-label>
+                      <tolle-input type="text" formControlName="fatherAddress" 
+                        placeholder="Residential address" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Telephone</tolle-label>
+                      <tolle-input type="tel" formControlName="fatherPhone" 
+                        placeholder="Phone number" class="w-full">
+                      </tolle-input>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mother Information -->
+                <div class="space-y-3">
+                  <h5 class="text-sm font-medium text-muted-foreground">Mother's Details</h5>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="space-y-1.5">
+                      <tolle-label>Mother's Name</tolle-label>
+                      <tolle-input type="text" formControlName="motherName" 
+                        placeholder="Enter mother's name" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Address</tolle-label>
+                      <tolle-input type="text" formControlName="motherAddress" 
+                        placeholder="Residential address" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Telephone</tolle-label>
+                      <tolle-input type="tel" formControlName="motherPhone" 
+                        placeholder="Phone number" class="w-full">
+                      </tolle-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+    <!-- ── Step 4: Medical & Education ── -->
+      @if (currentStep === 4) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-heart-pulse-line text-primary"></i>
+              Medical & Educational Background
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Health history and educational qualifications.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-6">
+
+            <!-- Medical History -->
+            <div>
+              <h4 class="text-sm font-semibold text-foreground mb-4">Medical History</h4>
+              <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                  <tolle-checkbox formControlName="hasChronicDiseases" 
+                    label="Do you have any chronic diseases from the past 5 years?">
+                  </tolle-checkbox>
+                </div>
+                
+                @if (guardForm.get('hasChronicDiseases')?.value) {
+                  <div class="space-y-1.5">
+                    <tolle-label>Please describe your chronic diseases</tolle-label>
+                    <tolle-textarea formControlName="chronicDiseaseDescription"
+                      placeholder="Please describe any chronic medical conditions..."
+                      class="w-full" [rows]="4">
+                    </tolle-textarea>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <!-- Educational Background -->
+            <div>
+              <h4 class="text-sm font-semibold text-foreground mb-4">Educational Background</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="space-y-1.5">
+                  <tolle-label>Highest Education</tolle-label>
+                  <tolle-select formControlName="highestEducation" class="w-full" placeholder="Select level">
+                    <tolle-select-item value="No Formal Education">No Formal Education</tolle-select-item>
+                    <tolle-select-item value="Basic Education">Basic Education</tolle-select-item>
+                    <tolle-select-item value="SSCE/WASSCE">SSCE/WASSCE</tolle-select-item>
+                    <tolle-select-item value="Diploma">Diploma</tolle-select-item>
+                    <tolle-select-item value="Bachelor's Degree">Bachelor's Degree</tolle-select-item>
+                    <tolle-select-item value="Master's Degree">Master's Degree</tolle-select-item>
+                    <tolle-select-item value="PhD">PhD</tolle-select-item>
+                    <tolle-select-item value="Professional Certification">Professional Certification</tolle-select-item>
+                  </tolle-select>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Institution Name</tolle-label>
+                  <tolle-input type="text" formControlName="institutionName"
+                    placeholder="e.g. University of Ghana" class="w-full">
+                    <i prefix class="ri-government-line"></i>
+                  </tolle-input>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Year Completed</tolle-label>
+                  <tolle-input type="text" formControlName="yearCompleted"
+                    placeholder="e.g. 2020" class="w-full">
+                    <i prefix class="ri-calendar-line"></i>
+                  </tolle-input>
+                </div>
+              </div>
+            </div>
+
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+    <!-- ── Step 5: Work Experience ── -->
+      @if (currentStep === 5) {
+        <tolle-card>
+          <tolle-card-header>
+            <tolle-card-title class="flex items-center gap-2">
+              <i class="ri-briefcase-line text-primary"></i>
+              Work Experience
+            </tolle-card-title>
+            <p class="text-sm text-muted-foreground">Previous employment history and references.</p>
+          </tolle-card-header>
+          <tolle-card-content class="pt-4 space-y-6">
+
+            <div class="space-y-4">
+              @for (work of workExperience.controls; track $index; let i = $index) {
+                <div class="p-4 border border-border rounded-lg bg-muted/30">
+                  <div class="flex items-center justify-between mb-3">
+                    <h5 class="text-sm font-medium">Previous Employment {{ i + 1 }}</h5>
+                    @if (workExperience.length > 1) {
+                      <tolle-button type="button" variant="ghost" size="icon-sm" (click)="removeWorkExperience(i)">
+                        <i class="ri-delete-bin-line text-destructive"></i>
+                      </tolle-button>
+                    }
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                      <tolle-label>Company Name <span class="text-destructive">*</span></tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'company')" 
+                        placeholder="e.g. Security Solutions Ltd" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Position <span class="text-destructive">*</span></tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'position')" 
+                        placeholder="e.g. Security Officer" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Start Date <span class="text-destructive">*</span></tolle-label>
+                      <tolle-date-picker
+                        [formControl]="getWorkExperienceControl(i, 'startDate')"
+                        placeholder="Select start date"
+                        class="w-full">
+                      </tolle-date-picker>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>End Date</tolle-label>
+                      <tolle-date-picker
+                        [formControl]="getWorkExperienceControl(i, 'endDate')"
+                        placeholder="Select end date (leave blank if current)"
+                        class="w-full">
+                      </tolle-date-picker>
+                    </div>
+                    <div class="col-span-2 space-y-1.5">
+                      <tolle-label>Responsibilities</tolle-label>
+                      <tolle-textarea [formControl]="getWorkExperienceControl(i, 'responsibilities')" 
+                        placeholder="Describe your key responsibilities..." 
+                        class="w-full" [rows]="3">
+                      </tolle-textarea>
+                    </div>
+                    <div class="col-span-2 space-y-1.5">
+                      <tolle-label>Reason for Leaving</tolle-label>
+                      <tolle-textarea [formControl]="getWorkExperienceControl(i, 'reasonForLeaving')" 
+                        placeholder="Reason for leaving the position..." 
+                        class="w-full" [rows]="2">
+                      </tolle-textarea>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (workExperience.length < 2) {
+              <tolle-button type="button" variant="outline" (click)="addWorkExperience()">
+                <i class="ri-add-line mr-2"></i>Add Previous Employment
+              </tolle-button>
+            }
+
+          </tolle-card-content>
+          <tolle-card-footer class="flex justify-between border-t border-border pt-4">
+            <tolle-button type="button" variant="outline" (click)="prevStep()">
+              <i class="ri-arrow-left-line mr-1"></i> Previous
+            </tolle-button>
+            <tolle-button type="button" (click)="nextStep()">
+              Next <i class="ri-arrow-right-line ml-1"></i>
+            </tolle-button>
+          </tolle-card-footer>
+        </tolle-card>
+      }
+
+      <!-- ── Step 6: Emergency Contact & Review ── -->
+      @if (currentStep === 6) {
         <div class="space-y-6">
 
           <!-- Emergency Contact Card -->
@@ -413,6 +826,14 @@
                 </div>
               </div>
 
+              <div class="space-y-1.5">
+                <tolle-label>Emergency Address</tolle-label>
+                <tolle-input type="text" formControlName="emergencyAddress"
+                  placeholder="e.g. 12 Osu Street, Accra" class="w-full">
+                  <i prefix class="ri-home-3-line"></i>
+                </tolle-input>
+              </div>
+
             </tolle-card-content>
           </tolle-card>
 
@@ -421,12 +842,13 @@
             <tolle-card-header>
               <tolle-card-title class="flex items-center gap-2">
                 <i class="ri-check-double-line text-primary"></i>
-                Review Summary
+                Review & Submit
               </tolle-card-title>
+              <p class="text-sm text-muted-foreground">Confirm details before adding the guard.</p>
             </tolle-card-header>
             <tolle-card-content class="pt-4 space-y-6">
 
-              <!-- Photo + Name -->
+              <!-- Photo + Name header -->
               <div class="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
                 <div class="w-16 h-16 rounded-full border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0">
                   @if (profilePhotoPreview) {
@@ -437,7 +859,7 @@
                 </div>
                 <div>
                   <p class="font-semibold text-lg">{{ formValues.fullName || '—' }}</p>
-                  <p class="text-sm text-muted-foreground">{{ formValues.guardRole }} · <span class="font-mono">{{ formValues.guardId }}</span></p>
+                  <p class="text-sm text-muted-foreground font-mono">{{ formValues.guardId }}</p>
                 </div>
               </div>
 
@@ -452,12 +874,36 @@
                     <p class="font-medium">{{ dobObj ? (dobObj | date:'mediumDate') : '—' }}</p>
                   </div>
                   <div>
+                    <span class="text-muted-foreground">Place of Birth</span>
+                    <p class="font-medium">{{ formValues.placeOfBirth || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Region of Birth</span>
+                    <p class="font-medium">{{ formValues.regionOfBirth || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Nationality</span>
+                    <p class="font-medium">{{ formValues.nationality || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Marital Status</span>
+                    <p class="font-medium">{{ formValues.maritalStatus || '—' }}</p>
+                  </div>
+                  <div>
                     <span class="text-muted-foreground">Gender</span>
                     <p class="font-medium">{{ formValues.gender || '—' }}</p>
                   </div>
                   <div>
                     <span class="text-muted-foreground">National ID</span>
                     <p class="font-medium font-mono">{{ formValues.nationalId || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">SNET Number</span>
+                    <p class="font-medium">{{ formValues.snetNumber || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Height</span>
+                    <p class="font-medium">{{ formValues.height || '—' }}</p>
                   </div>
                 </div>
               </div>
@@ -478,23 +924,39 @@
                     <span class="text-muted-foreground">Phone</span>
                     <p class="font-medium">{{ formValues.phone || '—' }}</p>
                   </div>
+                  <div>
+                    <span class="text-muted-foreground">Telephone</span>
+                    <p class="font-medium">{{ formValues.telephone || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Alternative Phone</span>
+                    <p class="font-medium">{{ formValues.alternativePhone || '—' }}</p>
+                  </div>
                   <div class="col-span-2">
-                    <span class="text-muted-foreground">Address</span>
-                    <p class="font-medium">{{ formValues.residentialAddress || '—' }}{{ formValues.city ? ', ' + formValues.city : '' }}</p>
+                    <span class="text-muted-foreground">Residential Address</span>
+                    <p class="font-medium">{{ formValues.residentialAddress || '—' }}{{ formValues.city ? ', ' + formValues.city : '' }}{{ formValues.region ? ', ' + formValues.region : '' }}</p>
+                  </div>
+                  <div class="col-span-2">
+                    <span class="text-muted-foreground">Postal Address</span>
+                    <p class="font-medium">{{ formValues.postalAddress || '—' }}</p>
                   </div>
                 </div>
               </div>
 
               <div class="border-t border-border"></div>
 
-              <!-- Security -->
+              <!-- Security Details -->
               <div>
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
                   <i class="ri-shield-check-line"></i> Security Details
                 </h4>
                 <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
                   <div>
-                    <span class="text-muted-foreground">Site</span>
+                    <span class="text-muted-foreground">Guard Role</span>
+                    <p class="font-medium">{{ formValues.guardRole || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Site Assignment</span>
                     <p class="font-medium">{{ formValues.site || '—' }}</p>
                   </div>
                   <div>
@@ -508,6 +970,68 @@
                   <div>
                     <span class="text-muted-foreground">Shift</span>
                     <p class="font-medium">{{ formValues.shiftPreference || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Certification</span>
+                    <p class="font-medium">{{ formValues.certification || '—' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-border"></div>
+
+              <!-- Banking -->
+              <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                  <i class="ri-bank-line"></i> Banking
+                </h4>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div>
+                    <span class="text-muted-foreground">Bank Name</span>
+                    <p class="font-medium">{{ formValues.bankName || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Bank Account Number</span>
+                    <p class="font-medium font-mono">{{ formValues.bankAccountNumber || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Mobile Money Name</span>
+                    <p class="font-medium">{{ formValues.momoName || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Mobile Money Number</span>
+                    <p class="font-medium">{{ formValues.momoNumber || '—' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-border"></div>
+
+              <!-- Emergency Contact -->
+              <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                  <i class="ri-alarm-warning-line"></i> Emergency Contact
+                </h4>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div>
+                    <span class="text-muted-foreground">Contact Name</span>
+                    <p class="font-medium">{{ formValues.emergencyName || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Relationship</span>
+                    <p class="font-medium">{{ formValues.emergencyRelationship || '—' }}</p>
+                  </div>
+                  <div class="col-span-2">
+                    <span class="text-muted-foreground">Address</span>
+                    <p class="font-medium">{{ formValues.emergencyAddress || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Emergency Phone</span>
+                    <p class="font-medium">{{ formValues.emergencyPhone || '—' }}</p>
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">Alternative Phone</span>
+                    <p class="font-medium">{{ formValues.emergencyAltPhone || '—' }}</p>
                   </div>
                 </div>
               </div>

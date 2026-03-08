@@ -78,7 +78,9 @@ export class StaffManagementComponent implements OnInit {
     this.staff = this.permissions.filterBySite(this.staff);
   }
 
-  viewPerson(person: StaffMember): void { console.log('View staff:', person); }
+  viewPerson(person: StaffMember): void {
+    this.router.navigate(['/hr/staff-management/view-staff', person.id]);
+  }
 
   navigateToNewStaff(): void {
     this.router.navigate(['/hr/staff-management/new-staff']);

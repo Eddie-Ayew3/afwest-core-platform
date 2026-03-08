@@ -1,0 +1,139 @@
+/* View Staff Component Styles */
+
+/* Print-specific styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .no-print-bg {
+    background: white !important;
+  }
+  
+  .print-wrapper {
+    background: white !important;
+    padding: 0 !important;
+  }
+  
+  .a4-sheet {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* A4 sheet styling */
+.a4-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: white;
+}
+
+/* Header band styling */
+.header-band {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* Identity strip styling */
+.identity-strip {
+  background: linear-gradient(135deg, #fafbfc 0%, #f1f5f9 100%);
+}
+
+/* Footer band styling */
+.footer-band {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* Section title styling */
+.section-title {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Status badge styling */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
+}
+
+.status-active {
+  background-color: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.status-suspended {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.status-inactive {
+  background-color: #f8fafc;
+  color: #6b7280;
+  border-color: #e2e8f0;
+}
+
+/* Content grid improvements */
+.content-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.content-section {
+  break-inside: avoid;
+}
+
+/* Form field styling */
+.form-field {
+  margin-bottom: 0.75rem;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.form-field .value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+  word-break: break-word;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .a4-sheet {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+  
+  .header-band,
+  .identity-strip,
+  .content-grid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

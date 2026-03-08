@@ -19,7 +19,7 @@ export interface WorkExperience {
   reasonForLeaving: string;
 }
 
-export interface GuardProfile {
+export interface StaffProfile {
   id: string;
   name: string;
   role: string;
@@ -45,14 +45,13 @@ export interface GuardProfile {
   postalAddress: string;
   city: string;
   region: string;
-  // Security
-  guardRole: string;
-  licenseNumber: string;
-  certification: string;
+  // Employment
+  department: string;
+  jobTitle: string;
   site: string;
-  shiftPreference: string;
+  employmentType: string;
   startDate: string;
-  supervisor: string;
+  reportingManager: string;
   notes: string;
   // Banking
   bankName: string;
@@ -76,12 +75,11 @@ export interface GuardProfile {
   yearCompleted: string;
   // Work Experience
   workExperience: WorkExperience[];
-  // Emergency
-  emergencyName: string;
-  emergencyRelationship: string;
-  emergencyAddress: string;
-  emergencyPhone: string;
-  emergencyAltPhone: string;
+  // Next of Kin
+  nextOfKinName: string;
+  nextOfKinRelationship: string;
+  nextOfKinAddress: string;
+  nextOfKinPhone: string;
   // Metadata
   createdBy: string;
   createdDate: string;
@@ -90,96 +88,93 @@ export interface GuardProfile {
   documentRef: string;
 }
 
-const MOCK_GUARDS: GuardProfile[] = [
+const MOCK_STAFF: StaffProfile[] = [
   {
-    id: 'GD001', 
-    name: 'Kwesi Owusu', 
-    fullName: 'Kwesi Owusu',
-    role: 'Senior Guard', 
-    guardRole: 'Senior Guard',
+    id: 'ST001', 
+    name: 'Kwame Mensah', 
+    fullName: 'Kwame Mensah',
+    role: 'Operations Manager', 
     status: 'Active',
-    dateOfBirth: '15 March 1990', 
+    dateOfBirth: '15 March 1985', 
     gender: 'Male', 
     nationality: 'Ghanaian',
     maritalStatus: 'Married',
     placeOfBirth: 'Accra',
     regionOfBirth: 'Greater Accra',
-    height: "5'10\"",
+    height: "5'11\"",
     snetNumber: 'SNET123456',
     nationalId: 'GHA-000123456-0',
-    email: 'k.owusu@afwest.com.gh', 
+    email: 'k.mensah@afwest.com.gh', 
     phone: '024 456 7890', 
     telephone: '030 123 4567',
     alternativePhone: '020 111 2233',
-    residentialAddress: '12 Osu Badu Street', 
+    residentialAddress: '12 Labone Street', 
     postalAddress: 'P.O. Box GP 12345',
     city: 'Accra', 
     region: 'Greater Accra',
-    licenseNumber: 'GSS-2022-00101', 
-    certification: 'Advanced Security Training',
+    department: 'Operations',
+    jobTitle: 'Operations Manager',
     site: 'Head Office – Accra', 
-    shiftPreference: 'Night', 
-    startDate: '15 January 2022',
-    supervisor: 'Esi Mensah', 
-    notes: 'Experienced night-shift guard. Handles VIP entry protocols.',
+    employmentType: 'Full-time',
+    startDate: '15 January 2020',
+    reportingManager: 'CEO', 
+    notes: 'Oversees all operational activities and ensures compliance with security protocols.',
     bankName: 'Ecobank Ghana',
     bankAccountNumber: '1234567890',
-    momoName: 'Kwesi Owusu',
+    momoName: 'Kwame Mensah',
     momoNumber: '024 456 7890',
     numberOfChildren: 2,
     children: [
-      { name: 'Kwame Owusu Jr', address: '12 Osu Badu Street', telephone: '024 456 7891' },
-      { name: 'Yaa Owusu', address: '12 Osu Badu Street', telephone: '024 456 7892' }
+      { name: 'Nana Yaa Mensah', address: '12 Labone Street', telephone: '024 456 7891' },
+      { name: 'Kwame Mensah Jr', address: '12 Labone Street', telephone: '024 456 7892' }
     ],
-    fatherName: 'Kofi Owusu Sr',
+    fatherName: 'Kofi Mensah Sr',
     fatherAddress: 'Kumasi', 
     fatherPhone: '050 123 4567',
-    motherName: 'Adwoa Owusu',
+    motherName: 'Adwoa Mensah',
     motherAddress: 'Accra',
     motherPhone: '024 123 4568',
     hasChronicDiseases: false,
     chronicDiseaseDescription: '',
-    highestEducation: 'Bachelor\'s Degree',
+    highestEducation: 'Master\'s Degree',
     institutionName: 'University of Ghana',
-    yearCompleted: '2012',
+    yearCompleted: '2010',
     workExperience: [
       {
-        company: 'Ghana Armed Forces',
-        position: 'Security Officer',
-        startDate: '2015',
-        endDate: '2021',
-        responsibilities: 'Base security, access control, patrol duties',
+        company: 'Ghana Police Service',
+        position: 'Senior Officer',
+        startDate: '2010',
+        endDate: '2019',
+        responsibilities: 'Security operations, team management, incident response',
         reasonForLeaving: 'Career advancement opportunity'
       }
     ],
-    emergencyName: 'Akua Owusu', 
-    emergencyRelationship: 'Spouse',
-    emergencyAddress: '12 Osu Badu Street, Accra',
-    emergencyPhone: '024 999 8877', 
-    emergencyAltPhone: '',
-    createdBy: 'Kwame Mensah', 
-    createdDate: '12 January 2022',
-    approvedBy: 'Akosua Frimpong', 
-    approvedDate: '14 January 2022',
-    documentRef: 'AFWS-GD-2022-001'
+    nextOfKinName: 'Naana Mensah', 
+    nextOfKinRelationship: 'Spouse',
+    nextOfKinAddress: '12 Labone Street, Accra',
+    nextOfKinPhone: '024 999 8877', 
+    createdBy: 'HR Department', 
+    createdDate: '10 January 2020',
+    approvedBy: 'CEO', 
+    approvedDate: '14 January 2020',
+    documentRef: 'AFWS-ST-2020-001'
   },
   {
-    id: 'GD002', 
-    name: 'Esi Mensah', 
-    fullName: 'Esi Mensah',
-    role: 'Guard Supervisor', 
-    guardRole: 'Guard Supervisor',
+    id: 'ST002', 
+    name: 'Akosua Frimpong', 
+    fullName: 'Akosua Frimpong',
+    role: 'HR Manager', 
     status: 'Active',
-    dateOfBirth: '8 June 1985', 
+    dateOfBirth: '8 June 1988', 
     gender: 'Female', 
     nationality: 'Ghanaian',
-    maritalStatus: 'Married',
+    maritalStatus: 'Single',
     placeOfBirth: 'Kumasi',
     regionOfBirth: 'Ashanti',
     height: "5'6\"",
     snetNumber: 'SNET234567',
     nationalId: 'GHA-000234567-1',
-    email: 'e.mensah@afwest.com.gh', 
+    email: 'a.frimpong@afwest.com.gh', 
     phone: '026 567 8901', 
     telephone: '',
     alternativePhone: '',
@@ -187,13 +182,13 @@ const MOCK_GUARDS: GuardProfile[] = [
     postalAddress: '',
     city: 'Kumasi', 
     region: 'Ashanti',
-    licenseNumber: 'GSS-2020-00045', 
-    certification: 'Advanced Security Training',
-    site: 'Kumasi Branch', 
-    shiftPreference: 'Day', 
-    startDate: '3 March 2020',
-    supervisor: 'Kofi Asante', 
-    notes: 'Supervisor for Kumasi Branch day shift. Trained in conflict de-escalation.',
+    department: 'HR',
+    jobTitle: 'HR Manager',
+    site: 'Head Office – Accra', 
+    employmentType: 'Full-time',
+    startDate: '3 March 2019',
+    reportingManager: 'CEO', 
+    notes: 'Manages all HR functions including recruitment, training, and employee relations.',
     bankName: '',
     bankAccountNumber: '',
     momoName: '',
@@ -212,38 +207,37 @@ const MOCK_GUARDS: GuardProfile[] = [
     institutionName: '',
     yearCompleted: '',
     workExperience: [],
-    emergencyName: 'Yaw Mensah', 
-    emergencyRelationship: 'Spouse',
-    emergencyAddress: '7 Adum Road, Kumasi',
-    emergencyPhone: '026 111 3344', 
-    emergencyAltPhone: '020 222 4455',
-    createdBy: 'Ama Boateng', 
-    createdDate: '1 March 2020',
-    approvedBy: 'Kwame Mensah', 
-    approvedDate: '2 March 2020',
-    documentRef: 'AFWS-GD-2020-002'
+    nextOfKinName: 'Kofi Frimpong', 
+    nextOfKinRelationship: 'Brother',
+    nextOfKinAddress: 'Kumasi',
+    nextOfKinPhone: '026 111 3344', 
+    createdBy: 'CEO', 
+    createdDate: '1 March 2019',
+    approvedBy: 'Board', 
+    approvedDate: '2 March 2019',
+    documentRef: 'AFWS-ST-2019-002'
   }
 ];
 
 @Component({
-  selector: 'app-view-guard',
+  selector: 'app-view-staff',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, NgxPrintModule],
-  templateUrl: './view-guard.component.html',
-  styleUrls: ['./view-guard.component.css']
+  imports: [CommonModule, NgxPrintModule,ButtonComponent],
+  templateUrl: './view-staff.component.html',
+  styleUrls: ['./view-staff.component.css']
 })
-export class ViewGuardComponent implements OnInit {
+export class ViewStaffComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  guard: GuardProfile | null = null;
+  staff: StaffProfile | null = null;
   today = new Date();
 
   @ViewChild('printer') printer: any;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.guard = MOCK_GUARDS.find(g => g.id === id) ?? MOCK_GUARDS[0];
+    this.staff = MOCK_STAFF.find(s => s.id === id) ?? MOCK_STAFF[0];
   }
 
   print(): void {
@@ -253,7 +247,7 @@ export class ViewGuardComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/hr/guard-management']);
+    this.router.navigate(['/hr/staff-management']);
   }
 
   getStatusColor(status: string): string {

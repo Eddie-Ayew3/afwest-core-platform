@@ -2,53 +2,43 @@
 <div class="no-print flex items-center justify-between px-8 py-4 bg-background border-b border-border sticky top-0 z-10">
   <button (click)="goBack()" class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
     <i class="ri-arrow-left-line"></i>
-    Back to Guard Management
+    Back to Staff Management
   </button>
   <div class="flex items-center gap-3">
-    <span class="text-xs text-muted-foreground">Document Ref: {{ guard?.documentRef }}</span>
-    <!-- <tolle-button (click)="print()"
-      class="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-      <i class="ri-printer-line"></i>
-      Print
-    </tolle-button> -->
+    <span class="text-xs text-muted-foreground">Document Ref: {{ staff?.documentRef }}</span>
     <!-- Hidden print button for ngxPrint -->
-<tolle-button 
-    [hidden]="true"
-    printSectionId="guard-print-section"
-    ngxPrint
-    [useExistingCss]="true"
-    [closeWindow]="true"
-    #printer
-    title="Print guard details"
-    
->Print
-</tolle-button>
+    <tolle-button 
+        [hidden]="true"
+        printSectionId="staff-print-section"
+        #printer
+        title="Print staff details"
+    >Print</tolle-button>
   </div>
 </div>
 
 
 
 <!-- Print area -->
-<div id="guard-print-section" class="print-wrapper bg-muted/30 min-h-screen py-8 flex flex-col items-center no-print-bg">
+<div id="staff-print-section" class="print-wrapper bg-muted/30 min-h-screen py-8 flex flex-col items-center no-print-bg">
 
-  @if (guard) {
+  @if (staff) {
   <div class="a4-sheet bg-white shadow-md">
 
     <!-- ── PAGE 1 ─────────────────────────────────────────────── -->
 
     <!-- Header band -->
-    <div class="header-band flex items-center justify-between px-10 py-6 border-b-2 border-red-600">
+    <div class="header-band flex items-center justify-between px-10 py-6 border-b-2 border-blue-600">
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
+        <div class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
           <span class="text-white font-bold text-xl">AW</span>
         </div>
         <div>
           <p class="text-xl font-bold text-gray-900 leading-tight">AFWest Security Services</p>
-          <p class="text-xs text-gray-500">Guard Personnel File — Confidential</p>
+          <p class="text-xs text-gray-500">Staff Personnel File — Confidential</p>
         </div>
       </div>
       <div class="text-right text-xs text-gray-500 space-y-0.5">
-        <p class="font-semibold text-gray-700">{{ guard.documentRef }}</p>
+        <p class="font-semibold text-gray-700">{{ staff.documentRef }}</p>
         <p>Printed: {{ today | date:'d MMM yyyy' }}</p>
       </div>
     </div>
@@ -57,12 +47,12 @@
     <div class="identity-strip flex items-start gap-6 px-10 py-6 bg-gray-50 border-b border-gray-200">
       <!-- Photo -->
       <div class="flex-shrink-0">
-        @if (guard.photo) {
-          <img [src]="guard.photo" alt="Guard photo"
+        @if (staff.photo) {
+          <img [src]="staff.photo" alt="Staff photo"
                class="w-28 h-28 rounded-lg object-cover border-2 border-gray-300" />
         } @else {
           <div class="w-28 h-28 rounded-lg bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
-            <span class="text-3xl font-bold text-gray-500">{{ getInitials(guard.name) }}</span>
+            <span class="text-3xl font-bold text-gray-500">{{ getInitials(staff.name) }}</span>
           </div>
         }
       </div>
@@ -71,47 +61,47 @@
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ guard.name }}</h1>
-            <p class="text-sm text-gray-600 mt-0.5">{{ guard.role }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ staff.name }}</h1>
+            <p class="text-sm text-gray-600 mt-0.5">{{ staff.role }}</p>
           </div>
           <span class="px-3 py-1 rounded-full text-xs font-semibold border"
-            [class.border-green-300]="guard.status === 'Active'"
-            [class.bg-green-50]="guard.status === 'Active'"
-            [class.text-green-700]="guard.status === 'Active'"
-            [class.border-red-300]="guard.status === 'Suspended'"
-            [class.bg-red-50]="guard.status === 'Suspended'"
-            [class.text-red-700]="guard.status === 'Suspended'"
-            [class.border-gray-300]="guard.status === 'Inactive'"
-            [class.bg-gray-50]="guard.status === 'Inactive'"
-            [class.text-gray-600]="guard.status === 'Inactive'">
-            {{ guard.status }}
+            [class.border-green-300]="staff.status === 'Active'"
+            [class.bg-green-50]="staff.status === 'Active'"
+            [class.text-green-700]="staff.status === 'Active'"
+            [class.border-red-300]="staff.status === 'Suspended'"
+            [class.bg-red-50]="staff.status === 'Suspended'"
+            [class.text-red-700]="staff.status === 'Suspended'"
+            [class.border-gray-300]="staff.status === 'Inactive'"
+            [class.bg-gray-50]="staff.status === 'Inactive'"
+            [class.text-gray-600]="staff.status === 'Inactive'">
+            {{ staff.status }}
           </span>
         </div>
 
         <div class="mt-3 grid grid-cols-3 gap-x-6 gap-y-1.5 text-sm">
           <div>
-            <span class="text-gray-500">Guard ID</span>
-            <p class="font-semibold text-gray-800">{{ guard.id }}</p>
+            <span class="text-gray-500">Staff ID</span>
+            <p class="font-semibold text-gray-800">{{ staff.id }}</p>
+          </div>
+          <div>
+            <span class="text-gray-500">Department</span>
+            <p class="font-semibold text-gray-800">{{ staff.department }}</p>
           </div>
           <div>
             <span class="text-gray-500">Site</span>
-            <p class="font-semibold text-gray-800">{{ guard.site }}</p>
+            <p class="font-semibold text-gray-800">{{ staff.site }}</p>
           </div>
           <div>
             <span class="text-gray-500">Start Date</span>
-            <p class="font-semibold text-gray-800">{{ guard.startDate }}</p>
+            <p class="font-semibold text-gray-800">{{ staff.startDate }}</p>
           </div>
           <div>
-            <span class="text-gray-500">Supervisor</span>
-            <p class="font-semibold text-gray-800">{{ guard.supervisor || '—' }}</p>
+            <span class="text-gray-500">Employment Type</span>
+            <p class="font-semibold text-gray-800">{{ staff.employmentType }}</p>
           </div>
           <div>
-            <span class="text-gray-500">Shift</span>
-            <p class="font-semibold text-gray-800">{{ guard.shiftPreference }}</p>
-          </div>
-          <div>
-            <span class="text-gray-500">License No.</span>
-            <p class="font-semibold text-gray-800">{{ guard.licenseNumber }}</p>
+            <span class="text-gray-500">Reporting Manager</span>
+            <p class="font-semibold text-gray-800">{{ staff.reportingManager || '—' }}</p>
           </div>
         </div>
       </div>
@@ -121,163 +111,163 @@
     <div class="px-10 py-6 space-y-6">
 
       <!-- Section: Personal Information -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+      <div class="content-section personal-info">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Personal Information
         </h2>
         <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
           <div>
             <p class="text-gray-500">Full Name</p>
-            <p class="font-medium text-gray-800">{{ guard.fullName }}</p>
+            <p class="font-medium text-gray-800">{{ staff.fullName }}</p>
           </div>
           <div>
             <p class="text-gray-500">Date of Birth</p>
-            <p class="font-medium text-gray-800">{{ guard.dateOfBirth }}</p>
+            <p class="font-medium text-gray-800">{{ staff.dateOfBirth }}</p>
           </div>
           <div>
             <p class="text-gray-500">Gender</p>
-            <p class="font-medium text-gray-800">{{ guard.gender }}</p>
+            <p class="font-medium text-gray-800">{{ staff.gender }}</p>
           </div>
           <div>
             <p class="text-gray-500">Nationality</p>
-            <p class="font-medium text-gray-800">{{ guard.nationality }}</p>
+            <p class="font-medium text-gray-800">{{ staff.nationality }}</p>
           </div>
           <div>
             <p class="text-gray-500">Marital Status</p>
-            <p class="font-medium text-gray-800">{{ guard.maritalStatus }}</p>
+            <p class="font-medium text-gray-800">{{ staff.maritalStatus }}</p>
           </div>
           <div>
             <p class="text-gray-500">Place of Birth</p>
-            <p class="font-medium text-gray-800">{{ guard.placeOfBirth }}</p>
+            <p class="font-medium text-gray-800">{{ staff.placeOfBirth }}</p>
           </div>
           <div>
             <p class="text-gray-500">Region of Birth</p>
-            <p class="font-medium text-gray-800">{{ guard.regionOfBirth }}</p>
+            <p class="font-medium text-gray-800">{{ staff.regionOfBirth }}</p>
           </div>
           <div>
             <p class="text-gray-500">Height</p>
-            <p class="font-medium text-gray-800">{{ guard.height }}</p>
+            <p class="font-medium text-gray-800">{{ staff.height }}</p>
           </div>
           <div>
             <p class="text-gray-500">SNET Number</p>
-            <p class="font-medium text-gray-800">{{ guard.snetNumber }}</p>
+            <p class="font-medium text-gray-800">{{ staff.snetNumber }}</p>
           </div>
           <div>
             <p class="text-gray-500">National ID (Ghana Card)</p>
-            <p class="font-medium text-gray-800">{{ guard.nationalId }}</p>
+            <p class="font-medium text-gray-800">{{ staff.nationalId }}</p>
           </div>
         </div>
       </div>
 
       <!-- Section: Contact Information -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Contact Information
         </h2>
         <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
           <div>
             <p class="text-gray-500">Email Address</p>
-            <p class="font-medium text-gray-800">{{ guard.email }}</p>
+            <p class="font-medium text-gray-800">{{ staff.email }}</p>
           </div>
           <div>
             <p class="text-gray-500">Phone Number</p>
-            <p class="font-medium text-gray-800">{{ guard.phone }}</p>
+            <p class="font-medium text-gray-800">{{ staff.phone }}</p>
           </div>
           <div>
             <p class="text-gray-500">Telephone</p>
-            <p class="font-medium text-gray-800">{{ guard.telephone || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.telephone || '—' }}</p>
           </div>
           <div>
             <p class="text-gray-500">Alternative Phone</p>
-            <p class="font-medium text-gray-800">{{ guard.alternativePhone || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.alternativePhone || '—' }}</p>
           </div>
           <div class="col-span-2">
             <p class="text-gray-500">Residential Address</p>
-            <p class="font-medium text-gray-800">{{ guard.residentialAddress }}, {{ guard.city }}, {{ guard.region }}</p>
+            <p class="font-medium text-gray-800">{{ staff.residentialAddress }}, {{ staff.city }}, {{ staff.region }}</p>
           </div>
           <div class="col-span-2">
             <p class="text-gray-500">Postal Address</p>
-            <p class="font-medium text-gray-800">{{ guard.postalAddress || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.postalAddress || '—' }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Section: Security Details -->
+      <!-- Section: Employment Details -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
-          Security Details
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
+          Employment Details
         </h2>
         <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
           <div>
-            <p class="text-gray-500">Security License No.</p>
-            <p class="font-medium text-gray-800">{{ guard.licenseNumber }}</p>
+            <p class="text-gray-500">Department</p>
+            <p class="font-medium text-gray-800">{{ staff.department }}</p>
           </div>
           <div>
-            <p class="text-gray-500">Certification</p>
-            <p class="font-medium text-gray-800">{{ guard.certification }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Shift Preference</p>
-            <p class="font-medium text-gray-800">{{ guard.shiftPreference }}</p>
+            <p class="text-gray-500">Job Title</p>
+            <p class="font-medium text-gray-800">{{ staff.jobTitle }}</p>
           </div>
           <div>
             <p class="text-gray-500">Assigned Site</p>
-            <p class="font-medium text-gray-800">{{ guard.site }}</p>
+            <p class="font-medium text-gray-800">{{ staff.site }}</p>
           </div>
           <div>
-            <p class="text-gray-500">Reporting Supervisor</p>
-            <p class="font-medium text-gray-800">{{ guard.supervisor || '—' }}</p>
+            <p class="text-gray-500">Employment Type</p>
+            <p class="font-medium text-gray-800">{{ staff.employmentType }}</p>
           </div>
           <div>
             <p class="text-gray-500">Start Date</p>
-            <p class="font-medium text-gray-800">{{ guard.startDate }}</p>
+            <p class="font-medium text-gray-800">{{ staff.startDate }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Reporting Manager</p>
+            <p class="font-medium text-gray-800">{{ staff.reportingManager || '—' }}</p>
           </div>
         </div>
-        @if (guard.notes) {
+        @if (staff.notes) {
           <div class="mt-3">
             <p class="text-gray-500 text-sm">Notes</p>
-            <p class="text-sm font-medium text-gray-800 mt-1 bg-gray-50 rounded px-3 py-2">{{ guard.notes }}</p>
+            <p class="text-sm font-medium text-gray-800 mt-1 bg-gray-50 rounded px-3 py-2">{{ staff.notes }}</p>
           </div>
         }
       </div>
 
       <!-- Section: Banking Information -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Banking Information
         </h2>
         <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
           <div>
             <p class="text-gray-500">Bank Name</p>
-            <p class="font-medium text-gray-800">{{ guard.bankName || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.bankName || '—' }}</p>
           </div>
           <div>
             <p class="text-gray-500">Bank Account Number</p>
-            <p class="font-medium text-gray-800">{{ guard.bankAccountNumber || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.bankAccountNumber || '—' }}</p>
           </div>
           <div>
             <p class="text-gray-500">Mobile Money Name</p>
-            <p class="font-medium text-gray-800">{{ guard.momoName || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.momoName || '—' }}</p>
           </div>
           <div>
             <p class="text-gray-500">Mobile Money Number</p>
-            <p class="font-medium text-gray-800">{{ guard.momoNumber || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.momoNumber || '—' }}</p>
           </div>
         </div>
       </div>
 
       <!-- Section: Family Information -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Family Information
         </h2>
         <div class="space-y-4">
           <!-- Children -->
           <div>
-            <p class="text-gray-500 text-sm font-medium mb-3">Number of Children: {{ guard.numberOfChildren }}</p>
-            @if (guard.children.length > 0) {
+            <p class="text-gray-500 text-sm font-medium mb-3">Number of Children: {{ staff.numberOfChildren }}</p>
+            @if (staff.children.length > 0) {
               <div class="space-y-2">
-                @for (child of guard.children; track $index; let i = $index) {
+                @for (child of staff.children; track $index; let i = $index) {
                   <div class="bg-gray-50 rounded p-3 border border-gray-200">
                     <p class="font-medium text-gray-800 mb-1">Child {{ i + 1 }}: {{ child.name }}</p>
                     <div class="grid grid-cols-3 gap-4 text-sm">
@@ -306,15 +296,15 @@
               <div class="space-y-2 text-sm">
                 <div>
                   <p class="text-gray-500">Name</p>
-                  <p class="font-medium text-gray-800">{{ guard.fatherName || '—' }}</p>
+                  <p class="font-medium text-gray-800">{{ staff.fatherName || '—' }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Address</p>
-                  <p class="font-medium text-gray-800">{{ guard.fatherAddress || '—' }}</p>
+                  <p class="font-medium text-gray-800">{{ staff.fatherAddress || '—' }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Phone</p>
-                  <p class="font-medium text-gray-800">{{ guard.fatherPhone || '—' }}</p>
+                  <p class="font-medium text-gray-800">{{ staff.fatherPhone || '—' }}</p>
                 </div>
               </div>
             </div>
@@ -325,15 +315,15 @@
               <div class="space-y-2 text-sm">
                 <div>
                   <p class="text-gray-500">Name</p>
-                  <p class="font-medium text-gray-800">{{ guard.motherName || '—' }}</p>
+                  <p class="font-medium text-gray-800">{{ staff.motherName || '—' }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Address</p>
-                  <p class="font-medium text-gray-800">{{ guard.motherAddress || '—' }}</p>
+                  <p class="font-medium text-gray-800">{{ staff.motherAddress || '—' }}</p>
                 </div>
                 <div>
                   <p class="text-gray-500">Phone</p>
-                  <p class="font-medium text-gray-800">{{ guard.motherPhone || '—' }}</p>
+                  <p class="font-medium text-gray-800">{{ staff.motherPhone || '—' }}</p>
                 </div>
               </div>
             </div>
@@ -343,7 +333,7 @@
 
       <!-- Section: Medical & Educational Background -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Medical & Educational Background
         </h2>
         <div class="space-y-4">
@@ -354,17 +344,17 @@
               <div class="flex items-center gap-2">
                 <p class="text-gray-500">Chronic Diseases (last 5 years):</p>
                 <span class="px-2 py-1 rounded text-xs font-medium"
-                  [class.bg-green-100]="!guard.hasChronicDiseases"
-                  [class.text-green-700]="!guard.hasChronicDiseases"
-                  [class.bg-yellow-100]="guard.hasChronicDiseases"
-                  [class.text-yellow-700]="guard.hasChronicDiseases">
-                  {{ guard.hasChronicDiseases ? 'Yes' : 'No' }}
+                  [class.bg-green-100]="!staff.hasChronicDiseases"
+                  [class.text-green-700]="!staff.hasChronicDiseases"
+                  [class.bg-yellow-100]="staff.hasChronicDiseases"
+                  [class.text-yellow-700]="staff.hasChronicDiseases">
+                  {{ staff.hasChronicDiseases ? 'Yes' : 'No' }}
                 </span>
               </div>
-              @if (guard.hasChronicDiseases && guard.chronicDiseaseDescription) {
+              @if (staff.hasChronicDiseases && staff.chronicDiseaseDescription) {
                 <div>
                   <p class="text-gray-500">Description:</p>
-                  <p class="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">{{ guard.chronicDiseaseDescription }}</p>
+                  <p class="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">{{ staff.chronicDiseaseDescription }}</p>
                 </div>
               }
             </div>
@@ -376,15 +366,15 @@
             <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
               <div>
                 <p class="text-gray-500">Highest Education</p>
-                <p class="font-medium text-gray-800">{{ guard.highestEducation || '—' }}</p>
+                <p class="font-medium text-gray-800">{{ staff.highestEducation || '—' }}</p>
               </div>
               <div>
                 <p class="text-gray-500">Institution Name</p>
-                <p class="font-medium text-gray-800">{{ guard.institutionName || '—' }}</p>
+                <p class="font-medium text-gray-800">{{ staff.institutionName || '—' }}</p>
               </div>
               <div>
                 <p class="text-gray-500">Year Completed</p>
-                <p class="font-medium text-gray-800">{{ guard.yearCompleted || '—' }}</p>
+                <p class="font-medium text-gray-800">{{ staff.yearCompleted || '—' }}</p>
               </div>
             </div>
           </div>
@@ -393,12 +383,12 @@
 
       <!-- Section: Work Experience -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Work Experience
         </h2>
-        @if (guard.workExperience.length > 0) {
+        @if (staff.workExperience.length > 0) {
           <div class="space-y-3">
-            @for (work of guard.workExperience; track $index; let i = $index) {
+            @for (work of staff.workExperience; track $index; let i = $index) {
               <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div class="flex items-center justify-between mb-3">
                   <h5 class="text-sm font-semibold text-gray-800">Previous Employment {{ i + 1 }}</h5>
@@ -441,46 +431,42 @@
         }
       </div>
 
-      <!-- Section: Emergency Contact -->
+      <!-- Section: Next of Kin -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
-          Emergency Contact
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
+          Next of Kin
         </h2>
         <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
           <div>
             <p class="text-gray-500">Contact Name</p>
-            <p class="font-medium text-gray-800">{{ guard.emergencyName }}</p>
+            <p class="font-medium text-gray-800">{{ staff.nextOfKinName }}</p>
           </div>
           <div>
             <p class="text-gray-500">Relationship</p>
-            <p class="font-medium text-gray-800">{{ guard.emergencyRelationship }}</p>
+            <p class="font-medium text-gray-800">{{ staff.nextOfKinRelationship }}</p>
           </div>
           <div>
             <p class="text-gray-500">Phone</p>
-            <p class="font-medium text-gray-800">{{ guard.emergencyPhone }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Alternative Phone</p>
-            <p class="font-medium text-gray-800">{{ guard.emergencyAltPhone || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.nextOfKinPhone }}</p>
           </div>
           <div class="col-span-2">
             <p class="text-gray-500">Address</p>
-            <p class="font-medium text-gray-800">{{ guard.emergencyAddress || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.nextOfKinAddress || '—' }}</p>
           </div>
         </div>
       </div>
 
       <!-- Section: Record Authorisation -->
       <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Record Authorisation
         </h2>
         <div class="grid grid-cols-2 gap-6 text-sm">
           <!-- Created by -->
           <div class="border border-gray-200 rounded-lg p-4">
             <p class="text-gray-500 mb-2">Created By</p>
-            <p class="font-semibold text-gray-800">{{ guard.createdBy }}</p>
-            <p class="text-gray-500 text-xs mt-0.5">{{ guard.createdDate }}</p>
+            <p class="font-semibold text-gray-800">{{ staff.createdBy }}</p>
+            <p class="text-gray-500 text-xs mt-0.5">{{ staff.createdDate }}</p>
             <div class="mt-4 border-t border-dashed border-gray-300 pt-3">
               <p class="text-xs text-gray-400">Signature</p>
               <div class="h-8"></div>
@@ -490,8 +476,8 @@
           <!-- Approved by -->
           <div class="border border-gray-200 rounded-lg p-4">
             <p class="text-gray-500 mb-2">Approved By</p>
-            <p class="font-semibold text-gray-800">{{ guard.approvedBy }}</p>
-            <p class="text-gray-500 text-xs mt-0.5">{{ guard.approvedDate }}</p>
+            <p class="font-semibold text-gray-800">{{ staff.approvedBy }}</p>
+            <p class="text-gray-500 text-xs mt-0.5">{{ staff.approvedDate }}</p>
             <div class="mt-4 border-t border-dashed border-gray-300 pt-3">
               <p class="text-xs text-gray-400">Signature</p>
               <div class="h-8"></div>
@@ -505,16 +491,16 @@
     <!-- Footer -->
     <div class="footer-band px-10 py-4 border-t border-gray-200 flex items-center justify-between text-xs text-gray-400 mt-auto">
       <span>AFWest Security Services — Confidential Personnel Record</span>
-      <span>{{ guard.documentRef }}</span>
+      <span>{{ staff.documentRef }}</span>
     </div>
 
   </div><!-- /a4-sheet -->
   }
 
-  @if (!guard) {
+  @if (!staff) {
   <div class="flex flex-col items-center justify-center py-24 text-muted-foreground gap-3">
     <i class="ri-user-search-line text-4xl"></i>
-    <p class="text-sm">Guard record not found.</p>
+    <p class="text-sm">Staff record not found.</p>
   </div>
   }
 

@@ -19,13 +19,16 @@ import { LeaveManagementComponent } from './features/leave-management/pages/all-
 import { PermissionsManagementComponent } from './features/permissions-management/permissions-management.component';
 import { authGuard } from './core/guards/auth.guard';
 import { globalOnlyGuard, notGuardRoleGuard } from './core/guards/role.guard';
+import { loadingGuard } from './core/guards/loading.guard';
 import { PermissionsService } from './core/services/permissions.service';
 import { StaffManagementComponent } from './features/staff-management/pages/all-staff/staff-management.component';
 import { NewClientManagementComponent } from './features/client-management/pages/client-management/new-client/new-client-management.component';
 import { NewStaffManagementComponent } from './features/staff-management/pages/new-staff/new-staff-management.component';
 import { NewGuardComponent } from './features/client-management/pages/guard-management/new-guard/new-guard.component';
 import { ViewGuardComponent } from './features/client-management/pages/guard-management/view-guard/view-guard.component';
+import { ViewStaffComponent } from './features/staff-management/pages/view-staff/view-staff.component';
 import { ViewClientComponent } from './features/client-management/pages/client-management/view-client/view-client.component';
+//import { MapComponent } from './features/client-management/pages/site-management/map/map.component';
 
 export const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: '/sign-in' },
@@ -41,6 +44,7 @@ export const routes: Routes = [
             {
                 path: 'dashboard/:id',
                 component: ClientDashboardComponent,
+                canActivate: [authGuard, loadingGuard]
             },
             {
                 path: 'request/:id',
@@ -86,6 +90,11 @@ export const routes: Routes = [
                         component: NewStaffManagementComponent
                     },
                     {
+                        path: 'staff-management/view-staff/:id',
+                        component: ViewStaffComponent,
+                        canActivate: [authGuard, loadingGuard]
+                    },
+                    {
                         path: 'guard-management',
                         component: GuardManagementComponent
                     },
@@ -95,7 +104,8 @@ export const routes: Routes = [
                     },
                     {
                         path: 'guard-management/view-guard/:id',
-                        component: ViewGuardComponent
+                        component: ViewGuardComponent,
+                        canActivate: [authGuard, loadingGuard]
                     },
                     {
                         path: 'client-management',

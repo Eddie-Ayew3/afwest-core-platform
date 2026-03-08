@@ -4,14 +4,16 @@
   min-height: 297mm;
   display: flex;
   flex-direction: column;
-  page-break-after: always;
+  margin: 0 auto;
+  background: white;
+  padding: 0;
 }
 
 /* ── Print styles ──────────────────────────────────────────── */
 @media print {
   @page {
     size: A4;
-    margin: 0;
+    margin: 15mm;
   }
 
   html, body {
@@ -36,5 +38,75 @@
   .a4-sheet {
     box-shadow: none !important;
     margin: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    min-height: auto !important;
+  }
+
+  /* Page break controls for guard component */
+  .header-band {
+    page-break-after: auto;
+    page-break-inside: avoid;
+  }
+
+  .identity-strip {
+    page-break-after: auto;
+    page-break-inside: avoid;
+  }
+
+  .space-y-6 > div {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .section-title {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .grid {
+    page-break-inside: avoid;
+  }
+
+  .grid > div {
+    page-break-inside: avoid;
+  }
+
+  /* Family information sections */
+  .space-y-4 > div {
+    page-break-inside: avoid;
+  }
+
+  /* Work experience items */
+  .bg-gray-50 {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  /* Emergency contact section */
+  .grid-cols-3 {
+    page-break-inside: avoid;
+  }
+
+  /* Record authorization */
+  .border-gray-200 {
+    page-break-inside: avoid;
+  }
+
+  /* Footer */
+  .footer-band {
+    page-break-before: auto;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure proper spacing */
+  .px-10 {
+    padding-left: 10mm !important;
+    padding-right: 10mm !important;
+  }
+
+  .py-6 {
+    padding-top: 6mm !important;
+    padding-bottom: 6mm !important;
   }
 }

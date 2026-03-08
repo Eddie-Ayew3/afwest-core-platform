@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 import {
   ButtonComponent,
   InputComponent,
@@ -17,6 +17,7 @@ import {
   TextareaComponent,
   DatePickerComponent,
   AlertComponent,
+  CheckboxComponent,
   AlertDialogService
 } from '@tolle_/tolle-ui';
 
@@ -40,7 +41,8 @@ import {
     CardFooterComponent,
     TextareaComponent,
     DatePickerComponent,
-    AlertComponent
+    AlertComponent,
+    CheckboxComponent
   ],
   templateUrl: './new-staff-management.component.html',
   styleUrls: ['./new-staff-management.component.css']
@@ -51,11 +53,11 @@ export class NewStaffManagementComponent implements OnInit {
   private alertDialog = inject(AlertDialogService);
 
   currentStep = 0;
-  readonly totalSteps = 4;
+  readonly totalSteps = 7;
   isSubmitting = false;
   showSuccessAlert = false;
 
-  readonly stepTitles = ['Personal Info', 'Contact', 'Employment', 'Review'];
+  readonly stepTitles = ['Personal Info', 'Contact Details', 'Employment & Banking', 'Family', 'Medical & Education', 'Work Experience', 'Review'];
 
   readonly departments = [
     'HR', 'Finance', 'IT', 'Operations', 'Admin',
@@ -75,6 +77,19 @@ export class NewStaffManagementComponent implements OnInit {
     'Tema Industrial', 'Cape Coast Post'
   ];
 
+  readonly ghanaianRegions = [
+    'Greater Accra', 'Ashanti', 'Western', 'Central', 'Eastern',
+    'Volta', 'Northern', 'Upper East', 'Upper West'
+  ];
+
+  readonly maritalStatuses = [
+    'Single', 'Married', 'Divorced', 'Widowed'
+  ];
+
+  readonly nationalities = [
+    'Ghanaian', 'Nigerian', 'Other'
+  ];
+
   // DatePicker objects (ngModel-based — synced into the reactive form)
   dobObj: Date | null = null;
   startDateObj: Date | null = null;
@@ -83,24 +98,37 @@ export class NewStaffManagementComponent implements OnInit {
   profilePhotoPreview: string | null = null;
 
   staffForm!: FormGroup;
+  childrenArray!: FormArray;
+  workExperienceArray!: FormArray;
 
   constructor() {
     this.initForm();
   }
 
   private initForm(): void {
+    this.childrenArray = this.fb.array([]);
+    this.workExperienceArray = this.fb.array([]);
+
     this.staffForm = this.fb.group({
       // Personal
       fullName:      ['', Validators.required],
       staffId:       [{ value: '', disabled: true }],
       dateOfBirth:   [null],
+      placeOfBirth:  [''],
+      regionOfBirth: [''],
+      nationality:   ['Ghanaian'],
+      maritalStatus: [''],
       gender:        [''],
       nationalId:    [''],
+      snetNumber:    [''],
+      height:        [''],
       // Contact
       email:              ['', [Validators.required, Validators.email]],
       phone:              ['', Validators.required],
+      telephone:          [''],
       alternativePhone:   [''],
       residentialAddress: ['', Validators.required],
+      postalAddress:      [''],
       city:               [''],
       region:             [''],
       // Employment
@@ -110,6 +138,34 @@ export class NewStaffManagementComponent implements OnInit {
       employmentType:   ['Full-time'],
       startDate:        [null, Validators.required],
       reportingManager: [''],
+      // Banking
+      bankName:         [''],
+      bankAccountNumber: [''],
+      momoName:         [''],
+      momoNumber:       [''],
+      // Next of Kin
+      nextOfKinName:        [''],
+      nextOfKinRelationship: [''],
+      nextOfKinAddress:     [''],
+      nextOfKinPhone:       [''],
+      // Family
+      numberOfChildren: [0],
+      children: this.childrenArray,
+      fatherName: [''],
+      fatherAddress: [''],
+      fatherPhone: [''],
+      motherName: [''],
+      motherAddress: [''],
+      motherPhone: [''],
+      // Medical
+      hasChronicDiseases: [false],
+      chronicDiseaseDescription: [''],
+      // Education
+      highestEducation: [''],
+      institutionName: [''],
+      yearCompleted: [''],
+      // Work Experience
+      workExperience: this.workExperienceArray,
       // Misc
       notes: ['']
     });
@@ -149,7 +205,10 @@ export class NewStaffManagementComponent implements OnInit {
       0: ['fullName'],
       1: ['email', 'phone', 'residentialAddress'],
       2: ['department', 'jobTitle', 'site', 'startDate'],
-      3: []
+      3: [],
+      4: [],
+      5: [],
+      6: []
     };
     return map[step] ?? [];
   }
@@ -222,5 +281,72 @@ export class NewStaffManagementComponent implements OnInit {
     if (field.errors['required']) return 'This field is required';
     if (field.errors['email']) return 'Please enter a valid email address';
     return 'Invalid value';
+  }
+
+  // Children array methods
+  addChild(): void {
+    const childGroup = this.fb.group({
+      name: ['', Validators.required],
+      address: [''],
+      telephone: ['']
+    });
+    this.childrenArray.push(childGroup);
+  }
+
+  removeChild(index: number): void {
+    this.childrenArray.removeAt(index);
+  }
+
+  // Work experience array methods
+  addWorkExperience(): void {
+    const workGroup = this.fb.group({
+      companyName: ['', Validators.required],
+      position: ['', Validators.required],
+      startDate: [null],
+      endDate: [null],
+      reasonForLeaving: [''],
+      contactPerson: [''],
+      contactPhone: ['']
+    });
+    this.workExperienceArray.push(workGroup);
+  }
+
+  removeWorkExperience(index: number): void {
+    this.workExperienceArray.removeAt(index);
+  }
+
+  // Helper to get form arrays
+  get children() {
+    return this.staffForm.get('children') as FormArray;
+  }
+
+  get workExperience() {
+    return this.staffForm.get('workExperience') as FormArray;
+  }
+
+  // Helper to get child form control safely
+  getChildControl(index: number, field: string) {
+    return this.children.at(index).get(field) as FormControl;
+  }
+
+  // Helper to get work experience form control safely
+  getWorkExperienceControl(index: number, field: string) {
+    return this.workExperience.at(index).get(field) as FormControl;
+  }
+
+  // Update children count based on input
+  updateChildrenCount(): void {
+    const count = this.staffForm.get('numberOfChildren')?.value || 0;
+    const currentCount = this.childrenArray.length;
+    
+    if (count > currentCount) {
+      for (let i = currentCount; i < count; i++) {
+        this.addChild();
+      }
+    } else if (count < currentCount) {
+      for (let i = currentCount; i > count; i--) {
+        this.removeChild(i - 1);
+      }
+    }
   }
 }

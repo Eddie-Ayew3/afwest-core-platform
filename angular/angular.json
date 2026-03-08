@@ -3,9 +3,13 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "afwest-core-platform": {
+    "angular-gl-js": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -13,13 +17,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/afwest-core-platform",
+            "outputPath": "dist/angular-gl-js",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
@@ -27,20 +32,18 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "node_modules/@tolle_/tolle-ui/theme.css",
+              "src/styles.scss",
               "node_modules/mapbox-gl/dist/mapbox-gl.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "server": "src/main.server.ts",
+            "prerender": true,
+            "ssr": {
+              "entry": "src/server.ts"
+            }
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -49,8 +52,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
                 }
               ],
               "outputHashing": "all"
@@ -67,10 +70,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "afwest-core-platform:build:production"
+              "buildTarget": "angular-gl-js:build:production"
             },
             "development": {
-              "buildTarget": "afwest-core-platform:build:development"
+              "buildTarget": "angular-gl-js:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -86,6 +89,7 @@
               "zone.js/testing"
             ],
             "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
@@ -93,9 +97,7 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "node_modules/@tolle_/tolle-ui/theme.css",
-              "node_modules/mapbox-gl/dist/mapbox-gl.css"
+              "src/styles.scss"
             ],
             "scripts": []
           }

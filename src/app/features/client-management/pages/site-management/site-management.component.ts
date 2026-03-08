@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
+import {
   CardComponent,
   CardContentComponent,
   ButtonComponent,
@@ -23,8 +23,11 @@ import {
   ModalService,
   DataTableComponent,
   TolleCellDirective,
-  TableColumn
+  TableColumn,
+  SheetComponent,
+  SheetContentComponent
 } from '@tolle_/tolle-ui';
+//import { MapComponent } from './map/map.component';
 
 export interface Site {
   id: string;
@@ -93,6 +96,9 @@ export interface Region {
     BreadcrumbSeparatorComponent,
     LabelComponent,
     DataTableComponent,
+    TolleCellDirective,
+    SheetComponent,
+    SheetContentComponent,
   ],
   templateUrl: './site-management.component.html',
   styleUrls: ['./site-management.component.css']
@@ -153,6 +159,7 @@ export class SiteManagementComponent implements OnInit {
       district: 'Accra',
       city: 'Accra',
       address: 'High Street, Accra Central',
+      coordinates: { latitude: 5.5487, longitude: -0.2019 },
       contact: {
         phone: '+233-302-665-100',
         email: 'accra.central@ecobank.com.gh',
@@ -207,6 +214,7 @@ export class SiteManagementComponent implements OnInit {
       district: 'Kumasi',
       city: 'Kumasi',
       address: 'Asokwa New Road, Kumasi',
+      coordinates: { latitude: 6.6701, longitude: -1.6100 },
       contact: {
         phone: '+233-322-202-401',
         email: 'asokwa@ecobank.com.gh',
@@ -279,6 +287,10 @@ export class SiteManagementComponent implements OnInit {
   selectedStatus: string = 'all';
   selectedType: string = 'all';
   selectedSecurityLevel: string = 'all';
+
+  // Map sheet
+  showMapSheet = false;
+  selectedSite: Site | null = null;
 
   // Pagination
   currentPage: number = 1;
@@ -418,10 +430,8 @@ export class SiteManagementComponent implements OnInit {
   }
 
   viewSiteOnMap(site: Site): void {
-    if (site.coordinates) {
-      console.log('View on map:', site.coordinates);
-      // In real app, this would open a map view
-    }
+    this.selectedSite = site;
+    this.showMapSheet = true;
   }
 
   openNewSiteDialog(){
