@@ -1,12 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-loading-screen',
   standalone: true,
-  imports: [
-    NgClass
-  ],
+  imports: [],
   templateUrl: './loading-screen.component.html',
   styleUrl: './loading-screen.component.css'
 })
