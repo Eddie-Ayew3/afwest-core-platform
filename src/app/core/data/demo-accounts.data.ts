@@ -9,6 +9,12 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     role: 'Admin', scope: 'global'
   },
   {
+    staffId: 'GM-001', password: 'admin123',
+    displayName: 'Ama Ofori',
+    label: 'GM-001 — General Manager (Global)',
+    role: 'GeneralManager', scope: 'global'
+  },
+  {
     staffId: 'MD-001', password: 'admin123',
     displayName: 'Ama Boateng',
     label: 'MD-001 — Managing Director (Global)',

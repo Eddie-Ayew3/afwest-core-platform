@@ -253,9 +253,7 @@
 
             <ng-template tolleCell="actions" let-row="row">
               <div class="flex items-center justify-end gap-2">
-                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewSiteDetails(row)">
-                  <i class="ri-eye-line"></i>
-                </tolle-button>
+                <tolle-button variant="default" size="xs" (click)="viewSiteDetails(row)">View</tolle-button>
                 <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View on map" placement="top" (click)="viewSiteOnMap(row)" *ngIf="row.coordinates">
                   <i class="ri-map-line"></i>
                 </tolle-button>

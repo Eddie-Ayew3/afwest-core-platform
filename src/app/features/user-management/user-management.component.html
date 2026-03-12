@@ -93,32 +93,32 @@
         </ng-template>
 
         <ng-template tolleCell="role" let-row="row">
-          <tolle-badge size="sm" style="background: rgba(46,52,64,0.15); color: #2e3440;">
-            {{row.role}}
-          </tolle-badge>
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="secondary">
+              {{row.role}}
+            </tolle-badge>
+          </div>
         </ng-template>
 
         <ng-template tolleCell="permissions" let-row="row">
-          <tolle-badge size="sm"
-            [style.background]="getPermissionBg(row.permissions)"
-            [style.color]="getPermissionFg(row.permissions)">
-            {{row.permissions}}
-          </tolle-badge>
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline">
+              {{row.permissions}}
+            </tolle-badge>
+          </div>
         </ng-template>
 
         <ng-template tolleCell="status" let-row="row">
-          <tolle-badge size="sm"
-            [style.background]="row.status === 'Active' ? 'rgba(76,175,80,0.15)' : 'rgba(120,120,120,0.15)'"
-            [style.color]="row.status === 'Active' ? '#4CAF50' : '#757575'">
-            {{row.status}}
-          </tolle-badge>
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" [variant]="row.status === 'Active' ? 'default' : 'secondary'">
+              {{row.status}}
+            </tolle-badge>
+          </div>
         </ng-template>
 
         <ng-template tolleCell="actions" let-row="row">
           <div class="flex items-center justify-end gap-2">
-            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewUserDetails(row)">
-              <i class="ri-eye-line text-muted-foreground"></i>
-            </tolle-button>
+            <tolle-button variant="default" size="xs" (click)="viewUserDetails(row)">View</tolle-button>
             <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit user" placement="top" (click)="editUser(row)">
               <i class="ri-edit-line text-muted-foreground"></i>
             </tolle-button>

@@ -130,6 +130,9 @@
 
         <ng-template tolleCell="actions" let-row="row">
           <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="outline" size="xs" (click)="openAssignZonesModal(row)">
+              <i class="ri-map-2-line mr-1"></i>Assign
+            </tolle-button>
             <tolle-button variant="default" size="xs" (click)="editClient(row)">Edit</tolle-button>
             <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="navigateToViewClient(row)">
               <i class="ri-eye-line"></i>
@@ -159,3 +162,59 @@
 
   </div>
 </div>
+
+<!-- Assign Zones Modal -->
+<ng-template #assignZonesModal>
+  <div class="space-y-5 p-1">
+
+    <!-- Client info banner -->
+    <div class="flex items-center gap-3 p-3 rounded-lg bg-muted/40 border border-border">
+      <div class="h-9 w-9 rounded-lg bg-green-100 flex items-center justify-center text-green-600 font-semibold shrink-0">
+        {{ assigningClient?.name?.charAt(0) }}
+      </div>
+      <div class="min-w-0">
+        <p class="font-medium truncate">{{ assigningClient?.name }}</p>
+        <p class="text-xs text-muted-foreground">{{ assigningClient?.region }} · {{ assigningClient?.id }}</p>
+      </div>
+    </div>
+
+    <!-- Multi-select -->
+    <div class="space-y-1.5">
+      <label class="text-sm font-medium">Operational Zones</label>
+      <p class="text-xs text-muted-foreground">Select all zones this client operates in.</p>
+      <tolle-multi-select
+        [(ngModel)]="selectedZones"
+        placeholder="Select zones...">
+        @for (zone of allZones; track zone) {
+          <tolle-select-item [value]="zone">{{ zone }}</tolle-select-item>
+        }
+      </tolle-multi-select>
+    </div>
+
+    <!-- Selected summary -->
+    @if (selectedZones.length > 0) {
+      <div class="space-y-1.5">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          {{ selectedZones.length }} zone{{ selectedZones.length > 1 ? 's' : '' }} selected
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          @for (id of selectedZones; track id) {
+            <span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary">
+              <i class="ri-map-2-line text-xs"></i>
+              {{ id }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button (click)="saveZoneAssignment()">
+        <i class="ri-save-line mr-2"></i>Save Assignment
+      </tolle-button>
+    </div>
+
+  </div>
+</ng-template>

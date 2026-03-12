@@ -12,11 +12,14 @@ export type NavFeature =
   | 'hr_permissions'
   | 'control_shift'
   | 'control_checkin'
-  | 'procurement';
+  | 'procurement'
+  | 'zone_management'
+  | 'finance_payroll'
+  | 'finance_payment';
 
 const NAV_PERMISSIONS: Record<UserScope, NavFeature[]> = {
-  global:   ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_user', 'hr_permissions', 'control_shift', 'control_checkin', 'procurement'],
-  regional: ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'control_shift', 'control_checkin'],
+  global:   ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_user', 'hr_permissions', 'control_shift', 'control_checkin', 'procurement', 'zone_management', 'finance_payroll', 'finance_payment'],
+  regional: ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'control_shift', 'control_checkin', 'zone_management', 'finance_payroll'],
   site:     ['overview', 'hr_staff', 'hr_guard', 'control_shift', 'control_checkin']
 };
 
@@ -74,8 +77,8 @@ export class PermissionsService {
 
     // ── Main ──────────────────────────────────────────────────
     const mainItems: any[] = [];
-    if (this.canSee('overview'))   mainItems.push({ title: 'Overview',           icon: 'ri-dashboard-line', url: '/dashboard' });
-    if (this.canSee('hr_client'))  mainItems.push({ title: 'Client Management',  icon: 'ri-building-line',  url: '/client-management' });
+    if (this.canSee('overview'))   mainItems.push({ title: 'Overview',          icon: 'ri-dashboard-line', url: '/dashboard' });
+    if (this.canSee('hr_client')) mainItems.push({ title: 'Client Management', icon: 'ri-building-line',  url: '/client-management' });
     if (mainItems.length) groups.push({ title: 'Main', items: mainItems });
 
     // ── Platform ──────────────────────────────────────────────
@@ -93,9 +96,16 @@ export class PermissionsService {
 
     // Control Unit
     const controlItems: any[] = [];
-    if (this.canSee('control_shift'))   controlItems.push({ title: 'Shift Management',      url: '/control-unit/shift-management' });
-    if (this.canSee('control_checkin')) controlItems.push({ title: 'Check In/Check Out',     url: '/control-unit/check-in-out' });
+    if (this.canSee('control_shift'))    controlItems.push({ title: 'Shift Management',  url: '/control-unit/shift-management' });
+    if (this.canSee('control_checkin')) controlItems.push({ title: 'Check In/Check Out', url: '/control-unit/check-in-out' });
+    if (this.canSee('zone_management')) controlItems.push({ title: 'Zone Management',    url: '/zone-management' });
     if (controlItems.length) platformItems.push({ title: 'Control Unit', icon: 'ri-shield-check-line', expanded: false, items: controlItems });
+
+    // Finance
+    const financeItems: any[] = [];
+    if (this.canSee('finance_payroll')) financeItems.push({ title: 'Payroll Management', url: '/finance/payroll-management' });
+    if (this.canSee('finance_payment')) financeItems.push({ title: 'Payment Management', url: '/finance/payment-management' });
+    if (financeItems.length) platformItems.push({ title: 'Finance', icon: 'ri-money-dollar-circle-line', expanded: false, items: financeItems });
 
     // Procurement (global only)
     if (this.canSee('procurement')) {

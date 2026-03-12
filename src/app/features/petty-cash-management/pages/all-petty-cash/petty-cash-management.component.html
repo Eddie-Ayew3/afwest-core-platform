@@ -156,9 +156,7 @@
 
             <ng-template tolleCell="description" let-row="row">
               <div class="flex items-center gap-2">
-                <tolle-badge size="xs"
-                  [style.background]="row.type === 'Expense' ? 'rgba(244, 67, 54, 0.12)' : 'rgba(76, 175, 80, 0.12)'"
-                  [style.color]="row.type === 'Expense' ? '#F44336' : '#4CAF50'">
+                <tolle-badge size="xs" [variant]="row.type === 'Expense' ? 'destructive' : 'default'">
                   {{row.type}}
                 </tolle-badge>
               </div>
@@ -205,20 +203,16 @@
             </ng-template>
 
             <ng-template tolleCell="status" let-row="row">
-              <tolle-badge size="sm"
-                [style.background]="getStatusBg(row.status)"
-                [style.color]="getStatusFg(row.status)">
-                {{row.status}}
-              </tolle-badge>
+              <div class="flex items-center justify-center">
+                <tolle-badge size="sm" variant="outline">
+                  {{row.status}}
+                </tolle-badge>
+              </div>
             </ng-template>
 
             <ng-template tolleCell="actions" let-row="row">
               <div class="flex items-center justify-end gap-2">
-                <tolle-button variant="ghost" size="icon-sm"
-                  tolleTooltip="View details" placement="top"
-                  (click)="viewTransaction(row)">
-                  <i class="ri-eye-line"></i>
-                </tolle-button>
+                <tolle-button variant="default" size="xs" (click)="viewTransaction(row)">View</tolle-button>
                 <div class="relative">
                   <tolle-button variant="ghost" size="icon-sm"
                     tolleTooltip="More actions" placement="top"

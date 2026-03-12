@@ -88,11 +88,11 @@
         </ng-template>
 
         <ng-template tolleCell="status" let-row="row">
-          <tolle-badge size="sm"
-            [style.background]="row.status === 'Pending' ? 'rgba(224,172,0,0.15)' : row.status === 'Approved' ? 'rgba(76,175,80,0.15)' : 'rgba(255,82,82,0.15)'"
-            [style.color]="row.status === 'Pending' ? '#E0AC00' : row.status === 'Approved' ? '#4CAF50' : '#FF5252'">
-            {{row.status}}
-          </tolle-badge>
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline">
+              {{row.status}}
+            </tolle-badge>
+          </div>
         </ng-template>
 
         <ng-template tolleCell="manager" let-row="row">
@@ -104,9 +104,7 @@
 
         <ng-template tolleCell="actions" let-row="row">
           <div class="flex items-center justify-end gap-2">
-            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewRequest(row)">
-              <i class="ri-eye-line"></i>
-            </tolle-button>
+            <tolle-button variant="default" size="xs" (click)="viewRequest(row)">View</tolle-button>
             <div class="relative">
               <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
                 <i class="ri-more-2-fill"></i>

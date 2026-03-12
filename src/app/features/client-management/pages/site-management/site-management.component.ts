@@ -27,6 +27,7 @@ import {
   SheetComponent,
   SheetContentComponent
 } from '@tolle_/tolle-ui';
+import { PermissionsService } from '../../../../core/services/permissions.service';
 //import { MapComponent } from './map/map.component';
 
 export interface Site {
@@ -105,7 +106,37 @@ export interface Region {
 })
 export class SiteManagementComponent implements OnInit {
   private modalService = inject(ModalService);
+  private permissions = inject(PermissionsService);
   @ViewChild('newSiteModal') newSiteModal!: TemplateRef<any>;
+
+  // User's assigned zone for site creation permissions
+  get userZone(): string {
+    return this.permissions.site || '';
+  }
+
+  get userRegion(): string {
+    return this.permissions.region || '';
+  }
+
+  // Check if user can create sites in a specific region
+  canCreateSiteInRegion(region: string): boolean {
+    if (this.permissions.role === 'Admin' || this.permissions.role === 'GeneralManager') {
+      return true; // Admin and GM can create sites anywhere
+    }
+    
+    // Zonal officers can only create sites in their assigned zone
+    return this.permissions.isGlobal() || this.permissions.region === region;
+  }
+
+  // Filter sites based on user's zone/region permissions
+  get allowedSites(): Site[] {
+    if (this.permissions.role === 'Admin' || this.permissions.role === 'GeneralManager') {
+      return this.sites; // Admin and GM see all sites
+    }
+    
+    // Filter sites by user's region/zone
+    return this.sites.filter(site => site.region === this.permissions.region);
+  }
 
   // Mock data for Ecobank branches across Ghana regions
   regions: Region[] = [
@@ -267,6 +298,17 @@ export class SiteManagementComponent implements OnInit {
   displayedSites: Site[] = [];
   currentUserRole: 'head-office' | 'zonal-commander' = 'head-office'; // This would come from auth service
   currentUserRegion?: string; // Would be set based on logged-in user
+  
+  // Filter and pagination properties
+  selectedType = 'all';
+  selectedSecurityLevel = 'all';
+  selectedRegion = 'all';
+  selectedStatus = 'all';
+  searchQuery = '';
+  showFilterPanel = false;
+  activeFilterCount = 0;
+  currentPage = 1;
+  pageSize = 10;
 
   columns: TableColumn[] = [
     { key: 'siteInfo', label: 'Site Info' },
@@ -278,23 +320,13 @@ export class SiteManagementComponent implements OnInit {
     { key: 'actions', label: '' }
   ];
 
-  searchQuery: string = '';
-  showFilterPanel: boolean = false;
-  activeFilterCount: number = 0;
-
-  // Filters
-  selectedRegion: string = 'all';
-  selectedStatus: string = 'all';
-  selectedType: string = 'all';
-  selectedSecurityLevel: string = 'all';
+  
 
   // Map sheet
   showMapSheet = false;
   selectedSite: Site | null = null;
 
-  // Pagination
-  currentPage: number = 1;
-  pageSize: number = 10;
+
 
   constructor() {
     // Simulate setting user region (in real app, this would come from auth service)
@@ -323,31 +355,28 @@ export class SiteManagementComponent implements OnInit {
       result = result.filter(site => site.region === this.selectedRegion);
     }
 
-    // Search
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      result = result.filter(site =>
-        site.name.toLowerCase().includes(query) ||
-        site.code.toLowerCase().includes(query) ||
-        site.city.toLowerCase().includes(query) ||
-        site.address.toLowerCase().includes(query) ||
-        site.contact.manager.toLowerCase().includes(query)
-      );
-    }
-
-    // Status filter
-    if (this.selectedStatus !== 'all') {
-      result = result.filter(site => site.status === this.selectedStatus);
-    }
-
-    // Type filter
+    // Apply additional filters
     if (this.selectedType !== 'all') {
       result = result.filter(site => site.type === this.selectedType);
     }
 
-    // Security level filter
     if (this.selectedSecurityLevel !== 'all') {
       result = result.filter(site => site.securityLevel === this.selectedSecurityLevel);
+    }
+
+    if (this.selectedStatus !== 'all') {
+      result = result.filter(site => site.status === this.selectedStatus);
+    }
+
+    // Search
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      result = result.filter(site => 
+        site.name.toLowerCase().includes(query) ||
+        site.code.toLowerCase().includes(query) ||
+        site.city.toLowerCase().includes(query) ||
+        site.address.toLowerCase().includes(query)
+      );
     }
 
     this.filteredSites = result;
@@ -362,28 +391,11 @@ export class SiteManagementComponent implements OnInit {
 
   updateActiveFilterCount(): void {
     let count = 0;
-    if (this.selectedRegion !== 'all') count++;
-    if (this.selectedStatus !== 'all') count++;
     if (this.selectedType !== 'all') count++;
     if (this.selectedSecurityLevel !== 'all') count++;
+    if (this.selectedStatus !== 'all') count++;
+    if (this.searchQuery.trim()) count++;
     this.activeFilterCount = count;
-  }
-
-  onSearch(): void {
-    this.applyFilters();
-  }
-
-  toggleFilterPanel(): void {
-    this.showFilterPanel = !this.showFilterPanel;
-  }
-
-  clearFilters(): void {
-    this.searchQuery = '';
-    this.selectedRegion = 'all';
-    this.selectedStatus = 'all';
-    this.selectedType = 'all';
-    this.selectedSecurityLevel = 'all';
-    this.applyFilters();
   }
 
   getSiteTypeIcon(type: string): string {
@@ -434,21 +446,50 @@ export class SiteManagementComponent implements OnInit {
     this.showMapSheet = true;
   }
 
-  openNewSiteDialog(){
-    const modalRef = this.modalService.open({
-      title: 'Add New Site',
-      content: this.newSiteModal,
-      size: 'lg',
-      showCloseButton: true,
-      backdropClose: true,
+  // Create new site with zone-based validation
+  createSite(siteData: any): void {
+    // Check if user can create site in the specified region
+    if (!this.canCreateSiteInRegion(siteData.region)) {
+      alert(`You don't have permission to create sites in ${siteData.region}. You can only create sites in ${this.userRegion || 'your assigned region'}.`);
+      return;
+    }
 
-    });
+    // Create new site object
+    const newSite: Site = {
+      id: `SITE-${Date.now()}`,
+      name: siteData.name,
+      code: siteData.code,
+      type: siteData.type,
+      region: siteData.region,
+      district: siteData.district,
+      city: siteData.city,
+      address: siteData.address,
+      coordinates: siteData.coordinates,
+      contact: siteData.contact,
+      status: 'active', // New sites are automatically active
+      staffCount: 0,
+      guardCount: 0,
+      operatingHours: siteData.operatingHours || {
+        weekdays: '8:00 AM - 5:00 PM',
+        weekends: 'Closed'
+      },
+      services: siteData.services || [],
+      establishedDate: new Date(),
+      securityLevel: siteData.securityLevel || 'medium',
+      zonalCommander: this.permissions.displayName
+    };
 
-    modalRef.afterClosed$.subscribe((result: any) => {
-      if (result?.success) {
-        console.log('New site added successfully');
-      }
-    });
+    // Add to sites array
+    this.sites.push(newSite);
+    
+    // Update display
+    this.applyFilters();
+    
+    console.log('New site created:', newSite);
+    alert(`Site "${newSite.name}" has been created and is now active for guard deployment.`);
+    
+    // Close modal
+    this.modalService.closeAll();
   }
 
   onPageSizeChange(): void {
@@ -464,6 +505,33 @@ export class SiteManagementComponent implements OnInit {
   switchUserRole(): void {
     // For testing purposes - switch between head-office and zonal-commander
     this.currentUserRole = this.currentUserRole === 'head-office' ? 'zonal-commander' : 'head-office';
+    this.applyFilters();
+  }
+
+  openNewSiteDialog(): void {
+    this.modalService.open({
+      title: 'Create New Site',
+      content: this.newSiteModal,
+      size: 'lg',
+      backdropClose: true,
+      showCloseButton: true
+    });
+  }
+
+  clearFilters(): void {
+    this.selectedType = 'all';
+    this.selectedSecurityLevel = 'all';
+    this.selectedRegion = 'all';
+    this.selectedStatus = 'all';
+    this.searchQuery = '';
+    this.applyFilters();
+  }
+
+  toggleFilterPanel(): void {
+    this.showFilterPanel = !this.showFilterPanel;
+  }
+
+  onSearch(): void {
     this.applyFilters();
   }
 }

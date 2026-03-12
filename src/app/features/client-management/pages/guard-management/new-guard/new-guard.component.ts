@@ -297,9 +297,9 @@ export class NewGuardComponent implements OnInit {
     if (this.guardForm.invalid) return;
 
     const dialogRef = this.alertDialog.open({
-      title: 'Add Guard?',
-      description: `Confirm adding ${this.formValues.fullName} (${this.formValues.guardId}) as a ${this.formValues.guardRole} at ${this.formValues.site}.`,
-      actionText: 'Yes, Add Guard',
+      title: 'Register Guard?',
+      description: `Confirm registering ${this.formValues.fullName} (${this.formValues.guardId}) as a ${this.formValues.guardRole} at ${this.formValues.site}. The guard will require approval before deployment.`,
+      actionText: 'Yes, Register Guard',
       variant: 'default'
     });
 
@@ -307,7 +307,13 @@ export class NewGuardComponent implements OnInit {
       if (!confirmed) return;
       this.isSubmitting = true;
       setTimeout(() => {
-        console.log('New guard submitted:', this.guardForm.getRawValue());
+        const newGuard = {
+          ...this.guardForm.getRawValue(),
+          status: 'pending-approval',
+          dateRegistered: new Date(),
+          registeredBy: 'HR Manager' // In real app, get from auth service
+        };
+        console.log('New guard registered:', newGuard);
         this.isSubmitting = false;
         this.showSuccessAlert = true;
         setTimeout(() => this.router.navigate(['/hr/guard-management']), 2500);

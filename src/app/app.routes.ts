@@ -22,6 +22,9 @@ import { globalOnlyGuard, notGuardRoleGuard } from './core/guards/role.guard';
 import { loadingGuard } from './core/guards/loading.guard';
 import { PermissionsService } from './core/services/permissions.service';
 import { StaffManagementComponent } from './features/staff-management/pages/all-staff/staff-management.component';
+import { ZoneManagementComponent } from './features/zone-management/pages/all-zones/zone-management.component';
+import { PayrollManagementComponent } from './features/finance-management/pages/payroll-management/payroll-management.component';
+import { PaymentManagementComponent } from './features/finance-management/pages/payment-management/payment-management.component';
 import { NewClientManagementComponent } from './features/client-management/pages/client-management/new-client/new-client-management.component';
 import { NewStaffManagementComponent } from './features/staff-management/pages/new-staff/new-staff-management.component';
 import { NewGuardComponent } from './features/client-management/pages/guard-management/new-guard/new-guard.component';
@@ -77,6 +80,23 @@ export const routes: Routes = [
             {
                 path: 'client-management',
                 component: ClientManagementComponent
+            },
+            {
+                path: 'zone-management',
+                component: ZoneManagementComponent
+            },
+            {
+                path: 'finance',
+                children: [
+                    {
+                        path: 'payroll-management',
+                        component: PayrollManagementComponent
+                    },
+                    {
+                        path: 'payment-management',
+                        component: PaymentManagementComponent
+                    }
+                ]
             },
             {
                 path: 'hr',

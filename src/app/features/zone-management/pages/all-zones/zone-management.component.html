@@ -1,0 +1,430 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Control Unit</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Zone Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Zone Management</h1>
+        <p class="text-muted-foreground mt-2">Operational command areas managed by AFWest Security</p>
+      </div>
+      <tolle-button variant="default" (click)="openCreateModal()">
+        <i class="ri-add-line mr-2"></i>New Zone
+      </tolle-button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-primary/10 rounded-lg shrink-0"><i class="ri-map-2-line text-primary text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{ totalZones }}</h3><p class="text-xs text-muted-foreground">Total Zones</p></div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0"><i class="ri-checkbox-circle-line text-green-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{ activeZones }}</h3><p class="text-xs text-muted-foreground">Active Zones</p></div>
+        <span class="ml-auto text-xs text-green-600 font-medium">Active</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-zinc-100 rounded-lg shrink-0"><i class="ri-pause-circle-line text-zinc-500 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{ inactiveZones }}</h3><p class="text-xs text-muted-foreground">Inactive Zones</p></div>
+        <span class="ml-auto text-xs text-zinc-500 font-medium">Inactive</span>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="flex justify-end items-center mb-3">
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{ activeFilterCount }})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Region:</span>
+        <tolle-select [(ngModel)]="filterRegion" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          @for (r of regions; track r) {
+            <tolle-select-item [value]="r">{{ r }}</tolle-select-item>
+          }
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="active">Active</tolle-select-item>
+          <tolle-select-item value="inactive">Inactive</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>Clear
+      </tolle-button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredZones"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25]">
+
+        <ng-template tolleCell="zone" let-row="row">
+          <div class="flex items-center gap-2">
+            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <i class="ri-map-2-line text-sm"></i>
+            </div>
+            <div>
+              <p class="font-medium">{{ row.name }}</p>
+              <p class="text-xs font-mono text-muted-foreground">{{ row.id }} · {{ row.code }}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="region" let-row="row">
+          <div class="flex items-center gap-1.5 text-sm">
+            <i class="ri-map-pin-line text-muted-foreground text-xs"></i>
+            <span>{{ row.region }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="commander" let-row="row">
+          <div class="flex items-center gap-2">
+            <div class="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold shrink-0">
+              {{ getInitials(row.commander) }}
+            </div>
+            <div>
+              <p class="text-sm">{{ row.commander }}</p>
+              <p class="text-xs font-mono text-muted-foreground">{{ row.officerId }}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="phone" let-row="row">
+          <div class="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <i class="ri-phone-line text-xs"></i>
+            <span>{{ row.phone }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline"
+              [style.background]="getStatusBg(row.status)"
+              [style.color]="getStatusFg(row.status)">
+              {{ row.status | titlecase }}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewZone(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="zoneMenu">
+                <i class="ri-more-2-fill"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #zoneMenu>
+                <div class="flex flex-col p-1">
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-edit-line"></i>Edit Zone
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-printer-line"></i>Print Details
+                  </button>
+                  <div class="my-1 h-px bg-border"></div>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors">
+                    <i class="ri-delete-bin-line"></i>Delete Zone
+                  </button>
+                </div>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Create Zone Modal ────────────────────────────────────────────────── -->
+@if (showCreateModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCreateModal()"></div>
+
+    <!-- Dialog -->
+    <div class="relative bg-background rounded-xl shadow-2xl w-full max-w-[520px] flex flex-col max-h-[88vh]"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+        <div>
+          <h2 class="text-lg font-semibold">Create New Zone</h2>
+          <p class="text-sm text-muted-foreground mt-0.5">
+            {{ createStep === 0 ? 'Enter zone details' : 'Assign a zone officer' }}
+          </p>
+        </div>
+        <button (click)="closeCreateModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+          <i class="ri-close-line text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="px-6 py-3 border-b border-border shrink-0">
+        <div class="flex items-center gap-3">
+          <!-- Step 1 -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ' +
+              (createStep === 0 ? 'bg-primary text-white ring-2 ring-primary/30' : 'bg-primary text-white')">
+              @if (createStep > 0) {
+                <i class="ri-check-line text-xs"></i>
+              } @else {
+                1
+              }
+            </div>
+            <span [class]="'text-sm font-medium ' + (createStep === 0 ? 'text-foreground' : 'text-muted-foreground')">
+              Zone Info
+            </span>
+          </div>
+          <!-- Connector -->
+          <div class="flex-1 h-px bg-border"></div>
+          <!-- Step 2 -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ' +
+              (createStep === 1 ? 'bg-primary text-white ring-2 ring-primary/30' : 'bg-muted text-muted-foreground')">
+              2
+            </div>
+            <span [class]="'text-sm font-medium ' + (createStep === 1 ? 'text-foreground' : 'text-muted-foreground')">
+              Assign Officer
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-auto p-6">
+
+        <!-- ── Step 0: Zone Info ── -->
+        @if (createStep === 0) {
+          <div class="space-y-4">
+
+            <!-- Auto ID preview -->
+            <div class="flex items-center gap-3 p-3 bg-muted/40 rounded-lg border border-border">
+              <div class="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                <i class="ri-barcode-line text-primary text-sm"></i>
+              </div>
+              <div>
+                <p class="text-xs text-muted-foreground">Zone ID (Auto-generated)</p>
+                <p class="text-sm font-mono font-semibold text-foreground">{{ previewZoneId }}</p>
+              </div>
+            </div>
+
+            <!-- Zone Name (full width) -->
+            <div class="space-y-1.5">
+              <tolle-label>Zone Name <span class="text-destructive">*</span></tolle-label>
+              <tolle-input
+                type="text"
+                placeholder="e.g. Greater Accra Zone"
+                [(ngModel)]="newZone.name"
+                class="w-full">
+              </tolle-input>
+            </div>
+
+            <!-- Code + Region -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <tolle-label>Zone Code</tolle-label>
+                <tolle-input
+                  type="text"
+                  placeholder="e.g. GAZ-01"
+                  [(ngModel)]="newZone.code"
+                  class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Region <span class="text-destructive">*</span></tolle-label>
+                <tolle-select [(ngModel)]="newZone.region" placeholder="Select region" class="w-full">
+                  @for (r of regions; track r) {
+                    <tolle-select-item [value]="r">{{ r }}</tolle-select-item>
+                  }
+                </tolle-select>
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="space-y-1.5">
+              <tolle-label>Status</tolle-label>
+              <tolle-select [(ngModel)]="newZone.status" class="w-full">
+                <tolle-select-item value="active">Active</tolle-select-item>
+                <tolle-select-item value="inactive">Inactive</tolle-select-item>
+              </tolle-select>
+            </div>
+
+            <!-- Validation error -->
+            @if (step1Error) {
+              <div class="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <i class="ri-error-warning-line text-destructive shrink-0"></i>
+                <p class="text-sm text-destructive">{{ step1Error }}</p>
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- ── Step 1: Assign Officer ── -->
+        @if (createStep === 1) {
+          <div class="space-y-3">
+
+            <!-- Search -->
+            <tolle-input
+              type="text"
+              placeholder="Search by name, ID, rank or region..."
+              [(ngModel)]="officerSearch"
+              class="w-full">
+              <i prefix class="ri-search-line text-muted-foreground"></i>
+            </tolle-input>
+
+            <!-- Officer list -->
+            <div class="space-y-2 max-h-[300px] overflow-auto pr-1">
+              @for (officer of filteredOfficers; track officer.id) {
+                <button type="button"
+                  (click)="selectOfficer(officer)"
+                  [class]="'w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ' +
+                    (newZone.officerId === officer.id
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-border hover:border-primary/40 hover:bg-muted/30')">
+
+                  <!-- Avatar -->
+                  <div [class]="'w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-sm shrink-0 ' +
+                    (newZone.officerId === officer.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary')">
+                    {{ getInitials(officer.name) }}
+                  </div>
+
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-sm leading-tight">{{ officer.name }}</p>
+                    <p class="text-xs text-muted-foreground mt-0.5">{{ officer.rank }}</p>
+                    <p class="text-xs text-muted-foreground">{{ officer.region }}</p>
+                  </div>
+
+                  <!-- ID + Phone -->
+                  <div class="text-right shrink-0">
+                    <p class="text-xs font-mono font-medium text-foreground">{{ officer.id }}</p>
+                    <p class="text-xs text-muted-foreground mt-0.5">{{ officer.phone }}</p>
+                  </div>
+
+                  <!-- Selected check -->
+                  @if (newZone.officerId === officer.id) {
+                    <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0 ml-1">
+                      <i class="ri-check-line text-white text-xs"></i>
+                    </div>
+                  }
+
+                </button>
+              }
+
+              @if (filteredOfficers.length === 0) {
+                <div class="text-center py-10 text-muted-foreground">
+                  <i class="ri-user-search-line text-3xl mb-2 block"></i>
+                  <p class="text-sm">No officers found</p>
+                </div>
+              }
+            </div>
+
+            <!-- Selected confirmation -->
+            @if (newZone.officerId) {
+              <div class="flex items-center gap-2 p-2.5 bg-green-50 border border-green-200 rounded-lg">
+                <i class="ri-checkbox-circle-fill text-green-600 shrink-0"></i>
+                <p class="text-sm text-green-700 font-medium">
+                  {{ newZone.officerName }} selected as Zone Officer
+                </p>
+              </div>
+            }
+
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-border shrink-0 flex items-center justify-between">
+        @if (createStep === 0) {
+          <tolle-button variant="outline" (click)="closeCreateModal()">Cancel</tolle-button>
+          <tolle-button variant="default" (click)="nextCreateStep()">
+            Next <i class="ri-arrow-right-line ml-1"></i>
+          </tolle-button>
+        } @else {
+          <tolle-button variant="outline" (click)="prevCreateStep()">
+            <i class="ri-arrow-left-line mr-1"></i>Back
+          </tolle-button>
+          <tolle-button variant="default" (click)="submitZone()" [busy]="creating">
+            <i class="ri-check-line mr-1"></i>Create Zone
+          </tolle-button>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ── Zone Detail Modal Template ──────────────────────────────────────── -->
+<ng-template #zoneModal let-zone="zone">
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-lg">
+        <i class="ri-map-2-line"></i>
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ zone.name }}</h4>
+        <p class="text-sm text-muted-foreground">{{ zone.id }} · {{ zone.code }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Region</p>
+        <p class="font-medium mt-1">{{ zone.region }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Status</p>
+        <tolle-badge size="sm" class="mt-1" variant="outline"
+          [style.background]="getStatusBg(zone.status)"
+          [style.color]="getStatusFg(zone.status)">
+          {{ zone.status | titlecase }}
+        </tolle-badge>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Zone Officer</p>
+        <p class="font-medium mt-1">{{ zone.commander }}</p>
+        <p class="text-xs font-mono text-muted-foreground">{{ zone.officerId }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Contact Phone</p>
+        <p class="font-medium mt-1">{{ zone.phone }}</p>
+      </div>
+    </div>
+  </div>
+</ng-template>

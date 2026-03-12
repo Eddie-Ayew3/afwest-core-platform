@@ -39,7 +39,7 @@
         <h1 class="text-2xl font-bold">Guard Management</h1>
         <p class="text-muted-foreground mt-1">Manage security guard personnel</p>
       </div>
-      <tolle-button variant="default" *ngIf="isHrContext" (click)="navigateToNewGuard()">
+      <tolle-button variant="default" *ngIf="canRegisterGuards && isHrContext" (click)="navigateToNewGuard()">
         <i class="ri-add-line mr-2"></i>
         Add Guard
       </tolle-button>
@@ -72,8 +72,8 @@
         </ng-template>
 
         <ng-template tolleCell="status" let-row="row">
-          <tolle-badge [variant]="row.status === 'Active' ? 'default' : 'secondary'" size="sm">
-            {{ row.status }}
+          <tolle-badge [variant]="getStatusColor(row.status)" size="sm">
+            {{ getStatusText(row.status) }}
           </tolle-badge>
         </ng-template>
 
@@ -83,9 +83,22 @@
 
         <ng-template tolleCell="actions" let-row="row">
           <div class="flex items-center justify-end gap-2">
-            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewGuard(row)">
-              <i class="ri-eye-line"></i>
-            </tolle-button>
+            <!-- Approval actions for pending guards -->
+            <ng-container *ngIf="row.status === 'pending-approval' && canApproveGuards">
+              <tolle-button variant="default" size="xs" (click)="approveGuard(row)">
+                <i class="ri-check-line mr-1"></i>
+                Approve
+              </tolle-button>
+              <tolle-button variant="destructive" size="xs" (click)="rejectGuard(row)">
+                <i class="ri-close-line mr-1"></i>
+                Reject
+              </tolle-button>
+            </ng-container>
+            
+            <!-- Regular view button for other statuses -->
+            <tolle-button variant="default" size="xs" (click)="viewGuard(row)">View</tolle-button>
+            
+            <!-- More actions dropdown -->
             <div class="relative">
               <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
                 <i class="ri-more-2-fill"></i>

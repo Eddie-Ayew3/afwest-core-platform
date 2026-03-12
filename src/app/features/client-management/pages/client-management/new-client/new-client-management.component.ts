@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PermissionsService } from '../../../../../core/services/permissions.service';
 import {
   ButtonComponent,
   InputComponent,
@@ -23,6 +24,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    DatePipe,
     FormsModule,
     ReactiveFormsModule,
     ButtonComponent,
@@ -45,17 +47,16 @@ import {
 export class NewClientManagementComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private permissions = inject(PermissionsService);
 
   currentStep = 0;
-  readonly totalSteps = 6;
+  readonly totalSteps = 4;
   isSubmitting = false;
 
-  readonly stepTitles = ['Basic Info', 'Contact', 'Address', 'Business', 'Contract', 'Review'];
+  readonly stepTitles = ['Client & Contact', 'Location & Business', 'Contract', 'Review'];
   readonly stepIcons = [
     'ri-building-line',
-    'ri-user-line',
     'ri-map-pin-line',
-    'ri-briefcase-line',
     'ri-file-text-line',
     'ri-check-double-line'
   ];
@@ -66,6 +67,12 @@ export class NewClientManagementComponent implements OnInit {
   contractStartDateObj: Date | null = null;
   contractEndDateObj: Date | null = null;
 
+  // Contract file uploads
+  contractFiles: File[] = [];
+  isDragOver = false;
+
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
+
   onStartDateChange(date: Date | null): void {
     this.clientForm.patchValue({ contractStartDate: date });
     this.clientForm.get('contractStartDate')?.markAsTouched();
@@ -74,6 +81,56 @@ export class NewClientManagementComponent implements OnInit {
   onEndDateChange(date: Date | null): void {
     this.clientForm.patchValue({ contractEndDate: date });
     this.clientForm.get('contractEndDate')?.markAsTouched();
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) this.addFiles(Array.from(input.files));
+    input.value = '';
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(): void {
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = false;
+    if (event.dataTransfer?.files) this.addFiles(Array.from(event.dataTransfer.files));
+  }
+
+  private addFiles(files: File[]): void {
+    const allowed = ['application/pdf', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg', 'image/png'];
+    files
+      .filter(f => allowed.includes(f.type) && !this.contractFiles.find(e => e.name === f.name))
+      .forEach(f => this.contractFiles.push(f));
+  }
+
+  triggerFileInput(): void {
+    this.fileInput?.nativeElement?.click();
+  }
+
+  removeFile(index: number): void {
+    this.contractFiles.splice(index, 1);
+  }
+
+  getFileIcon(file: File): string {
+    if (file.type === 'application/pdf') return 'ri-file-pdf-line';
+    if (file.type.startsWith('image/')) return 'ri-image-line';
+    return 'ri-file-word-line';
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   constructor() {
@@ -130,12 +187,10 @@ export class NewClientManagementComponent implements OnInit {
 
   private getStepRequiredFields(step: number): string[] {
     const map: Record<number, string[]> = {
-      0: ['clientName'],
-      1: ['contactPerson', 'email', 'phone'],
-      2: ['physicalAddress', 'city', 'region'],
-      3: [],
-      4: ['contractStartDate', 'contractEndDate'],
-      5: []
+      0: ['clientName', 'contactPerson', 'email', 'phone'],
+      1: ['physicalAddress', 'city', 'region'],
+      2: ['contractStartDate', 'contractEndDate'],
+      3: []
     };
     return map[step] ?? [];
   }
@@ -178,15 +233,39 @@ export class NewClientManagementComponent implements OnInit {
     if (this.clientForm.invalid) return;
 
     this.isSubmitting = true;
+    
+    // Simulate API call to save client
     setTimeout(() => {
-      console.log('New client:', this.clientForm.getRawValue());
+      const formValues = this.clientForm.getRawValue();
+      const newClient = {
+        id: formValues.clientId,
+        name: formValues.clientName,
+        contactPerson: formValues.contactPerson,
+        contactEmail: formValues.email,
+        status: 'Pending Approval' as const,
+        contractEnd: new Date(formValues.contractEndDate),
+        region: formValues.region,
+        assignedZones: [],
+        dateSubmitted: new Date(),
+        submittedBy: this.permissions.staffId,
+        // Store additional form data for approval process
+        formData: formValues
+      };
+
+      // Save to localStorage (simulating backend)
+      const existingClients = JSON.parse(localStorage.getItem('pendingClients') || '[]');
+      existingClients.push(newClient);
+      localStorage.setItem('pendingClients', JSON.stringify(existingClients));
+
+      console.log('Client submitted for approval:', newClient);
+      
       this.isSubmitting = false;
-      this.router.navigate(['/client-management']);
+      this.router.navigate(['/hr/client-management']);
     }, 2000);
   }
 
   onCancel(): void {
-    this.router.navigate(['/client-management']);
+    this.router.navigate(['/hr/client-management']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

@@ -71,9 +71,7 @@
         <ng-template tolleCell="actions" let-row="row">
           <div class="flex items-center justify-end gap-2">
             <tolle-button variant="default" size="xs">Edit</tolle-button>
-            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewPerson(row)">
-              <i class="ri-eye-line"></i>
-            </tolle-button>
+            <tolle-button variant="default" size="xs" (click)="viewPerson(row)">View</tolle-button>
             <div class="relative">
               <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="staffActionMenu">
                 <i class="ri-more-2-fill"></i>

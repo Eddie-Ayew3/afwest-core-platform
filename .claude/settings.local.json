@@ -4,7 +4,10 @@
       "Bash(node:*)",
       "Bash(npm install:*)",
       "Bash(npm view:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(cd \"C:\\\\Users\\\\edmun\\\\Documents\\\\Project\\\\afwest-core-platform\" && npx tsc --noEmit 2>&1 | head -100)",
+      "Bash(cd \"C:\\\\Users\\\\edmun\\\\Documents\\\\Project\\\\afwest-core-platform\" && npx tsc --noEmit 2>&1 | grep -v \"\\\\.spec\\\\.ts\" | head -80)",
+      "Bash(cd \"C:\\\\Users\\\\edmun\\\\Documents\\\\Project\\\\afwest-core-platform\" && npx tsc --noEmit 2>&1)"
     ]
   }
 }

@@ -61,6 +61,23 @@ export class DashboardLayoutComponent {
       ];
       this.pageTitle = 'Client Management';
       this.pageSubtitle = 'Manage clients and their information.';
+    } else if (url === '/zone-management') {
+      this.breadcrumbItems = [
+        { label: 'Home', url: '/dashboard' },
+        { label: 'Zone Management', active: true }
+      ];
+      this.pageTitle = 'Zone Management';
+      this.pageSubtitle = 'Manage security patrol zones and coverage areas across Ghana.';
+    } else if (url.startsWith('/finance/')) {
+      const section = url.replace('/finance/', '');
+      const sectionName = this.formatSectionName(section);
+      this.breadcrumbItems = [
+        { label: 'Home', url: '/dashboard' },
+        { label: 'Finance', url: '#' },
+        { label: sectionName, active: true }
+      ];
+      this.pageTitle = sectionName;
+      this.pageSubtitle = `Manage ${sectionName.toLowerCase()} and financial operations.`;
     } else if (url.startsWith('/hr/')) {
       const section = url.replace('/hr/', '');
       const sectionName = this.formatSectionName(section);
@@ -110,6 +127,9 @@ export class DashboardLayoutComponent {
       'user-management':       'User Management',
       'shift-management':      'Shift Management',
       'check-in-out':          'Check In/Check Out',
+      'zone-management':       'Zone Management',
+      'payroll-management':    'Payroll Management',
+      'payment-management':    'Payment Management',
       'supplier-management':   'Supplier Management',
       'logistics-management':  'Logistics Management',
       'petty-cash-management': 'Petty Cash Management'

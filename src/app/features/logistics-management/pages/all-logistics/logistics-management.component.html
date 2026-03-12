@@ -175,26 +175,25 @@
         </ng-template>
 
         <ng-template tolleCell="priority" let-row="row">
-          <tolle-badge *ngIf="row.priority === 'Urgent'" size="sm"
-            style="background: rgba(244, 67, 54, 0.15); color: #F44336;">
-            <i class="ri-alarm-warning-line mr-1"></i>Urgent
-          </tolle-badge>
-          <span *ngIf="row.priority === 'Normal'" class="text-sm text-muted-foreground">Normal</span>
+          <div class="flex items-center justify-center">
+            <tolle-badge *ngIf="row.priority === 'Urgent'" size="sm" variant="destructive">
+              <i class="ri-alarm-warning-line mr-1"></i>Urgent
+            </tolle-badge>
+            <span *ngIf="row.priority === 'Normal'" class="text-sm text-muted-foreground">Normal</span>
+          </div>
         </ng-template>
 
         <ng-template tolleCell="status" let-row="row">
-          <tolle-badge size="sm"
-            [style.background]="getStatusBg(row.status)"
-            [style.color]="getStatusFg(row.status)">
-            <i [class]="getStatusIcon(row.status) + ' mr-1'"></i>{{row.status}}
-          </tolle-badge>
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline">
+              <i [class]="getStatusIcon(row.status) + ' mr-1'"></i>{{row.status}}
+            </tolle-badge>
+          </div>
         </ng-template>
 
         <ng-template tolleCell="actions" let-row="row">
           <div class="flex items-center justify-end gap-2">
-            <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View details" placement="top" (click)="viewShipment(row)">
-              <i class="ri-eye-line"></i>
-            </tolle-button>
+            <tolle-button variant="default" size="xs" (click)="viewShipment(row)">View</tolle-button>
             <div class="relative">
               <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
                 <i class="ri-more-2-fill"></i>

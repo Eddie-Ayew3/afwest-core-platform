@@ -1,0 +1,215 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Client Management</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <a [routerLink]="['/client-management', currentClientId]" class="breadcrumb-link">Client Dashboard</a>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Guard Assignment</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Page Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Guard Assignment</h1>
+        <p class="text-muted-foreground mt-1" *ngIf="siteDetails">
+          Assign guards to {{ siteDetails.name }}
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" (click)="navigateToClientDashboard()">
+          <i class="ri-arrow-left-line mr-2"></i>
+          Back to Client
+        </tolle-button>
+        <tolle-button variant="outline" (click)="navigateToSiteManagement()">
+          <i class="ri-building-line mr-2"></i>
+          Site Management
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Site Details Card -->
+    <div class="mb-6" *ngIf="siteDetails">
+      <div class="rounded-lg border bg-card p-6">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h2 class="text-xl font-semibold">{{ siteDetails.name }}</h2>
+            <p class="text-muted-foreground">{{ siteDetails.client }} • {{ siteDetails.zone }}</p>
+          </div>
+          <tolle-badge [variant]="siteDetails.status === 'active' ? 'default' : 'secondary'">
+            {{ siteDetails.status }}
+          </tolle-badge>
+        </div>
+        
+        <!-- Assignment Progress -->
+        <div class="space-y-2">
+          <div class="flex justify-between text-sm">
+            <span>Guard Assignment Progress</span>
+            <span>{{ siteDetails.assignedGuards.length }} / {{ siteDetails.requiredGuards }} guards</span>
+          </div>
+          <div class="w-full bg-secondary rounded-full h-2">
+            <div class="bg-primary h-2 rounded-full transition-all duration-300" 
+                 [style.width.%]="getAssignmentProgress()"></div>
+          </div>
+          <p class="text-sm text-muted-foreground" *ngIf="getGuardsNeeded() > 0">
+            {{ getGuardsNeeded() }} more guard(s) needed
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+      
+      <!-- Available Guards -->
+      <div class="flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Available Guards</h3>
+          <span class="text-sm text-muted-foreground">
+            {{ availableGuards.length }} available
+          </span>
+        </div>
+        
+        <div class="flex-1 min-h-0">
+          <tolle-data-table
+            [data]="availableGuards"
+            [columns]="guardColumns"
+            [stickyHeader]="true"
+            [paginate]="true"
+            [pageSizeOptions]="[5, 10, 25]">
+            
+            <ng-template tolleCell="guardInfo" let-row="row">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" 
+                       [attr.checked]="isGuardSelected(row.id) ? 'true' : null"
+                       (click)="toggleGuardSelection(row.id); $event.preventDefault()"
+                       [disabled]="!canAssignGuards"
+                       class="h-4 w-4"
+                       [attr.aria-label]="'Select guard ' + row.name"
+                       [attr.title]="'Select guard ' + row.name">
+                <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
+                  {{ row.name.charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-medium truncate">{{ row.name }}</p>
+                  <p class="text-xs text-muted-foreground truncate">{{ row.role }} • {{ row.id }}</p>
+                </div>
+              </div>
+            </ng-template>
+            
+            <ng-template tolleCell="status" let-row="row">
+              <tolle-badge [variant]="getStatusColor(row.status)" size="sm">
+                {{ getStatusText(row.status) }}
+              </tolle-badge>
+            </ng-template>
+            
+            <ng-template tolleCell="contact" let-row="row">
+              <p class="text-sm truncate">{{ row.contact }}</p>
+            </ng-template>
+            
+            <ng-template tolleCell="actions" let-row="row">
+              <!-- Actions can be added here if needed -->
+            </ng-template>
+            
+          </tolle-data-table>
+        </div>
+        
+        <!-- Assign Button -->
+        <div class="mt-4 pt-4 border-t" *ngIf="canAssignGuards">
+          <tolle-button variant="default" 
+                     (click)="assignSelectedGuards()"
+                     [disabled]="selectedGuards.length === 0"
+                     class="w-full">
+            <i class="ri-user-add-line mr-2"></i>
+            Assign {{ selectedGuards.length }} Guard(s)
+          </tolle-button>
+        </div>
+      </div>
+      
+      <!-- Current Assignments -->
+      <div class="flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Current Assignments</h3>
+          <span class="text-sm text-muted-foreground">
+            {{ assignments.length }} total
+          </span>
+        </div>
+        
+        <div class="flex-1 min-h-0">
+          <tolle-data-table
+            [data]="assignments"
+            [columns]="assignmentColumns"
+            [stickyHeader]="true"
+            [paginate]="true"
+            [pageSizeOptions]="[5, 10, 25]">
+            
+            <ng-template tolleCell="guardName" let-row="row">
+              <div class="flex items-center gap-2">
+                <div class="h-6 w-6 rounded bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">
+                  {{ row.guardName.charAt(0) }}
+                </div>
+                <span class="text-sm">{{ row.guardName }}</span>
+              </div>
+            </ng-template>
+            
+            <ng-template tolleCell="dateAssigned" let-row="row">
+              <span class="text-sm">{{ row.dateAssigned | date:'mediumDate' }}</span>
+            </ng-template>
+            
+            <ng-template tolleCell="status" let-row="row">
+              <tolle-badge [variant]="getStatusColor(row.status)" size="sm">
+                {{ getStatusText(row.status) }}
+              </tolle-badge>
+            </ng-template>
+            
+            <ng-template tolleCell="actions" let-row="row">
+              <tolle-button variant="destructive" 
+                           size="xs" 
+                           (click)="removeAssignment(row)"
+                           [disabled]="!canAssignGuards">
+                <i class="ri-user-unfollow-line mr-1"></i>
+                Remove
+              </tolle-button>
+            </ng-template>
+            
+          </tolle-data-table>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- No Site Selected State -->
+    <div class="flex-1 flex items-center justify-center" *ngIf="!siteDetails">
+      <div class="text-center">
+        <i class="ri-building-line text-6xl text-muted-foreground mb-4"></i>
+        <h3 class="text-lg font-semibold mb-2">No Site Selected</h3>
+        <p class="text-muted-foreground mb-4">
+          Please select a site to manage guard assignments.
+        </p>
+        <tolle-button variant="default" (click)="navigateToSiteManagement()">
+          <i class="ri-building-line mr-2"></i>
+          Go to Site Management
+        </tolle-button>
+      </div>
+    </div>
+
+  </div>
+</div>

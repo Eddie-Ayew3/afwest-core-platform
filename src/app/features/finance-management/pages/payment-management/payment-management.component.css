@@ -1,0 +1,37 @@
+/* Payment Management Component Styles */
+
+.payment-summary-card {
+  transition: all 0.3s ease;
+}
+
+.payment-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.payment-status-badge {
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.payment-amount {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.payment-filters {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.payment-overdue {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
