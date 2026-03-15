@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import {
   InputComponent,
   ButtonComponent,
@@ -9,6 +10,22 @@ import {
 } from '@tolle_/tolle-ui';
 import { DEMO_ACCOUNTS } from '../../../../core/data/demo-accounts.data';
 import { LS } from '../../../../core/models/rbac.models';
+import { environment } from '../../../../../environments/environment';
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
+  userId: string;
+  staffId?: string;
+  email: string;
+  fullName: string;
+  role: string;
+  scope: string;
+  region?: string;
+  siteName?: string;
+  permissions: string[];
+}
 
 @Component({
   selector: 'app-sign-in',
@@ -26,6 +43,7 @@ import { LS } from '../../../../core/models/rbac.models';
 export class SignInComponent implements OnInit {
   showPassword = false;
   isLoading = false;
+  errorMessage = '';
 
   staffId = '';
   password = '';
@@ -33,7 +51,7 @@ export class SignInComponent implements OnInit {
   demoAccounts = DEMO_ACCOUNTS;
   selectedDemoId = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
     if (localStorage.getItem(LS.isAuthenticated) === 'true') {
@@ -57,33 +75,29 @@ export class SignInComponent implements OnInit {
     if (!this.staffId.trim() || !this.password.trim()) return;
 
     this.isLoading = true;
-    setTimeout(() => {
-      this.isLoading = false;
+    this.errorMessage = '';
 
-      const account = this.demoAccounts.find(
-        a => a.staffId === this.staffId && a.password === this.password
-      );
-
-      if (account) {
+    this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
+      staffId: this.staffId,
+      password: this.password
+    }).subscribe({
+      next: (response) => {
+        this.isLoading = false;
         localStorage.setItem(LS.isAuthenticated, 'true');
-        localStorage.setItem(LS.userStaffId,     account.staffId);
-        localStorage.setItem(LS.userDisplayName, account.displayName);
-        localStorage.setItem(LS.userRole,        account.role);
-        localStorage.setItem(LS.userScope,       account.scope);
-        localStorage.setItem(LS.userRegion,      account.region  ?? '');
-        localStorage.setItem(LS.userSite,        account.site    ?? '');
-      } else {
-        // Fallback: grant global admin access for unknown credentials
-        localStorage.setItem(LS.isAuthenticated, 'true');
-        localStorage.setItem(LS.userStaffId,     this.staffId);
-        localStorage.setItem(LS.userDisplayName, this.staffId);
-        localStorage.setItem(LS.userRole,        'Admin');
-        localStorage.setItem(LS.userScope,       'global');
-        localStorage.setItem(LS.userRegion,      '');
-        localStorage.setItem(LS.userSite,        '');
+        localStorage.setItem(LS.accessToken,     response.accessToken);
+        localStorage.setItem(LS.refreshToken,    response.refreshToken);
+        localStorage.setItem(LS.userStaffId,     response.staffId ?? response.userId);
+        localStorage.setItem(LS.userDisplayName, response.fullName);
+        localStorage.setItem(LS.userRole,        response.role);
+        localStorage.setItem(LS.userScope,       response.scope);
+        localStorage.setItem(LS.userRegion,      response.region ?? '');
+        localStorage.setItem(LS.userSite,        response.siteName ?? '');
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.isLoading = false;
+        this.errorMessage = 'Invalid staff ID or password.';
       }
-
-      this.router.navigate(['/dashboard']);
-    }, 1000);
+    });
   }
 }

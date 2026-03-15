@@ -1,69 +1,45 @@
 import { Routes } from '@angular/router';
-import { SignInComponent } from './features/auth/pages/sign-in/sign-in.component';
-import { DashBoardComponent } from './features/dashboard/pages/dashboard.component';
-import { GuardManagementComponent} from './features/client-management/pages/guard-management/all-guards/guard-management.component';
-import { ClientManagementComponent } from './features/client-management/pages/client-management/all-clients/client-management.component';
-import { RequestManagementComponent } from './features/client-management/pages/request-management/request-management.component';
-import { SiteManagementComponent } from './features/client-management/pages/site-management/site-management.component';
-import { ClientDashboardComponent } from './features/client-management/pages/client-dashboard/client-dashboard.component';
-import { UserManagementComponent } from './features/user-management/user-management.component';
-import { ShiftManagementComponent } from './features/shift-management/shift-management.component';
-import { CheckInOutComponent } from './features/check-in-out/check-in-out.component';
-import { SupplierManagementComponent } from './features/supplier-management/pages/all-suppliers/supplier-management.component';
-import { LogisticsManagementComponent } from './features/logistics-management/pages/all-logistics/logistics-management.component';
-import { PettyCashManagementComponent } from './features/petty-cash-management/pages/all-petty-cash/petty-cash-management.component';
-import { ResetPasswordComponent } from './features/auth/pages/reset-password/reset-password.component';
-import { ClientDashboardLayoutComponent } from './layout/client-dashboard-layout/client-dashboard-layout.component';
-import { DashboardLayoutComponent } from './layout/main-dashboard-layout/dashboard-layout.component';
-import { LeaveManagementComponent } from './features/leave-management/pages/all-leaves/leave-management.component';
-import { PermissionsManagementComponent } from './features/permissions-management/permissions-management.component';
 import { authGuard } from './core/guards/auth.guard';
 import { globalOnlyGuard, notGuardRoleGuard } from './core/guards/role.guard';
 import { loadingGuard } from './core/guards/loading.guard';
-import { PermissionsService } from './core/services/permissions.service';
-import { StaffManagementComponent } from './features/staff-management/pages/all-staff/staff-management.component';
-import { ZoneManagementComponent } from './features/zone-management/pages/all-zones/zone-management.component';
-import { PayrollManagementComponent } from './features/finance-management/pages/payroll-management/payroll-management.component';
-import { PaymentManagementComponent } from './features/finance-management/pages/payment-management/payment-management.component';
-import { NewClientManagementComponent } from './features/client-management/pages/client-management/new-client/new-client-management.component';
-import { NewStaffManagementComponent } from './features/staff-management/pages/new-staff/new-staff-management.component';
-import { NewGuardComponent } from './features/client-management/pages/guard-management/new-guard/new-guard.component';
-import { ViewGuardComponent } from './features/client-management/pages/guard-management/view-guard/view-guard.component';
-import { ViewStaffComponent } from './features/staff-management/pages/view-staff/view-staff.component';
-import { ViewClientComponent } from './features/client-management/pages/client-management/view-client/view-client.component';
-//import { MapComponent } from './features/client-management/pages/site-management/map/map.component';
 
 export const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: '/sign-in' },
-    { path: 'sign-in', component: SignInComponent },
-    { path: 'reset-password', component: ResetPasswordComponent },
-    
+    {
+        path: 'sign-in',
+        loadComponent: () => import('./features/auth/pages/sign-in/sign-in.component').then(m => m.SignInComponent)
+    },
+    {
+        path: 'reset-password',
+        loadComponent: () => import('./features/auth/pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+    },
+
     // Client-specific routes (more specific, must come first)
     {
         path: 'client',
-        component: ClientDashboardLayoutComponent,
+        loadComponent: () => import('./layout/client-dashboard-layout/client-dashboard-layout.component').then(m => m.ClientDashboardLayoutComponent),
         canActivate: [authGuard],
         children: [
             {
                 path: 'dashboard/:id',
-                component: ClientDashboardComponent,
+                loadComponent: () => import('./features/client-management/pages/client-dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent),
                 canActivate: [authGuard, loadingGuard]
             },
             {
                 path: 'request/:id',
-                component: RequestManagementComponent
+                loadComponent: () => import('./features/client-management/pages/request-management/request-management.component').then(m => m.RequestManagementComponent)
             },
             {
                 path: 'site/:id',
-                component: SiteManagementComponent
+                loadComponent: () => import('./features/client-management/pages/site-management/site-management.component').then(m => m.SiteManagementComponent)
             },
             {
                 path: 'shift/:id',
-                component: ShiftManagementComponent
+                loadComponent: () => import('./features/shift-management/shift-management.component').then(m => m.ShiftManagementComponent)
             },
             {
                 path: 'guard/:id',
-                component: GuardManagementComponent
+                loadComponent: () => import('./features/client-management/pages/guard-management/all-guards/guard-management.component').then(m => m.GuardManagementComponent)
             }
         ]
     },
@@ -71,30 +47,31 @@ export const routes: Routes = [
     // Main dashboard routes (more general)
     {
         path: '',
-        component: DashboardLayoutComponent,
+        loadComponent: () => import('./layout/main-dashboard-layout/dashboard-layout.component').then(m => m.DashboardLayoutComponent),
         canActivate: [authGuard],
         children: [
             {
-                path: 'dashboard', component: DashBoardComponent,
+                path: 'dashboard',
+                loadComponent: () => import('./features/dashboard/pages/dashboard.component').then(m => m.DashBoardComponent)
             },
             {
                 path: 'client-management',
-                component: ClientManagementComponent
+                loadComponent: () => import('./features/client-management/pages/client-management/all-clients/client-management.component').then(m => m.ClientManagementComponent)
             },
             {
                 path: 'zone-management',
-                component: ZoneManagementComponent
+                loadComponent: () => import('./features/zone-management/pages/all-zones/zone-management.component').then(m => m.ZoneManagementComponent)
             },
             {
                 path: 'finance',
                 children: [
                     {
                         path: 'payroll-management',
-                        component: PayrollManagementComponent
+                        loadComponent: () => import('./features/finance-management/pages/payroll-management/payroll-management.component').then(m => m.PayrollManagementComponent)
                     },
                     {
                         path: 'payment-management',
-                        component: PaymentManagementComponent
+                        loadComponent: () => import('./features/finance-management/pages/payment-management/payment-management.component').then(m => m.PaymentManagementComponent)
                     }
                 ]
             },
@@ -103,50 +80,50 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'staff-management',
-                        component: StaffManagementComponent
+                        loadComponent: () => import('./features/staff-management/pages/all-staff/staff-management.component').then(m => m.StaffManagementComponent)
                     },
                     {
                         path: 'staff-management/new-staff',
-                        component: NewStaffManagementComponent
+                        loadComponent: () => import('./features/staff-management/pages/new-staff/new-staff-management.component').then(m => m.NewStaffManagementComponent)
                     },
                     {
                         path: 'staff-management/view-staff/:id',
-                        component: ViewStaffComponent,
+                        loadComponent: () => import('./features/staff-management/pages/view-staff/view-staff.component').then(m => m.ViewStaffComponent),
                         canActivate: [authGuard, loadingGuard]
                     },
                     {
                         path: 'guard-management',
-                        component: GuardManagementComponent
+                        loadComponent: () => import('./features/client-management/pages/guard-management/all-guards/guard-management.component').then(m => m.GuardManagementComponent)
                     },
                     {
                         path: 'guard-management/new-guard',
-                        component: NewGuardComponent
+                        loadComponent: () => import('./features/client-management/pages/guard-management/new-guard/new-guard.component').then(m => m.NewGuardComponent)
                     },
                     {
                         path: 'guard-management/view-guard/:id',
-                        component: ViewGuardComponent,
+                        loadComponent: () => import('./features/client-management/pages/guard-management/view-guard/view-guard.component').then(m => m.ViewGuardComponent),
                         canActivate: [authGuard, loadingGuard]
                     },
                     {
                         path: 'client-management',
-                        component: ClientManagementComponent
+                        loadComponent: () => import('./features/client-management/pages/client-management/all-clients/client-management.component').then(m => m.ClientManagementComponent)
                     },
                     {
                         path: 'client-management/new-client',
-                        component: NewClientManagementComponent
+                        loadComponent: () => import('./features/client-management/pages/client-management/new-client/new-client-management.component').then(m => m.NewClientManagementComponent)
                     },
                     {
                         path: 'leave-management',
-                        component: LeaveManagementComponent
+                        loadComponent: () => import('./features/leave-management/pages/all-leaves/leave-management.component').then(m => m.LeaveManagementComponent)
                     },
                     {
                         path: 'user-management',
-                        component: UserManagementComponent,
+                        loadComponent: () => import('./features/user-management/user-management.component').then(m => m.UserManagementComponent),
                         canActivate: [globalOnlyGuard]
                     },
                     {
                         path: 'permissions-management',
-                        component: PermissionsManagementComponent,
+                        loadComponent: () => import('./features/permissions-management/permissions-management.component').then(m => m.PermissionsManagementComponent),
                         canActivate: [globalOnlyGuard]
                     }
                 ]
@@ -156,12 +133,12 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'shift-management',
-                        component: ShiftManagementComponent,
+                        loadComponent: () => import('./features/shift-management/shift-management.component').then(m => m.ShiftManagementComponent),
                         canActivate: [notGuardRoleGuard]
                     },
                     {
                         path: 'check-in-out',
-                        component: CheckInOutComponent
+                        loadComponent: () => import('./features/check-in-out/check-in-out.component').then(m => m.CheckInOutComponent)
                     }
                 ]
             },
@@ -171,15 +148,15 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'supplier-management',
-                        component: SupplierManagementComponent
+                        loadComponent: () => import('./features/supplier-management/pages/all-suppliers/supplier-management.component').then(m => m.SupplierManagementComponent)
                     },
                     {
                         path: 'logistics-management',
-                        component: LogisticsManagementComponent
+                        loadComponent: () => import('./features/logistics-management/pages/all-logistics/logistics-management.component').then(m => m.LogisticsManagementComponent)
                     },
                     {
                         path: 'petty-cash-management',
-                        component: PettyCashManagementComponent
+                        loadComponent: () => import('./features/petty-cash-management/pages/all-petty-cash/petty-cash-management.component').then(m => m.PettyCashManagementComponent)
                     }
                 ]
             },

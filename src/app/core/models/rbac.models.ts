@@ -38,6 +38,8 @@ export const REGION_SITES: Record<GhanaRegion, GhanaSite[]> = {
 
 export const LS = {
   isAuthenticated: 'isAuthenticated',
+  accessToken:     'access_token',
+  refreshToken:    'refresh_token',
   userStaffId:     'userStaffId',
   userDisplayName: 'userDisplayName',
   userRole:        'userRole',
