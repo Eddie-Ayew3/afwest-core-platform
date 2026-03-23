@@ -2,11 +2,11 @@ import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  ButtonComponent, BadgeComponent,
+  ButtonComponent,
   SelectComponent, SelectItemComponent,
   TooltipDirective, DropdownTriggerDirective, DropdownMenuComponent,
   BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
-  CheckboxComponent, LabelComponent, ModalService,
+  LabelComponent, ModalService,
   DataTableComponent, TolleCellDirective, TableColumn,
   AlertDialogService, ToastService
 } from '@tolle_/tolle-ui';
@@ -24,11 +24,11 @@ interface User {
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    ButtonComponent, BadgeComponent,
+    ButtonComponent,
     SelectComponent, SelectItemComponent,
     TooltipDirective, DropdownTriggerDirective, DropdownMenuComponent,
     BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
-    CheckboxComponent, LabelComponent,
+    LabelComponent,
     DataTableComponent, TolleCellDirective,
   ],
   templateUrl: './user-management.component.html',

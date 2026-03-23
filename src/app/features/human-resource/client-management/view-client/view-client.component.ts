@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonComponent, BadgeComponent } from '@tolle_/tolle-ui';
+import { ButtonComponent } from '@tolle_/tolle-ui';
 
 export interface ClientProfile {
   id: string;
@@ -166,7 +166,7 @@ const MOCK_CLIENTS: ClientProfile[] = [
 @Component({
   selector: 'app-view-client',
   standalone: true,
-  imports: [CommonModule, ButtonComponent, BadgeComponent],
+  imports: [CommonModule, ButtonComponent],
   templateUrl: './view-client.component.html',
   styleUrls: ['./view-client.component.css']
 })

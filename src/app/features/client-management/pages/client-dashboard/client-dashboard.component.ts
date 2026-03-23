@@ -104,7 +104,7 @@ const FALLBACK_DATA = {
   standalone: true,
   imports: [
     CommonModule,
-    ButtonComponent, BadgeComponent,
+    ButtonComponent, 
     BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
     DataTableComponent, TolleCellDirective,
   ],
