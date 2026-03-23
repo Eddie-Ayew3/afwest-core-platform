@@ -1,0 +1,16 @@
+/* Stat card text colors */
+.stat-open {
+  color: #dc2626;
+}
+
+.stat-investigating {
+  color: #ca8a04;
+}
+
+.stat-resolved {
+  color: #16a34a;
+}
+
+.stat-high-severity {
+  color: #dc2626;
+}

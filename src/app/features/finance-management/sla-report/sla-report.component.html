@@ -1,0 +1,141 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Finance</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">SLA Compliance Report</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">SLA Compliance Report</h1>
+        <p class="text-muted-foreground mt-1">Track client service-level agreement performance across all contracts.</p>
+      </div>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" (click)="exportReport()">
+          <i class="ri-download-line mr-2"></i>Export Report
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-4 gap-4 mb-4">
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold sla-compliant">{{compliantCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Compliant</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold sla-at-risk">{{atRiskCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">At Risk</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold sla-breached">{{breachedCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Breached</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold" [class]="getSlaScoreClass(avgSlaScore)">{{avgSlaScore}}%</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Avg SLA Score</p>
+      </div>
+    </div>
+
+    <!-- Search + Filter Bar -->
+    <div class="flex justify-between items-center mb-3">
+      <tolle-input
+        placeholder="Search by client, site, or ref..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        class="w-80">
+      </tolle-input>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="mb-3 p-4 bg-muted/30 border border-border rounded-lg">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Status</label>
+          <tolle-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Statuses</tolle-select-item>
+            <tolle-select-item *ngFor="let s of statusOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Period</label>
+          <tolle-select [(ngModel)]="selectedPeriod" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Periods</tolle-select-item>
+            <tolle-select-item *ngFor="let p of periodOptions" [value]="p">{{p}}</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-close-line mr-1"></i>Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredRecords"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="hoursDelivery" let-row="row">
+          <span class="text-sm">{{getHoursDeliveryDisplay(row)}}</span>
+        </ng-template>
+
+        <ng-template tolleCell="responseTime" let-row="row">
+          <span class="text-sm" [class]="getResponseTimeClass(row)">
+            {{getResponseTimeDisplay(row)}}
+          </span>
+        </ng-template>
+
+        <ng-template tolleCell="patrolCompliance" let-row="row">
+          <div class="flex items-center gap-2">
+            <div class="progress-bar">
+              <div class="progress-bar-fill"
+                   [style.width.%]="row.patrolCompliancePct"
+                   [style.background]="getSlaScoreColor(row.patrolCompliancePct)"></div>
+            </div>
+            <span class="text-sm" [class]="getSlaScoreClass(row.patrolCompliancePct)">{{row.patrolCompliancePct}}%</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="slaScore" let-row="row">
+          <span class="font-bold text-sm" [class]="getSlaScoreClass(row.slaScore)">{{row.slaScore}}%</span>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <span class="status-badge" [class]="getStatusClass(row.status)">
+              {{row.status}}
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end">
+            <tolle-button variant="default" size="xs" (click)="viewRecord(row)">View</tolle-button>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>

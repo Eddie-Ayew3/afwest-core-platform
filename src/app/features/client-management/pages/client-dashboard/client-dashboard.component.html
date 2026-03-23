@@ -1,194 +1,141 @@
-<div class="p-6">
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-  <div class="bg-white p-6 rounded-lg border border-border">
-    <div class="flex items-center justify-between mb-2">
-      <div class="p-2 bg-blue-100 rounded-lg">
-        <i class="ri-user-line text-blue-600"></i>
-      </div>
-      <span class="text-sm text-green-600 font-medium">+12%</span>
+<div class="p-6 overflow-y-auto h-full">
+
+  <!-- Breadcrumb -->
+  <tolle-breadcrumb class="mb-3">
+    <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+    <tolle-breadcrumb-item><tolle-breadcrumb-link (click)="navigateBack()" class="cursor-pointer">Client Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+    <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">{{clientName}}</tolle-breadcrumb-link></tolle-breadcrumb-item>
+  </tolle-breadcrumb>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">{{clientName}}</h1>
+      <p class="text-sm text-muted-foreground mt-1">Client security overview · {{clientId}}</p>
     </div>
-    <h3 class="text-2xl font-bold">2,543</h3>
-    <p class="text-sm text-muted-foreground">Total Users</p>
-  </div>
-  
-  <div class="bg-white p-6 rounded-lg border border-border">
-    <div class="flex items-center justify-between mb-2">
-      <div class="p-2 bg-green-100 rounded-lg">
-        <i class="ri-file-line text-green-600"></i>
-      </div>
-      <span class="text-sm text-green-600 font-medium">+8%</span>
+    <div class="flex gap-2">
+      <tolle-button variant="outline" size="default" (click)="navigateTo('/client/request/' + clientId)">
+        <i class="ri-file-list-3-line mr-2"></i>View Requests
+      </tolle-button>
+      <tolle-button variant="default" size="default" (click)="navigateTo('/client/site/' + clientId)">
+        <i class="ri-map-pin-line mr-2"></i>View Sites
+      </tolle-button>
     </div>
-    <h3 class="text-2xl font-bold">1,235</h3>
-    <p class="text-sm text-muted-foreground">Active Projects</p>
   </div>
-  
-  <div class="bg-white p-6 rounded-lg border border-border">
-    <div class="flex items-center justify-between mb-2">
-      <div class="p-2 bg-purple-100 rounded-lg">
-        <i class="ri-task-line text-purple-600"></i>
-      </div>
-      <span class="text-sm text-green-600 font-medium">+23%</span>
-    </div>
-    <h3 class="text-2xl font-bold">3,892</h3>
-    <p class="text-sm text-muted-foreground">Completed Tasks</p>
-  </div>
-  
-  <div class="bg-white p-6 rounded-lg border border-border">
-    <div class="flex items-center justify-between mb-2">
-      <div class="p-2 bg-orange-100 rounded-lg">
-        <i class="ri-time-line text-orange-600"></i>
-      </div>
-      <span class="text-sm text-red-600 font-medium">-5%</span>
-    </div>
-    <h3 class="text-2xl font-bold">127</h3>
-    <p class="text-sm text-muted-foreground">Pending Reviews</p>
-  </div>
-</div>
-    
-    <!-- Two Column Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- Recent Activity -->
-      <div class="lg:col-span-2 bg-white rounded-lg border border-border p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">Recent Activity</h3>
-          <button class="text-sm text-primary hover:underline">View All</button>
-        </div>
-        <div class="space-y-4">
-          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
-            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <i class="ri-user-add-line text-blue-600"></i>
-            </div>
-            <div class="flex-1">
-              <p class="text-sm"><span class="font-medium">Sarah Chen</span> joined the team</p>
-              <p class="text-xs text-muted-foreground">2 minutes ago</p>
-            </div>
-          </div>
-          
-          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
-            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-              <i class="ri-file-copy-line text-green-600"></i>
-            </div>
-            <div class="flex-1">
-              <p class="text-sm"><span class="font-medium">Q4 Report</span> was uploaded</p>
-              <p class="text-xs text-muted-foreground">1 hour ago</p>
-            </div>
-          </div>
-          
-          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
-            <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <i class="ri-check-line text-purple-600"></i>
-            </div>
-            <div class="flex-1">
-              <p class="text-sm"><span class="font-medium">Project Alpha</span> completed</p>
-              <p class="text-xs text-muted-foreground">3 hours ago</p>
-            </div>
-          </div>
-          
-          <div class="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
-            <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
-              <i class="ri-chat-1-line text-orange-600"></i>
-            </div>
-            <div class="flex-1">
-              <p class="text-sm">New comment from <span class="font-medium">Mike Ross</span></p>
-              <p class="text-xs text-muted-foreground">5 hours ago</p>
-            </div>
-          </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+
+    <div class="bg-background border border-border rounded-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+          <i class="ri-shield-user-line text-primary"></i>
         </div>
       </div>
-      
-      <!-- Quick Actions Dropdowns -->
-      <div class="space-y-4">
-        <h3 class="text-lg font-semibold">Quick Actions</h3>
-        
-        <!-- Enhanced Dropdowns -->
-        <div class="space-y-2">
-          <!-- Dropdown 1 -->
-          <div class="relative">
-            <button class="flex items-center justify-between w-full p-3 bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors">
-              <span class="flex items-center gap-2">
-                <i class="ri-user-add-line text-primary"></i>
-                Add New User
-              </span>
-              <i class="ri-arrow-down-s-line text-muted-foreground"></i>
-            </button>
-            <div class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg z-10">
-              <div class="p-2">
-                <a href="#" class="block p-2 hover:bg-muted/50 rounded-lg">Add Admin</a>
-                <a href="#" class="block p-2 hover:bg-muted/50 rounded-lg">Add Editor</a>
-                <a href="#" class="block p-2 hover:bg-muted/50 rounded-lg">Add Viewer</a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Dropdown 2 -->
-          <div class="relative">
-            <button class="flex items-center justify-between w-full p-3 bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors">
-              <span class="flex items-center gap-2">
-                <i class="ri-file-add-line text-primary"></i>
-                Create New Project
-              </span>
-              <i class="ri-arrow-down-s-line text-muted-foreground"></i>
-            </button>
-          </div>
-          
-          <!-- Dropdown 3 -->
-          <div class="relative">
-            <button class="flex items-center justify-between w-full p-3 bg-white border border-border rounded-lg hover:bg-muted/50 transition-colors">
-              <span class="flex items-center gap-2">
-                <i class="ri-settings-3-line text-primary"></i>
-                Settings
-              </span>
-              <i class="ri-arrow-down-s-line text-muted-foreground"></i>
-            </button>
-          </div>
+      <p class="text-3xl font-bold">{{guardsAssigned}}</p>
+      <p class="text-sm text-muted-foreground mt-1">Guards Assigned</p>
+    </div>
+
+    <div class="bg-background border border-border rounded-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center active-sites-icon">
+          <i class="ri-map-pin-line"></i>
         </div>
       </div>
+      <p class="text-3xl font-bold">{{activeSites}}</p>
+      <p class="text-sm text-muted-foreground mt-1">Active Sites</p>
     </div>
-    
-    <!-- Projects Table -->
-    <div class="bg-white rounded-lg border border-border p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">Recent Projects</h3>
-        <button class="text-sm text-primary hover:underline">View All Projects</button>
+
+    <div class="bg-background border border-border rounded-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center pending-request-icon">
+          <i class="ri-file-list-line"></i>
+        </div>
       </div>
-      <div class="min-h-0">
-        <tolle-data-table 
-          [data]="projects"
-          [columns]="columns"
-          [stickyHeader]="true"
-          [paginate]="false"
-          [searchable]="false"
-          [showSettings]="false">
-
-          <ng-template tolleCell="status" let-row="row">
-            <tolle-badge 
-              [variant]="row.status === 'Active' ? 'default' : row.status === 'In Review' ? 'secondary' : 'outline'" 
-              size="sm">
-              {{row.status}}
-            </tolle-badge>
-          </ng-template>
-
-          <ng-template tolleCell="progress" let-row="row">
-            <div class="flex items-center gap-2">
-              <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-green-500" [style.width.%]="row.progress"></div>
-              </div>
-              <span>{{row.progress}}%</span>
-            </div>
-          </ng-template>
-
-          <ng-template tolleCell="team" let-row="row">
-            <div class="flex -space-x-2">
-              <div *ngFor="let member of row.team" 
-                   class="h-8 w-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs"
-                   [class]="member.color">
-                {{member.initials}}
-              </div>
-            </div>
-          </ng-template>
-
-        </tolle-data-table>
-      </div>
+      <p class="text-3xl font-bold">{{pendingRequests}}</p>
+      <p class="text-sm text-muted-foreground mt-1">Pending Requests</p>
     </div>
+
+    <div class="bg-background border border-border rounded-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center sla-compliance-icon">
+          <i class="ri-bar-chart-line"></i>
+        </div>
+      </div>
+      <p class="text-3xl font-bold" [style.color]="getSlaColor()">{{slaCompliance}}%</p>
+      <p class="text-sm text-muted-foreground mt-1">SLA Compliance</p>
+    </div>
+
+  </div>
+
+  <!-- Recent Shifts Table -->
+  <div class="mb-6 border border-border rounded-lg overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-border">
+      <h2 class="font-semibold">Recent Shifts</h2>
+      <tolle-button variant="ghost" size="sm" (click)="navigateTo('/client/shift/' + clientId)">
+        View All <i class="ri-arrow-right-line ml-1"></i>
+      </tolle-button>
+    </div>
+    <tolle-data-table
+      [data]="shifts"
+      [columns]="shiftColumns"
+      [stickyHeader]="true"
+      [paginate]="false"
+      [searchable]="false"
+      [showSettings]="false">
+
+      <ng-template tolleCell="status" let-row="row">
+        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [style.background]="getShiftStatusBg(row.status)"
+              [style.color]="getShiftStatusFg(row.status)">
+          {{row.status}}
+        </span>
+      </ng-template>
+
+    </tolle-data-table>
+  </div>
+
+  <!-- Recent Incidents Table -->
+  <div class="border border-border rounded-lg overflow-hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-border">
+      <h2 class="font-semibold">Recent Incidents</h2>
+      <tolle-button variant="ghost" size="sm" (click)="navigateTo('/control-unit/incidents')">
+        View All <i class="ri-arrow-right-line ml-1"></i>
+      </tolle-button>
+    </div>
+
+    <div *ngIf="incidents.length === 0" class="px-4 py-8 text-center text-sm text-muted-foreground">
+      <i class="ri-shield-check-line text-2xl mb-2 block text-green-600"></i>
+      No incidents recorded for this client.
+    </div>
+
+    <tolle-data-table *ngIf="incidents.length > 0"
+      [data]="incidents"
+      [columns]="incidentColumns"
+      [stickyHeader]="true"
+      [paginate]="false"
+      [searchable]="false"
+      [showSettings]="false">
+
+      <ng-template tolleCell="severity" let-row="row">
+        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [style.background]="getSeverityBg(row.severity)"
+              [style.color]="getSeverityFg(row.severity)">
+          {{row.severity}}
+        </span>
+      </ng-template>
+
+      <ng-template tolleCell="status" let-row="row">
+        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [style.background]="getIncidentStatusBg(row.status)"
+              [style.color]="getIncidentStatusFg(row.status)">
+          {{row.status}}
+        </span>
+      </ng-template>
+
+    </tolle-data-table>
+  </div>
+
 </div>

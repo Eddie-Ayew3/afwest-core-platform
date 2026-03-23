@@ -2,16 +2,12 @@ import { Component, OnInit, inject, ViewChild, TemplateRef, CUSTOM_ELEMENTS_SCHE
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  CardComponent,
-  CardContentComponent,
   ButtonComponent,
   InputComponent,
   TextareaComponent,
   BadgeComponent,
   SelectComponent,
   SelectItemComponent,
-  EmptyStateComponent,
-  PaginationComponent,
   TooltipDirective,
   DropdownTriggerDirective,
   LabelComponent,
@@ -25,7 +21,9 @@ import {
   TolleCellDirective,
   TableColumn,
   SheetComponent,
-  SheetContentComponent
+  SheetContentComponent,
+  AlertDialogService,
+  ToastService
 } from '@tolle_/tolle-ui';
 import { PermissionsService } from '../../../../core/services/permissions.service';
 //import { MapComponent } from './map/map.component';
@@ -78,16 +76,11 @@ export interface Region {
   imports: [
     CommonModule,
     FormsModule,
-    CardComponent,
-    CardContentComponent,
     ButtonComponent,
     InputComponent,
-    TextareaComponent,
     BadgeComponent,
     SelectComponent,
     SelectItemComponent,
-    EmptyStateComponent,
-    PaginationComponent,
     TooltipDirective,
     DropdownTriggerDirective,
     DropdownMenuComponent,
@@ -105,8 +98,10 @@ export interface Region {
   styleUrls: ['./site-management.component.css']
 })
 export class SiteManagementComponent implements OnInit {
-  private modalService = inject(ModalService);
+  modalService = inject(ModalService);
   private permissions = inject(PermissionsService);
+  private alertDialog = inject(AlertDialogService);
+  private toast = inject(ToastService);
   @ViewChild('newSiteModal') newSiteModal!: TemplateRef<any>;
 
   // User's assigned zone for site creation permissions
@@ -295,11 +290,10 @@ export class SiteManagementComponent implements OnInit {
   ];
 
   filteredSites: Site[] = [];
-  displayedSites: Site[] = [];
   currentUserRole: 'head-office' | 'zonal-commander' = 'head-office'; // This would come from auth service
   currentUserRegion?: string; // Would be set based on logged-in user
-  
-  // Filter and pagination properties
+
+  // Filter properties
   selectedType = 'all';
   selectedSecurityLevel = 'all';
   selectedRegion = 'all';
@@ -307,8 +301,6 @@ export class SiteManagementComponent implements OnInit {
   searchQuery = '';
   showFilterPanel = false;
   activeFilterCount = 0;
-  currentPage = 1;
-  pageSize = 10;
 
   columns: TableColumn[] = [
     { key: 'siteInfo', label: 'Site Info' },
@@ -326,6 +318,11 @@ export class SiteManagementComponent implements OnInit {
   showMapSheet = false;
   selectedSite: Site | null = null;
 
+  // New site form state
+  newSiteForm: { name: string; code: string; type: Site['type'] | ''; region: string; city: string; address: string; securityLevel: Site['securityLevel'] | '' } = {
+    name: '', code: '', type: '', region: '', city: '', address: '', securityLevel: ''
+  };
+
 
 
   constructor() {
@@ -335,14 +332,6 @@ export class SiteManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.applyFilters();
-  }
-
-  get startIndex(): number {
-    return (this.currentPage - 1) * this.pageSize;
-  }
-
-  get endIndex(): number {
-    return Math.min(this.startIndex + this.pageSize, this.filteredSites.length);
   }
 
   applyFilters(): void {
@@ -381,12 +370,6 @@ export class SiteManagementComponent implements OnInit {
 
     this.filteredSites = result;
     this.updateActiveFilterCount();
-    this.currentPage = 1;
-    this.updateDisplayedSites();
-  }
-
-  updateDisplayedSites(): void {
-    this.displayedSites = this.filteredSites.slice(this.startIndex, this.endIndex);
   }
 
   updateActiveFilterCount(): void {
@@ -450,7 +433,7 @@ export class SiteManagementComponent implements OnInit {
   createSite(siteData: any): void {
     // Check if user can create site in the specified region
     if (!this.canCreateSiteInRegion(siteData.region)) {
-      alert(`You don't have permission to create sites in ${siteData.region}. You can only create sites in ${this.userRegion || 'your assigned region'}.`);
+      this.toast.show({ title: 'Permission Denied', description: `You can only create sites in ${this.userRegion || 'your assigned region'}.`, variant: 'destructive' });
       return;
     }
 
@@ -481,25 +464,13 @@ export class SiteManagementComponent implements OnInit {
 
     // Add to sites array
     this.sites.push(newSite);
-    
+
     // Update display
     this.applyFilters();
-    
-    console.log('New site created:', newSite);
-    alert(`Site "${newSite.name}" has been created and is now active for guard deployment.`);
-    
-    // Close modal
+
+    // Close modal and show success alert
     this.modalService.closeAll();
-  }
-
-  onPageSizeChange(): void {
-    this.currentPage = 1;
-    this.updateDisplayedSites();
-  }
-
-  onPageChange(event: any): void {
-    this.currentPage = event;
-    this.updateDisplayedSites();
+    this.toast.show({ title: 'Site Created', description: `"${newSite.name}" has been created and is now active for guard deployment.`, variant: 'success' });
   }
 
   switchUserRole(): void {
@@ -509,12 +480,29 @@ export class SiteManagementComponent implements OnInit {
   }
 
   openNewSiteDialog(): void {
+    this.newSiteForm = { name: '', code: '', type: '', region: '', city: '', address: '', securityLevel: '' };
     this.modalService.open({
       title: 'Create New Site',
       content: this.newSiteModal,
       size: 'lg',
       backdropClose: true,
       showCloseButton: true
+    });
+  }
+
+  submitNewSite(): void {
+    if (!this.newSiteForm.name || !this.newSiteForm.code || !this.newSiteForm.type || !this.newSiteForm.region) return;
+    this.createSite({
+      name: this.newSiteForm.name,
+      code: this.newSiteForm.code,
+      type: this.newSiteForm.type,
+      region: this.newSiteForm.region,
+      district: this.newSiteForm.city,
+      city: this.newSiteForm.city,
+      address: this.newSiteForm.address,
+      securityLevel: this.newSiteForm.securityLevel || 'medium',
+      contact: { phone: '', email: '', manager: '' },
+      services: []
     });
   }
 
@@ -533,5 +521,20 @@ export class SiteManagementComponent implements OnInit {
 
   onSearch(): void {
     this.applyFilters();
+  }
+
+  deleteSite(site: Site) {
+    const ref = this.alertDialog.open({
+      title: 'Delete Site?',
+      description: `Delete "${site.name}"? All associated data will be removed.`,
+      actionText: 'Delete',
+      variant: 'destructive'
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (!confirmed) return;
+      this.sites = this.sites.filter(s => s.id !== site.id);
+      this.applyFilters();
+      this.toast.show({ title: 'Site Deleted', description: `"${site.name}" has been deleted.`, variant: 'destructive' });
+    });
   }
 }

@@ -1,0 +1,220 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Control Unit</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Incident Reports</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Incident Reports</h1>
+        <p class="text-muted-foreground mt-1">Log, track, and resolve security incidents across all sites.</p>
+      </div>
+      <tolle-button variant="default" size="default" (click)="openCreateSheet()">
+        <i class="ri-add-line mr-2"></i>Report Incident
+      </tolle-button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-4 gap-4 mb-4">
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-open">{{openCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Open</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-investigating">{{investigatingCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Investigating</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-resolved">{{resolvedCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Resolved / Closed</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-high-severity">{{highCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">High Severity</p>
+      </div>
+    </div>
+
+    <!-- Search + Filter Bar -->
+    <div class="flex justify-between items-center mb-3">
+      <tolle-input
+        placeholder="Search by ref, type, site, or reporter..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        class="w-80">
+      </tolle-input>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="mb-3 p-4 bg-muted/30 border border-border rounded-lg">
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Severity</label>
+          <tolle-select [(ngModel)]="selectedSeverity" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Severities</tolle-select-item>
+            <tolle-select-item *ngFor="let s of severityOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Status</label>
+          <tolle-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Statuses</tolle-select-item>
+            <tolle-select-item *ngFor="let s of statusOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Site</label>
+          <tolle-select [(ngModel)]="selectedSite" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Sites</tolle-select-item>
+            <tolle-select-item *ngFor="let s of siteOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-close-line mr-1"></i>Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredIncidents"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="severity" let-row="row">
+          <div class="flex items-center justify-center">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                  [style.background]="getSeverityBg(row.severity)"
+                  [style.color]="getSeverityFg(row.severity)">
+              {{row.severity}}
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                  [style.background]="getStatusBg(row.status)"
+                  [style.color]="getStatusFg(row.status)">
+              {{row.status}}
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewIncident(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="incMenu">
+                <i class="ri-more-2-fill text-muted-foreground"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #incMenu>
+                <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 rounded-sm" (click)="updateStatus(row, 'Investigating')">
+                  <i class="ri-search-line text-muted-foreground"></i> Mark Investigating
+                </button>
+                <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 rounded-sm" (click)="updateStatus(row, 'Resolved')">
+                  <i class="ri-check-line text-muted-foreground"></i> Mark Resolved
+                </button>
+                <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 rounded-sm" (click)="updateStatus(row, 'Closed')">
+                  <i class="ri-lock-line text-muted-foreground"></i> Close
+                </button>
+                <div class="h-px bg-border my-1"></div>
+                <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 text-destructive rounded-sm" (click)="deleteIncident(row)">
+                  <i class="ri-delete-bin-line"></i> Delete
+                </button>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Create Incident Sheet -->
+<tolle-sheet [(isOpen)]="showCreateSheet">
+  <tolle-sheet-content side="right" class="w-[480px]">
+    <div class="p-6 h-full flex flex-col">
+      <h2 class="text-lg font-semibold mb-1">Report Incident</h2>
+      <p class="text-sm text-muted-foreground mb-6">Log a new security incident for investigation.</p>
+
+      <div class="flex-1 overflow-y-auto space-y-4">
+
+        <div class="space-y-1.5">
+          <tolle-label>Incident Type</tolle-label>
+          <tolle-input placeholder="e.g. Unauthorized Access" [(ngModel)]="newIncidentForm.type"></tolle-input>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Site</tolle-label>
+          <tolle-select class="w-full" [(ngModel)]="newIncidentForm.site" placeholder="Select site">
+            <tolle-select-item *ngFor="let s of siteOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Severity</tolle-label>
+          <tolle-select class="w-full" [(ngModel)]="newIncidentForm.severity" placeholder="Select severity">
+            <tolle-select-item value="High">High</tolle-select-item>
+            <tolle-select-item value="Medium">Medium</tolle-select-item>
+            <tolle-select-item value="Low">Low</tolle-select-item>
+          </tolle-select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <tolle-label>Date</tolle-label>
+            <tolle-input type="date" [(ngModel)]="newIncidentForm.date"></tolle-input>
+          </div>
+          <div class="space-y-1.5">
+            <tolle-label>Time</tolle-label>
+            <tolle-input type="time" [(ngModel)]="newIncidentForm.time"></tolle-input>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Reported By</tolle-label>
+          <tolle-input placeholder="Guard or staff name" [(ngModel)]="newIncidentForm.reportedBy"></tolle-input>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Description</tolle-label>
+          <tolle-textarea placeholder="Describe what happened..." [(ngModel)]="newIncidentForm.description" [rows]="4"></tolle-textarea>
+        </div>
+
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-border mt-4">
+        <tolle-button variant="outline" class="flex-1" (click)="showCreateSheet = false">Cancel</tolle-button>
+        <tolle-button variant="default" class="flex-1" (click)="submitIncident()"
+          [disabled]="!newIncidentForm.type || !newIncidentForm.site || !newIncidentForm.severity">
+          Submit Report
+        </tolle-button>
+      </div>
+    </div>
+  </tolle-sheet-content>
+</tolle-sheet>

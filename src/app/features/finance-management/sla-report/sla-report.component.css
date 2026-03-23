@@ -1,0 +1,62 @@
+/* SLA Status Colors */
+.sla-compliant {
+  color: #16a34a;
+}
+
+.sla-at-risk {
+  color: #ca8a04;
+}
+
+.sla-breached {
+  color: #dc2626;
+}
+
+/* Progress Bar Styles */
+.progress-bar {
+  width: 16px;
+  height: 6px;
+  background-color: hsl(var(--muted));
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.status-compliant {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.status-at-risk {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: #ca8a04;
+}
+
+.status-breached {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+/* Dynamic SLA Score Colors */
+.sla-score-excellent {
+  color: #16a34a;
+}
+
+.sla-score-good {
+  color: #ca8a04;
+}
+
+.sla-score-poor {
+  color: #dc2626;
+}

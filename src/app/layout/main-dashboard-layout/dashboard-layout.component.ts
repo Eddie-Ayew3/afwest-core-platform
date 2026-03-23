@@ -130,6 +130,11 @@ export class DashboardLayoutComponent {
       'zone-management':       'Zone Management',
       'payroll-management':    'Payroll Management',
       'payment-management':    'Payment Management',
+      'invoice-management':    'Client Invoices',
+      'sla-report':            'SLA Compliance Report',
+      'incidents':             'Incident Reports',
+      'site-inspections':      'Site Inspections',
+      'guard-performance':     'Guard Performance',
       'supplier-management':   'Supplier Management',
       'logistics-management':  'Logistics Management',
       'petty-cash-management': 'Petty Cash Management'

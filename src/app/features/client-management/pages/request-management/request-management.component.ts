@@ -1,20 +1,13 @@
 import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  CardComponent,
-  CardHeaderComponent,
-  CardTitleComponent,
-  CardContentComponent,
+import {
   ButtonComponent,
   InputComponent,
   TextareaComponent,
   BadgeComponent,
   SelectComponent,
   SelectItemComponent,
-  DatePickerComponent,
-  EmptyStateComponent,
-  PaginationComponent,
   TooltipDirective,
   DropdownTriggerDirective,
   LabelComponent,
@@ -26,7 +19,9 @@ import {
   ModalService,
   DataTableComponent,
   TolleCellDirective,
-  TableColumn
+  TableColumn,
+  AlertDialogService,
+  ToastService
 } from '@tolle_/tolle-ui';
 
 export interface GuardRequest {
@@ -51,16 +46,11 @@ export interface GuardRequest {
   imports: [
     CommonModule,
     FormsModule,
-    CardComponent,
-    CardContentComponent,
     ButtonComponent,
     InputComponent,
-    TextareaComponent,
     BadgeComponent,
     SelectComponent,
     SelectItemComponent,
-    EmptyStateComponent,
-    PaginationComponent,
     TooltipDirective,
     DropdownTriggerDirective,
     LabelComponent,
@@ -69,74 +59,102 @@ export interface GuardRequest {
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
     BreadcrumbSeparatorComponent,
-    DataTableComponent
+    DataTableComponent,
+    TolleCellDirective,
   ],
   templateUrl: './request-management.component.html',
   styleUrls: ['./request-management.component.css']
 })
 export class RequestManagementComponent implements OnInit {
-  private modalService = inject(ModalService);
+  modalService = inject(ModalService);
+  private alertDialog = inject(AlertDialogService);
+  private toast = inject(ToastService);
   @ViewChild('newRequestModal') newRequestModal!: TemplateRef<any>;
+  @ViewChild('requestDetailModal') requestDetailModal!: TemplateRef<any>;
 
   requests: GuardRequest[] = [
     {
       id: 'REQ001',
-      guardName: 'John Smith',
-      guardId: 'GRD001',
+      guardName: 'Kwame Mensah',
+      guardId: 'GD-001',
       requestType: 'uniform',
       title: 'New Uniform Set',
       description: 'Request for complete uniform set including shirt, pants, and cap',
       urgency: 'high',
       status: 'pending',
-      requestedDate: new Date('2024-02-25'),
-      expectedDeliveryDate: new Date('2024-03-05'),
-      cost: 150.00,
+      requestedDate: new Date('2025-03-01'),
+      expectedDeliveryDate: new Date('2025-03-10'),
+      cost: 320.00,
       items: ['Shirt (2x)', 'Pants (2x)', 'Cap (1x)', 'Boots (1x)']
     },
     {
       id: 'REQ002',
-      guardName: 'Sarah Johnson',
-      guardId: 'GRD002',
+      guardName: 'Ama Boateng',
+      guardId: 'GD-002',
       requestType: 'petty-cash',
       title: 'Transportation Allowance',
-      description: 'Request for transportation allowance for night shift coverage',
+      description: 'Request for transportation allowance for night shift coverage at Kumasi Branch',
       urgency: 'medium',
       status: 'approved',
-      requestedDate: new Date('2024-02-24'),
-      expectedDeliveryDate: new Date('2024-02-26'),
-      completedDate: new Date('2024-02-26'),
-      cost: 50.00
+      requestedDate: new Date('2025-02-28'),
+      expectedDeliveryDate: new Date('2025-03-02'),
+      cost: 85.00
     },
     {
       id: 'REQ003',
-      guardName: 'Mike Chen',
-      guardId: 'GRD003',
+      guardName: 'Kofi Asante',
+      guardId: 'GD-003',
       requestType: 'equipment',
-      title: 'Security Equipment',
-      description: 'Request for new flashlight and radio batteries',
+      title: 'Security Equipment Restock',
+      description: 'Request for new flashlights and replacement radio batteries for the Tema Industrial site',
       urgency: 'low',
       status: 'completed',
-      requestedDate: new Date('2024-02-20'),
-      completedDate: new Date('2024-02-23'),
-      cost: 35.50,
-      items: ['Flashlight (1x)', 'Radio Batteries (4x)']
+      requestedDate: new Date('2025-02-20'),
+      completedDate: new Date('2025-02-24'),
+      cost: 95.00,
+      items: ['Flashlight (2x)', 'Radio Batteries (8x)', 'Batons (2x)']
     },
     {
       id: 'REQ004',
-      guardName: 'Emily Rodriguez',
-      guardId: 'GRD004',
+      guardName: 'Abena Osei',
+      guardId: 'GD-004',
       requestType: 'transportation',
-      title: 'Emergency Transport',
-      description: 'Request for emergency transportation due to vehicle breakdown',
+      title: 'Emergency Site Transfer',
+      description: 'Request for emergency transportation to cover Takoradi Branch due to vehicle breakdown',
       urgency: 'urgent',
       status: 'pending',
-      requestedDate: new Date('2024-02-27'),
-      cost: 75.00
+      requestedDate: new Date('2025-03-01'),
+      cost: 150.00
+    },
+    {
+      id: 'REQ005',
+      guardName: 'Yaw Darko',
+      guardId: 'GD-005',
+      requestType: 'uniform',
+      title: 'Replacement Uniform',
+      description: 'Existing uniform is worn out and needs replacement ahead of client inspection',
+      urgency: 'medium',
+      status: 'rejected',
+      requestedDate: new Date('2025-02-18'),
+      cost: 180.00,
+      items: ['Shirt (1x)', 'Pants (1x)']
+    },
+    {
+      id: 'REQ006',
+      guardName: 'Akosua Frimpong',
+      guardId: 'GD-006',
+      requestType: 'petty-cash',
+      title: 'Meal Allowance – Night Shift',
+      description: 'Meal allowance request for guards covering the extended night shift at Head Office',
+      urgency: 'low',
+      status: 'completed',
+      requestedDate: new Date('2025-02-15'),
+      completedDate: new Date('2025-02-16'),
+      cost: 60.00
     }
   ];
 
   filteredRequests: GuardRequest[] = [];
-  displayedRequests: GuardRequest[] = [];
 
   columns: TableColumn[] = [
     { key: 'requestId', label: 'Request ID' },
@@ -154,27 +172,19 @@ export class RequestManagementComponent implements OnInit {
   showFilterPanel: boolean = false;
   activeFilterCount: number = 0;
 
+  newRequestForm: { guardName: string; guardId: string; requestType: GuardRequest['requestType'] | ''; title: string; description: string; urgency: GuardRequest['urgency'] | ''; cost: number | null } = {
+    guardName: '', guardId: '', requestType: '', title: '', description: '', urgency: '', cost: null
+  };
+
   // Filters
   selectedStatus: string = 'all';
   selectedType: string = 'all';
   selectedUrgency: string = 'all';
 
-  // Pagination
-  currentPage: number = 1;
-  pageSize: number = 10;
-
   constructor() {}
 
   ngOnInit(): void {
     this.applyFilters();
-  }
-
-  get startIndex(): number {
-    return (this.currentPage - 1) * this.pageSize;
-  }
-
-  get endIndex(): number {
-    return Math.min(this.startIndex + this.pageSize, this.filteredRequests.length);
   }
 
   applyFilters(): void {
@@ -208,12 +218,6 @@ export class RequestManagementComponent implements OnInit {
 
     this.filteredRequests = result;
     this.updateActiveFilterCount();
-    this.currentPage = 1;
-    this.updateDisplayedRequests();
-  }
-
-  updateDisplayedRequests(): void {
-    this.displayedRequests = this.filteredRequests.slice(this.startIndex, this.endIndex);
   }
 
   updateActiveFilterCount(): void {
@@ -272,47 +276,107 @@ export class RequestManagementComponent implements OnInit {
   }
 
   approveRequest(request: GuardRequest): void {
-    request.status = 'approved';
-    this.applyFilters();
+    const ref = this.alertDialog.open({
+      title: 'Approve Request?',
+      description: `Approve "${request.title}" submitted by ${request.guardName}? The guard will be notified.`,
+      actionText: 'Approve',
+      cancelText: 'Cancel',
+      variant: 'default'
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (!confirmed) return;
+      request.status = 'approved';
+      this.applyFilters();
+      this.toast.show({ title: 'Request Approved', description: `"${request.title}" has been approved.`, variant: 'success' });
+    });
   }
 
   rejectRequest(request: GuardRequest): void {
-    request.status = 'rejected';
-    this.applyFilters();
+    const ref = this.alertDialog.open({
+      title: 'Reject Request?',
+      description: `Reject "${request.title}" submitted by ${request.guardName}? This action will notify the guard.`,
+      actionText: 'Reject',
+      cancelText: 'Cancel',
+      variant: 'destructive'
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (!confirmed) return;
+      request.status = 'rejected';
+      this.applyFilters();
+      this.toast.show({ title: 'Request Rejected', description: `"${request.title}" has been rejected.`, variant: 'destructive' });
+    });
   }
 
   completeRequest(request: GuardRequest): void {
-    request.status = 'completed';
-    request.completedDate = new Date();
-    this.applyFilters();
+    const ref = this.alertDialog.open({
+      title: 'Mark as Completed?',
+      description: `Mark "${request.title}" as completed? This confirms the request has been fulfilled.`,
+      actionText: 'Complete',
+      cancelText: 'Cancel',
+      variant: 'default'
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (!confirmed) return;
+      request.status = 'completed';
+      request.completedDate = new Date();
+      this.applyFilters();
+      this.toast.show({ title: 'Request Completed', description: `"${request.title}" has been marked as completed.`, variant: 'success' });
+    });
   }
 
   viewRequestDetails(request: GuardRequest): void {
-    console.log('View request details:', request);
+    this.modalService.open({
+      title: `Request Details – ${request.id}`,
+      backdropClose: true,
+      size: 'default',
+      showCloseButton: true,
+      content: this.requestDetailModal,
+      context: { request }
+    });
   }
 
   openNewRequestDialog(): void {
-    const modalRef = this.modalService.open({
+    this.newRequestForm = { guardName: '', guardId: '', requestType: '', title: '', description: '', urgency: '', cost: null };
+    this.modalService.open({
       title: 'New Guard Request',
       content: this.newRequestModal,
       showCloseButton: true,
       size: 'lg'
     });
+  }
 
-    modalRef.afterClosed$.subscribe((result: any) => {
-      if (result?.success) {
-        console.log('New request added successfully');
-      }
+  submitNewRequest(): void {
+    if (!this.newRequestForm.guardName || !this.newRequestForm.requestType || !this.newRequestForm.title || !this.newRequestForm.urgency) return;
+    const newRequest: GuardRequest = {
+      id: `REQ${String(this.requests.length + 1).padStart(3, '0')}`,
+      guardName: this.newRequestForm.guardName,
+      guardId: this.newRequestForm.guardId || `GRD${String(this.requests.length + 1).padStart(3, '0')}`,
+      requestType: this.newRequestForm.requestType as GuardRequest['requestType'],
+      title: this.newRequestForm.title,
+      description: this.newRequestForm.description,
+      urgency: this.newRequestForm.urgency as GuardRequest['urgency'],
+      status: 'pending',
+      requestedDate: new Date(),
+      cost: this.newRequestForm.cost ?? undefined
+    };
+    this.requests.unshift(newRequest);
+    this.applyFilters();
+    this.modalService.closeAll();
+    this.toast.show({ title: 'Request Submitted', description: `"${newRequest.title}" has been submitted for review.`, variant: 'success' });
+  }
+
+  deleteRequest(request: GuardRequest) {
+    const ref = this.alertDialog.open({
+      title: 'Delete Request?',
+      description: `Delete guard request "${request.id}"? This cannot be undone.`,
+      actionText: 'Delete',
+      variant: 'destructive'
     });
-  }
-
-  onPageSizeChange(): void {
-    this.currentPage = 1;
-    this.updateDisplayedRequests();
-  }
-
-  onPageChange(event: any): void {
-    this.currentPage = event;
-    this.updateDisplayedRequests();
+    ref.afterClosed$.subscribe(confirmed => {
+      if (!confirmed) return;
+      this.requests = this.requests.filter(r => r.id !== request.id);
+      this.applyFilters();
+      this.toast.show({ title: 'Request Deleted', description: 'The guard request has been deleted.', variant: 'destructive' });
+    });
   }
 }

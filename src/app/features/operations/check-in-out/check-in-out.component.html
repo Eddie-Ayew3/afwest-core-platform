@@ -1,0 +1,333 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Control Unit</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Check In / Out</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Check In / Check Out</h1>
+        <p class="text-muted-foreground mt-2">Real-time attendance tracking for all security staff</p>
+      </div>
+      <div class="flex gap-2">
+        <tolle-button variant="default" (click)="openCheckInModal()">
+          <i class="ri-login-box-line mr-2"></i>Check In
+        </tolle-button>
+        <tolle-button variant="outline" (click)="openCheckOutModal()">
+          <i class="ri-logout-box-line mr-2"></i>Check Out
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0"><i class="ri-login-box-line text-green-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{presentCount}}</h3><p class="text-xs text-muted-foreground">Staff Present</p></div>
+        <span class="ml-auto text-xs text-green-600 font-medium">Present</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-blue-100 rounded-lg shrink-0"><i class="ri-logout-box-line text-blue-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{leftCount}}</h3><p class="text-xs text-muted-foreground">Checked Out</p></div>
+        <span class="ml-auto text-xs text-blue-600 font-medium">Left</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-orange-100 rounded-lg shrink-0"><i class="ri-time-line text-orange-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{lateCount}}</h3><p class="text-xs text-muted-foreground">Late Arrivals</p></div>
+        <span class="ml-auto text-xs text-orange-600 font-medium">Late</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-red-100 rounded-lg shrink-0"><i class="ri-user-line text-red-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{absentCount}}</h3><p class="text-xs text-muted-foreground">Not Present</p></div>
+        <span class="ml-auto text-xs text-red-600 font-medium">Absent</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="flex justify-end items-center mb-3">
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Present">Present</tolle-select-item>
+          <tolle-select-item value="Left">Left</tolle-select-item>
+          <tolle-select-item value="Late">Late</tolle-select-item>
+          <tolle-select-item value="Absent">Absent</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>Clear
+      </tolle-button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredRecords"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="staff" let-row="row">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
+              {{row.name.charAt(0)}}
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium truncate">{{row.name}}</p>
+              <p class="text-xs text-muted-foreground truncate">{{row.role}}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="staffId" let-row="row">
+          <span class="text-sm font-mono bg-muted/60 px-2 py-0.5 rounded">{{row.staffId}}</span>
+        </ng-template>
+
+        <ng-template tolleCell="site" let-row="row">
+          <div class="flex items-center gap-1 min-w-0">
+            <i class="ri-map-pin-line text-muted-foreground text-xs shrink-0"></i>
+            <span class="text-sm truncate">{{row.site}}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="checkIn" let-row="row">
+          <span *ngIf="row.checkIn" class="text-sm font-medium text-green-600">
+            <i class="ri-login-box-line mr-1"></i>{{row.checkIn}}
+          </span>
+          <span *ngIf="!row.checkIn" class="text-sm text-muted-foreground">—</span>
+        </ng-template>
+
+        <ng-template tolleCell="checkOut" let-row="row">
+          <span *ngIf="row.checkOut" class="text-sm font-medium">
+            <i class="ri-logout-box-line mr-1 text-muted-foreground"></i>{{row.checkOut}}
+          </span>
+          <span *ngIf="!row.checkOut" class="text-sm text-muted-foreground">—</span>
+        </ng-template>
+
+        <ng-template tolleCell="hoursWorked" let-row="row">
+          <span *ngIf="row.hoursWorked" class="text-sm font-medium">{{row.hoursWorked}}</span>
+          <span *ngIf="!row.hoursWorked" class="text-sm text-muted-foreground">—</span>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline">
+              {{row.status}}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewRecord(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="attendanceMenu">
+                <i class="ri-more-2-fill"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #attendanceMenu>
+                <div class="flex flex-col p-1">
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-edit-line"></i>Edit Record
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-printer-line"></i>Print Slip
+                  </button>
+                  <div class="my-1 h-px bg-border"></div>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors" (click)="removeRecord(row)">
+                    <i class="ri-delete-bin-line"></i>Remove
+                  </button>
+                </div>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Check In Modal ─────────────────────────────────────────────────────── -->
+@if (showCheckInModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCheckInModal()"></div>
+    <div class="relative bg-background rounded-xl shadow-2xl w-full max-w-[440px] flex flex-col" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-border">
+        <div>
+          <h2 class="text-lg font-semibold">Check In Staff</h2>
+          <p class="text-sm text-muted-foreground mt-0.5">Record staff arrival for today's shift</p>
+        </div>
+        <tolle-button (click)="closeCheckInModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+          <i class="ri-close-line text-lg"></i>
+        </tolle-button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+
+        <!-- Staff selector -->
+        <div class="space-y-1.5">
+          <tolle-label>Staff Member <span class="text-destructive">*</span></tolle-label>
+          @if (absentRecords.length > 0) {
+            <tolle-select [(ngModel)]="checkInRecordId" placeholder="Select staff member" class="w-full">
+              @for (r of absentRecords; track r.id) {
+                <tolle-select-item [value]="r.id">
+                  {{ r.name }} <span class="text-muted-foreground ml-1">· {{ r.staffId }} · {{ r.site }}</span>
+                </tolle-select-item>
+              }
+            </tolle-select>
+          } @else {
+            <div class="flex items-center gap-2 p-3 bg-muted/40 border border-border rounded-lg text-sm text-muted-foreground">
+              <i class="ri-checkbox-circle-line text-green-500"></i>
+              All staff have already checked in today.
+            </div>
+          }
+        </div>
+
+        <!-- Time -->
+        <div class="space-y-1.5">
+          <tolle-label>Check-In Time <span class="text-destructive">*</span></tolle-label>
+          <tolle-input type="time" [(ngModel)]="checkInTime" class="w-full"></tolle-input>
+        </div>
+
+        <!-- Error -->
+        @if (checkInError) {
+          <div class="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <i class="ri-error-warning-line text-destructive shrink-0"></i>
+            <p class="text-sm text-destructive">{{ checkInError }}</p>
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-border flex items-center justify-between">
+        <tolle-button variant="outline" (click)="closeCheckInModal()">Cancel</tolle-button>
+        <tolle-button variant="default" (click)="submitCheckIn()" [busy]="checkingIn" [disabled]="absentRecords.length === 0">
+          <i class="ri-login-box-line mr-1"></i>Confirm Check In
+        </tolle-button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ── Check Out Modal ────────────────────────────────────────────────────── -->
+@if (showCheckOutModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCheckOutModal()"></div>
+    <div class="relative bg-background rounded-xl shadow-2xl w-full max-w-[440px] flex flex-col" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-border">
+        <div>
+          <h2 class="text-lg font-semibold">Check Out Staff</h2>
+          <p class="text-sm text-muted-foreground mt-0.5">Record staff departure from today's shift</p>
+        </div>
+        <tolle-button (click)="closeCheckOutModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+          <i class="ri-close-line text-lg"></i>
+        </tolle-button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+
+        <!-- Staff selector -->
+        <div class="space-y-1.5">
+          <tolle-label>Staff Member <span class="text-destructive">*</span></tolle-label>
+          @if (onSiteRecords.length > 0) {
+            <tolle-select [(ngModel)]="checkOutRecordId" placeholder="Select staff member" class="w-full">
+              @for (r of onSiteRecords; track r.id) {
+                <tolle-select-item [value]="r.id">
+                  {{ r.name }} <span class="text-muted-foreground ml-1">· {{ r.staffId }} · in {{ r.checkIn }}</span>
+                </tolle-select-item>
+              }
+            </tolle-select>
+          } @else {
+            <div class="flex items-center gap-2 p-3 bg-muted/40 border border-border rounded-lg text-sm text-muted-foreground">
+              <i class="ri-information-line text-blue-500"></i>
+              No staff are currently on site.
+            </div>
+          }
+        </div>
+
+        <!-- Time -->
+        <div class="space-y-1.5">
+          <tolle-label>Check-Out Time <span class="text-destructive">*</span></tolle-label>
+          <tolle-input type="time" [(ngModel)]="checkOutTime" class="w-full"></tolle-input>
+        </div>
+
+        <!-- Error -->
+        @if (checkOutError) {
+          <div class="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <i class="ri-error-warning-line text-destructive shrink-0"></i>
+            <p class="text-sm text-destructive">{{ checkOutError }}</p>
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-border flex items-center justify-between">
+        <tolle-button variant="outline" (click)="closeCheckOutModal()">Cancel</tolle-button>
+        <tolle-button variant="default" (click)="submitCheckOut()" [busy]="checkingOut" [disabled]="onSiteRecords.length === 0">
+          <i class="ri-logout-box-line mr-1"></i>Confirm Check Out
+        </tolle-button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- Attendance record detail modal -->
+<ng-template #recordModal let-record="record">
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+        {{ record.name.charAt(0) }}
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ record.name }}</h4>
+        <p class="text-sm text-muted-foreground">{{ record.role }} · {{ record.staffId }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Site</p><p class="font-medium mt-1">{{ record.site }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Status</p><p class="font-medium mt-1">{{ record.status }}</p></div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Check In</p><p class="font-medium mt-1">{{ record.checkIn ?? '—' }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Check Out</p><p class="font-medium mt-1">{{ record.checkOut ?? '—' }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Hours Worked</p><p class="font-medium mt-1">{{ record.hoursWorked ?? '—' }}</p></div>
+    </div>
+  </div>
+</ng-template>

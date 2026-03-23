@@ -1,0 +1,308 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Finance</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Payroll Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Payroll Management</h1>
+        <p class="text-muted-foreground mt-1">Manage staff payroll, salaries, and payment processing</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <tolle-button variant="outline">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+        <tolle-button variant="default">
+          <i class="ri-refresh-line mr-2"></i>Process Payroll
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-4 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-primary/10 rounded-lg shrink-0"><i class="ri-money-dollar-circle-line text-primary text-base"></i></div>
+        <div>
+          <h3 class="text-lg font-bold leading-tight">₵{{ totalPayroll.toLocaleString() }}</h3>
+          <p class="text-xs text-muted-foreground">Total Payroll</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-orange-100 rounded-lg shrink-0"><i class="ri-time-line text-orange-600 text-base"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{ pendingCount }}</h3>
+          <p class="text-xs text-muted-foreground">Pending</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-blue-100 rounded-lg shrink-0"><i class="ri-refresh-line text-blue-600 text-base"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{ processedCount }}</h3>
+          <p class="text-xs text-muted-foreground">Processed</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0"><i class="ri-check-double-line text-green-600 text-base"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{ paidCount }}</h3>
+          <p class="text-xs text-muted-foreground">Paid</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="flex justify-between items-center mb-3">
+      <div class="flex-1 max-w-sm">
+        <tolle-input
+          type="text"
+          placeholder="Search name, ID, or position..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="applyFilters()"
+          class="w-full">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      <div class="flex gap-2 ml-3">
+        @if (activeFilterCount > 0) {
+          <tolle-button variant="outline" size="default" (click)="clearFilters()">
+            <i class="ri-filter-off-line mr-2"></i>Clear ({{ activeFilterCount }})
+          </tolle-button>
+        }
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (showFilterPanel) {
+      <div class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium">Department:</span>
+          <tolle-select [(ngModel)]="filterDepartment" (ngModelChange)="applyFilters()" size="sm">
+            <tolle-select-item value="All">All</tolle-select-item>
+            @for (d of departments; track d) {
+              <tolle-select-item [value]="d">{{ d }}</tolle-select-item>
+            }
+          </tolle-select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium">Status:</span>
+          <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()" size="sm">
+            <tolle-select-item value="All">All</tolle-select-item>
+            @for (s of statuses; track s) {
+              <tolle-select-item [value]="s">{{ s | titlecase }}</tolle-select-item>
+            }
+          </tolle-select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium">Pay Period:</span>
+          <tolle-select [(ngModel)]="filterPayPeriod" (ngModelChange)="applyFilters()" size="sm">
+            <tolle-select-item value="All">All</tolle-select-item>
+            @for (p of payPeriods; track p) {
+              <tolle-select-item [value]="p">{{ p }}</tolle-select-item>
+            }
+          </tolle-select>
+        </div>
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-refresh-line mr-1"></i>Clear
+        </tolle-button>
+      </div>
+    }
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredPayroll"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25]">
+
+        <ng-template tolleCell="staff" let-row="row">
+          <div class="flex items-center gap-2">
+            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold shrink-0">
+              {{ getInitials(row.staffName) }}
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium text-sm truncate">{{ row.staffName }}</p>
+              <p class="text-xs text-muted-foreground font-mono">{{ row.staffId }} · {{ row.position }}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="department" let-row="row">
+          <tolle-badge size="sm" variant="outline"
+            [style.background]="getDeptBg(row.department)"
+            [style.color]="getDeptFg(row.department)">
+            {{ row.department }}
+          </tolle-badge>
+        </ng-template>
+
+        <ng-template tolleCell="baseSalary" let-row="row">
+          <span class="text-sm font-medium">₵{{ row.baseSalary.toLocaleString() }}</span>
+        </ng-template>
+
+        <ng-template tolleCell="breakdown" let-row="row">
+          <div class="text-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-green-600">
+              <i class="ri-add-line"></i>
+              <span>₵{{ row.allowances.toLocaleString() }} allowances</span>
+            </div>
+            <div class="flex items-center gap-1 text-red-500">
+              <i class="ri-subtract-line"></i>
+              <span>₵{{ row.deductions.toLocaleString() }} deductions</span>
+            </div>
+            @if (row.overtime > 0) {
+              <div class="flex items-center gap-1 text-blue-600">
+                <i class="ri-time-line"></i>
+                <span>₵{{ row.overtime.toLocaleString() }} overtime</span>
+              </div>
+            }
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="netSalary" let-row="row">
+          <span class="text-sm font-bold text-green-600">₵{{ row.netSalary.toLocaleString() }}</span>
+        </ng-template>
+
+        <ng-template tolleCell="payPeriod" let-row="row">
+          <div class="flex items-center gap-1.5 text-sm">
+            <i class="ri-calendar-line text-muted-foreground text-xs"></i>
+            <span>{{ row.payPeriod }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline"
+              [style.background]="getStatusBg(row.status)"
+              [style.color]="getStatusFg(row.status)">
+              {{ row.status | titlecase }}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-1">
+            <tolle-button variant="default" size="xs" (click)="viewPayroll(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="payrollMenu">
+                <i class="ri-more-2-fill"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #payrollMenu>
+                <div class="flex flex-col p-1">
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-file-text-line"></i>View Payslip
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-edit-line"></i>Edit Details
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-printer-line"></i>Print Payslip
+                  </button>
+                  @if (row.status === 'pending') {
+                    <div class="my-1 h-px bg-border"></div>
+                    <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                      <i class="ri-refresh-line"></i>Process Now
+                    </button>
+                  }
+                  @if (row.status === 'processed') {
+                    <div class="my-1 h-px bg-border"></div>
+                    <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors text-green-700">
+                      <i class="ri-bank-card-line"></i>Mark as Paid
+                    </button>
+                  }
+                </div>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Payslip Detail Modal Template -->
+<ng-template #payrollModal let-payroll="payroll">
+  <div class="space-y-4">
+    <!-- Staff header -->
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold">
+        {{ getInitials(payroll.staffName) }}
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ payroll.staffName }}</h4>
+        <p class="text-sm text-muted-foreground">{{ payroll.staffId }} · {{ payroll.position }}</p>
+      </div>
+      <div class="ml-auto">
+        <tolle-badge size="sm" variant="outline"
+          [style.background]="getStatusBg(payroll.status)"
+          [style.color]="getStatusFg(payroll.status)">
+          {{ payroll.status | titlecase }}
+        </tolle-badge>
+      </div>
+    </div>
+    <!-- Period + Dept -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Pay Period</p>
+        <p class="font-medium mt-1">{{ payroll.payPeriod }}</p>
+      </div>
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Department</p>
+        <p class="font-medium mt-1">{{ payroll.department }}</p>
+      </div>
+    </div>
+    <!-- Salary breakdown -->
+    <div class="p-3 bg-muted/50 rounded-lg space-y-2">
+      <p class="text-xs text-muted-foreground uppercase font-semibold mb-2">Salary Breakdown</p>
+      <div class="flex justify-between text-sm">
+        <span class="text-muted-foreground">Base Salary</span>
+        <span class="font-medium">₵{{ payroll.baseSalary.toLocaleString() }}</span>
+      </div>
+      <div class="flex justify-between text-sm text-green-600">
+        <span>+ Allowances</span>
+        <span class="font-medium">₵{{ payroll.allowances.toLocaleString() }}</span>
+      </div>
+      @if (payroll.overtime > 0) {
+        <div class="flex justify-between text-sm text-blue-600">
+          <span>+ Overtime</span>
+          <span class="font-medium">₵{{ payroll.overtime.toLocaleString() }}</span>
+        </div>
+      }
+      <div class="flex justify-between text-sm text-red-500">
+        <span>− Deductions</span>
+        <span class="font-medium">₵{{ payroll.deductions.toLocaleString() }}</span>
+      </div>
+      <div class="border-t border-border pt-2 flex justify-between text-sm font-bold">
+        <span>Net Salary</span>
+        <span class="text-green-600">₵{{ payroll.netSalary.toLocaleString() }}</span>
+      </div>
+    </div>
+    <!-- Bank + Payment date -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Bank Account</p>
+        <p class="font-mono font-medium mt-1">{{ payroll.bankAccount }}</p>
+      </div>
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Payment Date</p>
+        <p class="font-medium mt-1">{{ payroll.paymentDate || '—' }}</p>
+      </div>
+    </div>
+  </div>
+</ng-template>

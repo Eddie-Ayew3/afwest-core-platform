@@ -1,0 +1,430 @@
+<div class="flex h-full bg-background">
+  <div class="flex-1 p-6 overflow-auto">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Finance</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Client Invoices</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">Client Invoices & Payments</h1>
+        <p class="text-muted-foreground mt-2">Manage invoices and track payments from security service clients</p>
+      </div>
+      <tolle-button variant="default" size="lg" (click)="openNewInvoiceSheet()">
+        <i class="ri-add-line mr-2"></i>New Invoice
+      </tolle-button>
+    </div>
+
+    <!-- Client filter banner (shown when pre-filtered via query param) -->
+    @if (filterClientBanner) {
+      <div class="flex items-center gap-3 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <i class="ri-filter-line text-blue-500"></i>
+        <span class="text-sm text-blue-700">Showing invoices for <strong>{{ filterClientBanner }}</strong></span>
+        <button class="ml-auto text-xs text-blue-600 hover:underline" (click)="clearFilters()">Clear filter</button>
+      </div>
+    }
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-lg border border-border p-4 flex items-center gap-3">
+        <div class="p-2 bg-blue-100 rounded-lg shrink-0"><i class="ri-file-list-3-line text-blue-600 text-lg"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">₵{{ totalInvoiced.toLocaleString() }}</h3>
+          <p class="text-xs text-muted-foreground">Total Invoiced</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-4 flex items-center gap-3">
+        <div class="p-2 bg-green-100 rounded-lg shrink-0"><i class="ri-checkbox-circle-line text-green-600 text-lg"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">₵{{ totalCollected.toLocaleString() }}</h3>
+          <p class="text-xs text-muted-foreground">Collected</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-4 flex items-center gap-3">
+        <div class="p-2 bg-orange-100 rounded-lg shrink-0"><i class="ri-time-line text-orange-600 text-lg"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">₵{{ totalOutstanding.toLocaleString() }}</h3>
+          <p class="text-xs text-muted-foreground">Outstanding</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-4 flex items-center gap-3">
+        <div class="p-2 bg-red-100 rounded-lg shrink-0"><i class="ri-error-warning-line text-red-600 text-lg"></i></div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{ overdueCount }}</h3>
+          <p class="text-xs text-muted-foreground">Overdue Invoices</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex-1 max-w-md">
+        <tolle-input placeholder="Search by invoice ID, client, period..." class="w-full"
+          [(ngModel)]="searchQuery" (ngModelChange)="onSearch()">
+          <i prefix class="ri-search-line text-muted-foreground"></i>
+        </tolle-input>
+      </div>
+      <div class="flex gap-2 ml-4">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{ activeFilterCount }})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-4 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()" size="sm">
+          <tolle-select-item value="all">All</tolle-select-item>
+          <tolle-select-item value="draft">Draft</tolle-select-item>
+          <tolle-select-item value="sent">Sent</tolle-select-item>
+          <tolle-select-item value="paid">Paid</tolle-select-item>
+          <tolle-select-item value="overdue">Overdue</tolle-select-item>
+          <tolle-select-item value="cancelled">Cancelled</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Client:</span>
+        <tolle-select [(ngModel)]="filterClient" (ngModelChange)="applyFilters()" size="sm">
+          <tolle-select-item value="all">All Clients</tolle-select-item>
+          @for (c of uniqueClients; track c.id) {
+            <tolle-select-item [value]="c.id">{{ c.name }}</tolle-select-item>
+          }
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>Clear
+      </tolle-button>
+    </div>
+
+    <!-- Table -->
+    <tolle-card class="w-full overflow-hidden">
+      <tolle-card-content class="p-0">
+
+        <div *ngIf="displayedInvoices.length > 0">
+          <tolle-data-table
+            [data]="displayedInvoices"
+            [columns]="columns"
+            [stickyHeader]="true"
+            [paginate]="false"
+            [searchable]="false"
+            [showSettings]="false">
+
+            <ng-template tolleCell="invoiceRef" let-row="row">
+              <div>
+                <button class="font-mono text-sm font-medium text-primary hover:underline" (click)="viewInvoice(row)">{{ row.id }}</button>
+                <p class="text-xs text-muted-foreground mt-0.5">{{ row.servicePeriod }}</p>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="client" let-row="row">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                  {{ row.clientName.charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-medium truncate">{{ row.clientName }}</p>
+                  <p class="text-xs text-muted-foreground font-mono">{{ row.clientId }}</p>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="period" let-row="row">
+              <div>
+                <p class="text-sm">Issued: {{ row.issueDate }}</p>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="dueDate" let-row="row">
+              <span class="text-sm" [class.text-destructive]="row.status === 'overdue'" [class.font-semibold]="row.status === 'overdue'">
+                {{ row.dueDate }}
+                @if (row.status === 'overdue') {
+                  <i class="ri-error-warning-line ml-1"></i>
+                }
+              </span>
+            </ng-template>
+
+            <ng-template tolleCell="amount" let-row="row">
+              <span class="text-sm font-medium">₵{{ row.totalAmount.toLocaleString() }}</span>
+            </ng-template>
+
+            <ng-template tolleCell="balance" let-row="row">
+              <div>
+                <span class="text-sm font-medium" [class.text-green-600]="getBalance(row) === 0" [class.text-destructive]="getBalance(row) > 0">
+                  ₵{{ getBalance(row).toLocaleString() }}
+                </span>
+                @if (row.totalAmount > 0) {
+                  <div class="w-16 bg-muted rounded-full h-1 mt-1">
+                    <div class="h-1 rounded-full bg-green-500"
+                      [style.width.%]="(row.amountPaid / row.totalAmount) * 100">
+                    </div>
+                  </div>
+                }
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="status" let-row="row">
+              <div class="flex justify-center">
+                <tolle-badge size="sm" variant="outline"
+                  [style.background]="getStatusBg(row.status)"
+                  [style.color]="getStatusFg(row.status)">
+                  {{ row.status | titlecase }}
+                </tolle-badge>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="actions" let-row="row">
+              <div class="flex items-center justify-end gap-2">
+                <tolle-button variant="default" size="xs" (click)="viewInvoice(row)">View</tolle-button>
+                @if (row.status === 'draft') {
+                  <tolle-button variant="outline" size="xs" (click)="markAsSent(row)">Send</tolle-button>
+                }
+                @if (row.status === 'sent' || row.status === 'overdue') {
+                  <tolle-button variant="outline" size="xs" (click)="openRecordPayment(row)">
+                    <i class="ri-money-dollar-circle-line mr-1"></i>Pay
+                  </tolle-button>
+                }
+                <div class="relative">
+                  <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More" tolleTooltipPosition="top" [tolleDropdownTrigger]="invMenu">
+                    <i class="ri-more-2-fill"></i>
+                  </tolle-button>
+                  <tolle-dropdown-menu #invMenu>
+                    <div class="flex flex-col p-1">
+                      <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors" (click)="viewInvoice(row)">
+                        <i class="ri-eye-line"></i>View Detail
+                      </button>
+                      @if (row.status === 'draft') {
+                        <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors" (click)="markAsSent(row)">
+                          <i class="ri-send-plane-line"></i>Mark as Sent
+                        </button>
+                      }
+                      @if (row.status === 'sent' || row.status === 'overdue') {
+                        <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors" (click)="openRecordPayment(row)">
+                          <i class="ri-money-dollar-circle-line"></i>Record Payment
+                        </button>
+                      }
+                      <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                        <i class="ri-printer-line"></i>Print Invoice
+                      </button>
+                      <div class="my-1 h-px bg-border"></div>
+                      <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors" (click)="deleteInvoice(row)">
+                        <i class="ri-delete-bin-line"></i>Delete
+                      </button>
+                    </div>
+                  </tolle-dropdown-menu>
+                </div>
+              </div>
+            </ng-template>
+
+          </tolle-data-table>
+        </div>
+
+        <div *ngIf="displayedInvoices.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
+          <tolle-empty-state title="No invoices found" description="Try adjusting your search or filter criteria" variant="default">
+            <i icon class="ri-file-list-3-line text-4xl"></i>
+            <div class="mt-4">
+              <tolle-button variant="outline" size="sm" (click)="clearFilters()">Clear Filters</tolle-button>
+            </div>
+          </tolle-empty-state>
+        </div>
+
+        <!-- Pagination -->
+        <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="filteredInvoices.length > 0">
+          <div class="flex items-center gap-2">
+            <tolle-select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()" size="sm">
+              <tolle-select-item [value]="5">5 per page</tolle-select-item>
+              <tolle-select-item [value]="10">10 per page</tolle-select-item>
+              <tolle-select-item [value]="25">25 per page</tolle-select-item>
+            </tolle-select>
+            <span class="text-sm text-muted-foreground">
+              Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ filteredInvoices.length }}
+            </span>
+          </div>
+          <tolle-pagination
+            [totalRecords]="filteredInvoices.length"
+            [currentPage]="currentPage"
+            [currentPageSize]="pageSize"
+            [showPageOptions]="false"
+            (pageChange)="onPageChange($event)">
+          </tolle-pagination>
+        </div>
+
+      </tolle-card-content>
+    </tolle-card>
+
+  </div>
+</div>
+
+<!-- New Invoice Sheet -->
+<tolle-sheet [(isOpen)]="showNewInvoiceSheet">
+  <tolle-sheet-content side="right" class="w-[520px] flex flex-col h-full">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+      <div>
+        <h2 class="text-lg font-semibold">New Invoice</h2>
+        <p class="text-sm text-muted-foreground">Create a new client invoice</p>
+      </div>
+    </div>
+    <div class="flex-1 overflow-auto p-6 space-y-4">
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1.5">
+          <tolle-label>Client Name <span class="text-destructive">*</span></tolle-label>
+          <tolle-input type="text" placeholder="e.g. GoldFields Ghana Ltd." [(ngModel)]="newInvoice.clientName" class="w-full"></tolle-input>
+        </div>
+        <div class="space-y-1.5">
+          <tolle-label>Client ID</tolle-label>
+          <tolle-input type="text" placeholder="e.g. CLT001" [(ngModel)]="newInvoice.clientId" class="w-full"></tolle-input>
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <tolle-label>Contact Person</tolle-label>
+        <tolle-input type="text" placeholder="e.g. Kwame Asante" [(ngModel)]="newInvoice.clientContact" class="w-full"></tolle-input>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="space-y-1.5">
+          <tolle-label>Service Period <span class="text-destructive">*</span></tolle-label>
+          <tolle-input type="text" placeholder="e.g. March 2025" [(ngModel)]="newInvoice.servicePeriod" class="w-full"></tolle-input>
+        </div>
+        <div class="space-y-1.5">
+          <tolle-label>Issue Date <span class="text-destructive">*</span></tolle-label>
+          <tolle-input type="date" [(ngModel)]="newInvoice.issueDate" class="w-full"></tolle-input>
+        </div>
+        <div class="space-y-1.5">
+          <tolle-label>Due Date <span class="text-destructive">*</span></tolle-label>
+          <tolle-input type="date" [(ngModel)]="newInvoice.dueDate" class="w-full"></tolle-input>
+        </div>
+      </div>
+
+      <!-- Line Items -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <tolle-label>Line Items</tolle-label>
+          <tolle-button variant="ghost" size="sm" (click)="addLineItem()">
+            <i class="ri-add-line mr-1"></i>Add Item
+          </tolle-button>
+        </div>
+        <div class="space-y-2">
+          @for (line of newInvoiceLines; track $index) {
+            <div class="grid grid-cols-[1fr_80px_100px_32px] gap-2 items-center">
+              <tolle-input type="text" placeholder="Description" [(ngModel)]="line.description" class="w-full"></tolle-input>
+              <tolle-input type="number" placeholder="Qty" [(ngModel)]="line.quantity" class="w-full"></tolle-input>
+              <tolle-input type="number" placeholder="Unit ₵" [(ngModel)]="line.unitPrice" class="w-full"></tolle-input>
+              <tolle-button class="text-muted-foreground hover:text-destructive transition-colors" (click)="removeLineItem($index)" [disabled]="newInvoiceLines.length === 1">
+                <i class="ri-delete-bin-line"></i>
+              </tolle-button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Totals preview -->
+      <div class="bg-muted/30 border border-border rounded-lg p-4 space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-muted-foreground">Subtotal</span>
+          <span class="font-medium">₵{{ newInvoiceSubtotal.toLocaleString() }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="text-muted-foreground">VAT (%)</span>
+            <tolle-input type="number" [(ngModel)]="newInvoice.taxRate" class="w-16"></tolle-input>
+          </div>
+          <span class="font-medium">₵{{ newInvoiceTax.toLocaleString() }}</span>
+        </div>
+        <div class="flex justify-between border-t border-border pt-2 font-bold">
+          <span>Total</span>
+          <span>₵{{ newInvoiceTotal.toLocaleString() }}</span>
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <tolle-label>Notes (Optional)</tolle-label>
+        <textarea [(ngModel)]="newInvoice.notes" placeholder="Any additional notes..."
+          class="w-full min-h-[70px] p-3 border border-border rounded-lg resize-none text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background">
+        </textarea>
+      </div>
+
+    </div>
+    <div class="px-6 py-4 border-t border-border shrink-0 flex justify-between">
+      <tolle-button variant="outline" (click)="showNewInvoiceSheet = false">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="submitNewInvoice()"
+        [disabled]="!newInvoice.clientName || !newInvoice.servicePeriod || !newInvoice.issueDate || !newInvoice.dueDate">
+        <i class="ri-file-add-line mr-1"></i>Create Invoice
+      </tolle-button>
+    </div>
+  </tolle-sheet-content>
+</tolle-sheet>
+
+<!-- Record Payment Modal -->
+<ng-template #recordPaymentModal>
+  <div class="space-y-4 p-1" *ngIf="selectedInvoiceForPayment">
+    <div class="p-3 bg-muted/40 border border-border rounded-lg text-sm">
+      <div class="flex justify-between mb-1">
+        <span class="text-muted-foreground">Invoice</span>
+        <span class="font-mono font-medium">{{ selectedInvoiceForPayment.id }}</span>
+      </div>
+      <div class="flex justify-between mb-1">
+        <span class="text-muted-foreground">Total Amount</span>
+        <span class="font-medium">₵{{ selectedInvoiceForPayment.totalAmount.toLocaleString() }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-muted-foreground">Outstanding Balance</span>
+        <span class="font-bold text-destructive">₵{{ getBalance(selectedInvoiceForPayment).toLocaleString() }}</span>
+      </div>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Amount (₵) <span class="text-destructive">*</span></tolle-label>
+      <tolle-input type="number" [(ngModel)]="paymentForm.amount" class="w-full"></tolle-input>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="space-y-1.5">
+        <tolle-label>Payment Method <span class="text-destructive">*</span></tolle-label>
+        <tolle-select [(ngModel)]="paymentForm.method" class="w-full">
+          <tolle-select-item value="bank_transfer">Bank Transfer</tolle-select-item>
+          <tolle-select-item value="mobile_money">Mobile Money</tolle-select-item>
+          <tolle-select-item value="cash">Cash</tolle-select-item>
+          <tolle-select-item value="cheque">Cheque</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="space-y-1.5">
+        <tolle-label>Payment Date <span class="text-destructive">*</span></tolle-label>
+        <tolle-input type="date" [(ngModel)]="paymentForm.paymentDate" class="w-full"></tolle-input>
+      </div>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Bank / Reference No.</tolle-label>
+      <tolle-input type="text" placeholder="e.g. GCB-TXN-20250328-001" [(ngModel)]="paymentForm.bankRef" class="w-full"></tolle-input>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Notes (Optional)</tolle-label>
+      <textarea [(ngModel)]="paymentForm.notes" placeholder="Any notes about this payment..."
+        class="w-full min-h-[60px] p-3 border border-border rounded-lg resize-none text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background">
+      </textarea>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="submitPayment()" [disabled]="!paymentForm.amount || !paymentForm.paymentDate">
+        <i class="ri-checkbox-circle-line mr-1"></i>Record Payment
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>

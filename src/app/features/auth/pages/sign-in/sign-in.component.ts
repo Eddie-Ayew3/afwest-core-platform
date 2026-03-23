@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import {
   InputComponent,
   ButtonComponent,
@@ -10,22 +9,6 @@ import {
 } from '@tolle_/tolle-ui';
 import { DEMO_ACCOUNTS } from '../../../../core/data/demo-accounts.data';
 import { LS } from '../../../../core/models/rbac.models';
-import { environment } from '../../../../../environments/environment';
-
-interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: string;
-  userId: string;
-  staffId?: string;
-  email: string;
-  fullName: string;
-  role: string;
-  scope: string;
-  region?: string;
-  siteName?: string;
-  permissions: string[];
-}
 
 @Component({
   selector: 'app-sign-in',
@@ -51,7 +34,7 @@ export class SignInComponent implements OnInit {
   demoAccounts = DEMO_ACCOUNTS;
   selectedDemoId = '';
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     if (localStorage.getItem(LS.isAuthenticated) === 'true') {
@@ -77,27 +60,30 @@ export class SignInComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
-      staffId: this.staffId,
-      password: this.password
-    }).subscribe({
-      next: (response) => {
-        this.isLoading = false;
+    // Use demo data authentication instead of API call
+    setTimeout(() => {
+      const account = this.demoAccounts.find(a => 
+        a.staffId === this.staffId && a.password === this.password
+      );
+
+      if (account) {
+        // Simulate successful login with demo data
         localStorage.setItem(LS.isAuthenticated, 'true');
-        localStorage.setItem(LS.accessToken,     response.accessToken);
-        localStorage.setItem(LS.refreshToken,    response.refreshToken);
-        localStorage.setItem(LS.userStaffId,     response.staffId ?? response.userId);
-        localStorage.setItem(LS.userDisplayName, response.fullName);
-        localStorage.setItem(LS.userRole,        response.role);
-        localStorage.setItem(LS.userScope,       response.scope);
-        localStorage.setItem(LS.userRegion,      response.region ?? '');
-        localStorage.setItem(LS.userSite,        response.siteName ?? '');
+        localStorage.setItem(LS.accessToken, 'demo-access-token-' + Date.now());
+        localStorage.setItem(LS.refreshToken, 'demo-refresh-token-' + Date.now());
+        localStorage.setItem(LS.userStaffId, account.staffId);
+        localStorage.setItem(LS.userDisplayName, account.displayName);
+        localStorage.setItem(LS.userRole, account.role);
+        localStorage.setItem(LS.userScope, account.scope);
+        localStorage.setItem(LS.userRegion, account.region ?? '');
+        localStorage.setItem(LS.userSite, account.site ?? '');
+        
+        this.isLoading = false;
         this.router.navigate(['/dashboard']);
-      },
-      error: () => {
+      } else {
         this.isLoading = false;
         this.errorMessage = 'Invalid staff ID or password.';
       }
-    });
+    }, 500); // Simulate network delay
   }
 }

@@ -1,0 +1,209 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Control Unit</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Site Inspections</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Site Inspections</h1>
+        <p class="text-muted-foreground mt-1">Log and review patrol inspections across all AFWest sites.</p>
+      </div>
+      <tolle-button variant="default" size="default" (click)="openCreateSheet()">
+        <i class="ri-add-line mr-2"></i>Log Inspection
+      </tolle-button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-4 gap-4 mb-4">
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-pass">{{passCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Passed</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-fail">{{failCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Failed</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-pending">{{pendingCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Pending</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold">{{avgScore}}%</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Avg Score</p>
+      </div>
+    </div>
+
+    <!-- Search + Filter Bar -->
+    <div class="flex justify-between items-center mb-3">
+      <tolle-input
+        placeholder="Search by ref, site, or inspector..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        class="w-80">
+      </tolle-input>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="mb-3 p-4 bg-muted/30 border border-border rounded-lg">
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Type</label>
+          <tolle-select [(ngModel)]="selectedType" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Types</tolle-select-item>
+            <tolle-select-item *ngFor="let t of typeOptions" [value]="t">{{t}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Result</label>
+          <tolle-select [(ngModel)]="selectedResult" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Results</tolle-select-item>
+            <tolle-select-item *ngFor="let r of resultOptions" [value]="r">{{r}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Site</label>
+          <tolle-select [(ngModel)]="selectedSite" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Sites</tolle-select-item>
+            <tolle-select-item *ngFor="let s of siteOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-close-line mr-1"></i>Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredInspections"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="type" let-row="row">
+          <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                [style.background]="getTypeBg(row.type)"
+                [style.color]="getTypeFg(row.type)">
+            {{row.type}}
+          </span>
+        </ng-template>
+
+        <ng-template tolleCell="score" let-row="row">
+          <span class="font-semibold text-sm" [style.color]="getScoreColor(row.score)">
+            {{row.score > 0 ? row.score + '%' : '—'}}
+          </span>
+        </ng-template>
+
+        <ng-template tolleCell="result" let-row="row">
+          <div class="flex items-center justify-center">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                  [style.background]="getResultBg(row.result)"
+                  [style.color]="getResultFg(row.result)">
+              {{row.result}}
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewInspection(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="insMenu">
+                <i class="ri-more-2-fill text-muted-foreground"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #insMenu>
+                <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 text-destructive rounded-sm" (click)="deleteInspection(row)">
+                  <i class="ri-delete-bin-line"></i> Delete
+                </button>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Create Inspection Sheet -->
+<tolle-sheet [(isOpen)]="showCreateSheet">
+  <tolle-sheet-content side="right" class="w-[480px]">
+    <div class="p-6 h-full flex flex-col">
+      <h2 class="text-lg font-semibold mb-1">Log Inspection</h2>
+      <p class="text-sm text-muted-foreground mb-6">Record a new site inspection or patrol visit.</p>
+
+      <div class="flex-1 overflow-y-auto space-y-4">
+
+        <div class="space-y-1.5">
+          <tolle-label>Site</tolle-label>
+          <tolle-select class="w-full" [(ngModel)]="newForm.site" placeholder="Select site">
+            <tolle-select-item *ngFor="let s of siteOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Inspector Name</tolle-label>
+          <tolle-input placeholder="Name of inspector" [(ngModel)]="newForm.inspector"></tolle-input>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Inspection Type</tolle-label>
+          <tolle-select class="w-full" [(ngModel)]="newForm.type" placeholder="Select type">
+            <tolle-select-item value="Routine">Routine</tolle-select-item>
+            <tolle-select-item value="Surprise">Surprise</tolle-select-item>
+            <tolle-select-item value="Follow-up">Follow-up</tolle-select-item>
+          </tolle-select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <tolle-label>Date</tolle-label>
+            <tolle-input type="date" [(ngModel)]="newForm.date"></tolle-input>
+          </div>
+          <div class="space-y-1.5">
+            <tolle-label>Time</tolle-label>
+            <tolle-input type="time" [(ngModel)]="newForm.time"></tolle-input>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Findings / Notes</tolle-label>
+          <tolle-textarea placeholder="Describe findings, issues, or observations..." [(ngModel)]="newForm.findings" [rows]="4"></tolle-textarea>
+        </div>
+
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-border mt-4">
+        <tolle-button variant="outline" class="flex-1" (click)="showCreateSheet = false">Cancel</tolle-button>
+        <tolle-button variant="default" class="flex-1" (click)="submitInspection()"
+          [disabled]="!newForm.site || !newForm.inspector || !newForm.type">
+          Log Inspection
+        </tolle-button>
+      </div>
+    </div>
+  </tolle-sheet-content>
+</tolle-sheet>

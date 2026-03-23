@@ -1,0 +1,443 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Control Unit</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Shift Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Shift Management</h1>
+        <p class="text-muted-foreground mt-2">Schedule and monitor security guard shifts across all sites</p>
+      </div>
+      <tolle-button variant="default" (click)="openCreateModal()">
+        <i class="ri-add-line mr-2"></i>Create Shift
+      </tolle-button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0"><i class="ri-time-line text-green-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{activeCount}}</h3><p class="text-xs text-muted-foreground">Active Shifts</p></div>
+        <span class="ml-auto text-xs text-green-600 font-medium">Active</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-blue-100 rounded-lg shrink-0"><i class="ri-user-line text-blue-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{onDutyCount}}</h3><p class="text-xs text-muted-foreground">Guards On Duty</p></div>
+        <span class="ml-auto text-xs text-blue-600 font-medium">On Duty</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-orange-100 rounded-lg shrink-0"><i class="ri-calendar-event-line text-orange-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{upcomingCount}}</h3><p class="text-xs text-muted-foreground">Upcoming Shifts</p></div>
+        <span class="ml-auto text-xs text-orange-600 font-medium">Upcoming</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="flex justify-end items-center mb-3">
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-calendar-line mr-2"></i>Today
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Active">Active</tolle-select-item>
+          <tolle-select-item value="Upcoming">Upcoming</tolle-select-item>
+          <tolle-select-item value="Completed">Completed</tolle-select-item>
+          <tolle-select-item value="Cancelled">Cancelled</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Type:</span>
+        <tolle-select [(ngModel)]="filterType" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Morning">Morning</tolle-select-item>
+          <tolle-select-item value="Afternoon">Afternoon</tolle-select-item>
+          <tolle-select-item value="Night">Night</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>Clear
+      </tolle-button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredShifts"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="shift" let-row="row">
+          <div>
+            <p class="font-medium">{{row.shiftName}}</p>
+            <p class="text-xs font-mono text-muted-foreground">{{row.shiftCode}}</p>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="type" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline">
+              <i [class]="getTypeIcon(row.type) + ' mr-1'"></i>{{row.type}}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="site" let-row="row">
+          <div class="flex items-center gap-1 min-w-0">
+            <i class="ri-map-pin-line text-muted-foreground text-xs shrink-0"></i>
+            <span class="text-sm truncate">{{row.site}}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="datetime" let-row="row">
+          <p class="text-sm">{{row.date}}</p>
+          <p class="text-xs text-muted-foreground">{{row.startTime}} – {{row.endTime}}</p>
+        </ng-template>
+
+        <ng-template tolleCell="supervisor" let-row="row">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold shrink-0">
+              {{row.supervisor.charAt(0)}}
+            </div>
+            <span class="text-sm truncate">{{row.supervisor}}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="guards" let-row="row">
+          <div class="flex items-center gap-1">
+            <span class="text-sm font-medium"
+              [class.text-green-600]="row.guardsPresent === row.guardsAssigned"
+              [class.text-orange-600]="row.guardsPresent < row.guardsAssigned && row.guardsPresent > 0"
+              [class.text-muted-foreground]="row.guardsPresent === 0">
+              {{row.guardsPresent}}
+            </span>
+            <span class="text-muted-foreground text-xs">/{{row.guardsAssigned}}</span>
+          </div>
+          <div class="w-16 bg-muted rounded-full h-1 mt-1">
+            <div class="h-1 rounded-full"
+              [style.width.%]="row.guardsAssigned ? (row.guardsPresent / row.guardsAssigned * 100) : 0"
+              [class.bg-green-500]="row.guardsPresent === row.guardsAssigned"
+              [class.bg-orange-500]="row.guardsPresent < row.guardsAssigned && row.guardsPresent > 0"
+              [class.bg-muted-foreground]="row.guardsPresent === 0">
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" variant="outline">
+              {{row.status}}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewShift(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="shiftMenu">
+                <i class="ri-more-2-fill"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #shiftMenu>
+                <div class="flex flex-col p-1">
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-edit-line"></i>Edit Shift
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-user-add-line"></i>Assign Guards
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-file-copy-line"></i>Duplicate
+                  </button>
+                  <div class="my-1 h-px bg-border"></div>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors" (click)="cancelShift(row)">
+                    <i class="ri-delete-bin-line"></i>Cancel Shift
+                  </button>
+                </div>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Create Shift Modal ────────────────────────────────────────────────── -->
+@if (showCreateModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCreateModal()"></div>
+
+    <!-- Dialog -->
+    <div class="relative bg-background rounded-xl shadow-2xl w-full max-w-[580px] flex flex-col max-h-[90vh]"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+        <div>
+          <h2 class="text-lg font-semibold">Create New Shift</h2>
+          <p class="text-sm text-muted-foreground mt-0.5">
+            {{ createStep === 0 ? 'Enter shift details' : 'Configure shift settings' }}
+          </p>
+        </div>
+        <tolle-button (click)="closeCreateModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+          <i class="ri-close-line text-lg"></i>
+        </tolle-button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="px-6 py-3 border-b border-border shrink-0">
+        <div class="flex items-center gap-3">
+          <!-- Step 1 -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ' +
+              (createStep === 0 ? 'bg-primary text-white ring-2 ring-primary/30' : 'bg-primary text-white')">
+              @if (createStep > 0) {
+                <i class="ri-check-line text-xs"></i>
+              } @else {
+                1
+              }
+            </div>
+            <span [class]="'text-sm font-medium ' + (createStep === 0 ? 'text-foreground' : 'text-muted-foreground')">
+              Basic Info
+            </span>
+          </div>
+          <!-- Connector -->
+          <div class="flex-1 h-px bg-border"></div>
+          <!-- Step 2 -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ' +
+              (createStep === 1 ? 'bg-primary text-white ring-2 ring-primary/30' : 'bg-muted text-muted-foreground')">
+              2
+            </div>
+            <span [class]="'text-sm font-medium ' + (createStep === 1 ? 'text-foreground' : 'text-muted-foreground')">
+              Assignment
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-auto p-6">
+
+        <!-- ── Step 0: Basic Information ── -->
+        @if (createStep === 0) {
+          <div class="space-y-4">
+
+            <!-- Shift Name -->
+            <div class="space-y-1.5">
+              <tolle-label>Shift Name <span class="text-destructive">*</span></tolle-label>
+              <tolle-input
+                type="text"
+                placeholder="e.g. Morning Alpha Shift"
+                [(ngModel)]="newShift.shiftName"
+                class="w-full">
+              </tolle-input>
+            </div>
+
+            <!-- Site and Type -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <tolle-label>Site <span class="text-destructive">*</span></tolle-label>
+                <tolle-select [(ngModel)]="newShift.site" placeholder="Select site" class="w-full">
+                  @for (site of sites; track site) {
+                    <tolle-select-item [value]="site">{{ site }}</tolle-select-item>
+                  }
+                </tolle-select>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Shift Type <span class="text-destructive">*</span></tolle-label>
+                <tolle-select [(ngModel)]="newShift.type" class="w-full">
+                  @for (type of shiftTypes; track type.value) {
+                    <tolle-select-item [value]="type.value">
+                      <i [class]="type.icon + ' mr-2'"></i>{{ type.label }}
+                    </tolle-select-item>
+                  }
+                </tolle-select>
+              </div>
+            </div>
+
+            <!-- Date -->
+            <div class="space-y-1.5">
+              <tolle-label>Date <span class="text-destructive">*</span></tolle-label>
+              <tolle-input
+                type="date"
+                [(ngModel)]="newShift.date"
+                class="w-full">
+              </tolle-input>
+            </div>
+
+            <!-- Time Range -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <tolle-label>Start Time</tolle-label>
+                <tolle-input
+                  type="time"
+                  [(ngModel)]="newShift.startTime"
+                  class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>End Time</tolle-label>
+                <tolle-input
+                  type="time"
+                  [(ngModel)]="newShift.endTime"
+                  class="w-full">
+                </tolle-input>
+              </div>
+            </div>
+
+            <!-- Validation error -->
+            @if (step1Error) {
+              <div class="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <i class="ri-error-warning-line text-destructive shrink-0"></i>
+                <p class="text-sm text-destructive">{{ step1Error }}</p>
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- ── Step 1: Assignment & Status ── -->
+        @if (createStep === 1) {
+          <div class="space-y-4">
+
+            <!-- Supervisor -->
+            <div class="space-y-1.5">
+              <tolle-label>Supervisor</tolle-label>
+              <tolle-select [(ngModel)]="newShift.supervisor" placeholder="Select supervisor" class="w-full">
+                @for (supervisor of supervisors; track supervisor) {
+                  <tolle-select-item [value]="supervisor">{{ supervisor }}</tolle-select-item>
+                }
+              </tolle-select>
+            </div>
+
+            <!-- Number of Guards -->
+            <div class="space-y-1.5">
+              <tolle-label>Number of Guards</tolle-label>
+              <tolle-input
+                type="number"
+                [(ngModel)]="newShift.guardsAssigned"
+                min="1"
+                max="10"
+                class="w-full">
+              </tolle-input>
+            </div>
+
+            <!-- Status -->
+            <div class="space-y-1.5">
+              <tolle-label>Status</tolle-label>
+              <tolle-select [(ngModel)]="newShift.status" class="w-full">
+                @for (status of statuses; track status.value) {
+                  <tolle-select-item [value]="status.value">
+                    <i [class]="'ri-checkbox-circle-fill mr-2 text-' + status.color + '-600'"></i>{{ status.label }}
+                  </tolle-select-item>
+                }
+              </tolle-select>
+            </div>
+
+            <!-- Notes -->
+            <div class="space-y-1.5">
+              <tolle-label>Notes (Optional)</tolle-label>
+              <textarea 
+                [(ngModel)]="newShift.notes"
+                placeholder="Any additional notes about this shift..."
+                class="w-full min-h-[80px] p-3 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary/20">
+              </textarea>
+            </div>
+
+            <!-- Summary -->
+            <div class="bg-muted/30 border border-border rounded-lg p-4">
+              <h4 class="font-semibold text-sm mb-3">Shift Summary</h4>
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-muted-foreground">Name:</span> <span class="font-medium">{{ newShift.shiftName || '—' }}</span></div>
+                <div><span class="text-muted-foreground">Site:</span> <span class="font-medium">{{ newShift.site || '—' }}</span></div>
+                <div><span class="text-muted-foreground">Type:</span> <span class="font-medium">{{ newShift.type }}</span></div>
+                <div><span class="text-muted-foreground">Date:</span> <span class="font-medium">{{ newShift.date || '—' }}</span></div>
+                <div><span class="text-muted-foreground">Time:</span> <span class="font-medium">{{ newShift.startTime || '—' }} - {{ newShift.endTime || '—' }}</span></div>
+                <div><span class="text-muted-foreground">Guards:</span> <span class="font-medium">{{ newShift.guardsAssigned }}</span></div>
+              </div>
+            </div>
+
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-border shrink-0 flex items-center justify-between">
+        @if (createStep === 0) {
+          <tolle-button variant="outline" (click)="closeCreateModal()">Cancel</tolle-button>
+          <tolle-button variant="default" (click)="nextCreateStep()">
+            Next <i class="ri-arrow-right-line ml-1"></i>
+          </tolle-button>
+        } @else {
+          <tolle-button variant="outline" (click)="prevCreateStep()">
+            <i class="ri-arrow-left-line mr-1"></i>Back
+          </tolle-button>
+          <tolle-button variant="default" (click)="submitShift()" [busy]="creating">
+            <i class="ri-check-line mr-1"></i>Create Shift
+          </tolle-button>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- Shift detail modal -->
+<ng-template #shiftModal let-shift="shift">
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+        <i class="ri-time-line"></i>
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ shift.shiftName }}</h4>
+        <p class="text-sm text-muted-foreground">{{ shift.shiftCode }} · {{ shift.type }} Shift</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Site</p><p class="font-medium mt-1">{{ shift.site }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Date</p><p class="font-medium mt-1">{{ shift.date }}</p></div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Start</p><p class="font-medium mt-1">{{ shift.startTime }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">End</p><p class="font-medium mt-1">{{ shift.endTime }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Status</p><p class="font-medium mt-1">{{ shift.status }}</p></div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Supervisor</p><p class="font-medium mt-1">{{ shift.supervisor }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Assigned</p><p class="font-medium mt-1">{{ shift.guardsAssigned }} guards</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Present</p><p class="font-medium mt-1">{{ shift.guardsPresent }} guards</p></div>
+    </div>
+  </div>
+</ng-template>

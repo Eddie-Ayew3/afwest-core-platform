@@ -1,6 +1,6 @@
-<div class="flex h-full bg-background">
+<div class="flex h-full bg-background overflow-hidden">
   <!-- Main Content Area -->
-  <div class="flex-1 p-6 overflow-auto">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
     <!-- Breadcrumb Navigation -->
     <tolle-breadcrumb class="mb-6">
       <tolle-breadcrumb-item>
@@ -172,18 +172,13 @@
     </div>
 
     <!-- Sites Table -->
-    <tolle-card class="w-full overflow-hidden flex-1 min-h-0">
-      <tolle-card-content class="p-0">
-
-        <!-- TABLE -->
-        <div class="min-h-0" *ngIf="displayedSites.length > 0">
-          <tolle-data-table 
-            [data]="displayedSites"
-            [columns]="columns"
-            [stickyHeader]="true"
-            [paginate]="false"
-            [searchable]="false"
-            [showSettings]="false">
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredSites"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
 
             <ng-template tolleCell="siteInfo" let-row="row">
               <div class="flex items-center gap-3">
@@ -254,14 +249,14 @@
             <ng-template tolleCell="actions" let-row="row">
               <div class="flex items-center justify-end gap-2">
                 <tolle-button variant="default" size="xs" (click)="viewSiteDetails(row)">View</tolle-button>
-                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View on map" placement="top" (click)="viewSiteOnMap(row)" *ngIf="row.coordinates">
+                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="View on map" tolleTooltipPosition="top" (click)="viewSiteOnMap(row)" *ngIf="row.coordinates">
                   <i class="ri-map-line"></i>
                 </tolle-button>
-                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit site" placement="top" (click)="editSite(row)">
+                <tolle-button variant="ghost" size="icon-sm" tolleTooltip="Edit site" tolleTooltipPosition="top" (click)="editSite(row)">
                   <i class="ri-edit-line"></i>
                 </tolle-button>
                 <div class="relative">
-                  <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" placement="top" [tolleDropdownTrigger]="actionMenu">
+                  <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="actionMenu">
                     <i class="ri-more-2-fill"></i>
                   </tolle-button>
                   <tolle-dropdown-menu #actionMenu>
@@ -275,7 +270,7 @@
                       <i class="ri-calendar-line"></i> Schedule Inspection
                     </button>
                     <div class="h-px bg-border my-1"></div>
-                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm">
+                    <button class="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm flex items-center gap-2 text-destructive rounded-sm" (click)="deleteSite(row)">
                       <i class="ri-delete-bin-line"></i> Delete Site
                     </button>
                   </tolle-dropdown-menu>
@@ -283,59 +278,14 @@
               </div>
             </ng-template>
 
-          </tolle-data-table>
-        </div>
-
-        <!-- EMPTY STATE -->
-        <div *ngIf="displayedSites.length === 0" class="p-12 flex flex-col items-center justify-center text-center">
-          <tolle-empty-state
-            title="No sites found"
-            description="Try adjusting your search or filter criteria"
-            variant="default">
-            <i icon class="ri-map-pin-line text-4xl"></i>
-            <div class="mt-4">
-              <tolle-button variant="outline" size="sm" (click)="clearFilters()">
-                Clear Filters
-              </tolle-button>
-            </div>
-          </tolle-empty-state>
-        </div>
-
-        <!-- Pagination -->
-        <div class="border-t border-border p-4 flex items-center justify-between" *ngIf="displayedSites.length > 0 || filteredSites.length > 0">
-          <div class="flex items-center gap-2">
-            <tolle-select 
-              placeholder="10 per page" 
-              size="sm" 
-              [(ngModel)]="pageSize"
-              (ngModelChange)="onPageSizeChange()">
-              <tolle-select-item value="5">5 per page</tolle-select-item>
-              <tolle-select-item value="10">10 per page</tolle-select-item>
-              <tolle-select-item value="25">25 per page</tolle-select-item>
-              <tolle-select-item value="50">50 per page</tolle-select-item>
-            </tolle-select>
-            <span class="text-sm text-muted-foreground">
-              Showing {{startIndex + 1}}-{{endIndex}} of {{filteredSites.length}}
-            </span>
-          </div>
-          
-          <tolle-pagination
-            [totalRecords]="filteredSites.length"
-            [currentPage]="currentPage"
-            [currentPageSize]="pageSize"
-            [showPageOptions]="false"
-            (pageChange)="onPageChange($event)">
-          </tolle-pagination>
-        </div>
-
-      </tolle-card-content>
-    </tolle-card>
+      </tolle-data-table>
+    </div>
   </div>
 </div>
 
 <!-- Map Sheet -->
-<tolle-sheet [(isOpen)]="showMapSheet" side="right">
-  <tolle-sheet-content>
+<tolle-sheet [(isOpen)]="showMapSheet">
+  <tolle-sheet-content side="right">
     <ng-container *ngIf="selectedSite && showMapSheet">
       <!-- Map functionality temporarily removed -->
     </ng-container>
@@ -345,61 +295,67 @@
 <!-- New site modal -->
 <ng-template #newSiteModal>
   <div class="space-y-4 p-4">
-    <div>
-      <tolle-input
-        label="Site Name"
-        placeholder="Enter site name"
-        type="text">
-      </tolle-input>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-1.5">
+        <tolle-label>Site Name</tolle-label>
+        <tolle-input placeholder="e.g. Ecobank Kumasi Main" type="text" [(ngModel)]="newSiteForm.name"></tolle-input>
+      </div>
+      <div class="space-y-1.5">
+        <tolle-label>Site Code</tolle-label>
+        <tolle-input placeholder="e.g. KUM-001" type="text" [(ngModel)]="newSiteForm.code"></tolle-input>
+      </div>
     </div>
-    <div>
-      <tolle-input
-        label="Site Code"
-        placeholder="e.g. SITE-001"
-        type="text">
-      </tolle-input>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-1.5">
+        <tolle-label>Site Type</tolle-label>
+        <tolle-select placeholder="Select type" [(ngModel)]="newSiteForm.type">
+          <tolle-select-item value="headquarters">Headquarters</tolle-select-item>
+          <tolle-select-item value="branch">Branch</tolle-select-item>
+          <tolle-select-item value="sub-branch">Sub-Branch</tolle-select-item>
+          <tolle-select-item value="atm">ATM</tolle-select-item>
+          <tolle-select-item value="agency">Agency</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="space-y-1.5">
+        <tolle-label>Region</tolle-label>
+        <tolle-select placeholder="Select region" [(ngModel)]="newSiteForm.region">
+          <tolle-select-item value="Greater Accra">Greater Accra</tolle-select-item>
+          <tolle-select-item value="Ashanti">Ashanti</tolle-select-item>
+          <tolle-select-item value="Western">Western</tolle-select-item>
+          <tolle-select-item value="Central">Central</tolle-select-item>
+          <tolle-select-item value="Eastern">Eastern</tolle-select-item>
+          <tolle-select-item value="Volta">Volta</tolle-select-item>
+          <tolle-select-item value="Northern">Northern</tolle-select-item>
+          <tolle-select-item value="Upper East">Upper East</tolle-select-item>
+          <tolle-select-item value="Upper West">Upper West</tolle-select-item>
+          <tolle-select-item value="Brong-Ahafo">Brong-Ahafo</tolle-select-item>
+        </tolle-select>
+      </div>
     </div>
-    <div>
-      <tolle-label for="siteType">Site Type</tolle-label>
-      <tolle-select id="siteType" placeholder="Select type">
-        <tolle-select-item value="Commercial">Commercial</tolle-select-item>
-        <tolle-select-item value="Residential">Residential</tolle-select-item>
-        <tolle-select-item value="Industrial">Industrial</tolle-select-item>
-        <tolle-select-item value="Government">Government</tolle-select-item>
-      </tolle-select>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-1.5">
+        <tolle-label>City / Town</tolle-label>
+        <tolle-input placeholder="e.g. Kumasi" type="text" [(ngModel)]="newSiteForm.city"></tolle-input>
+      </div>
+      <div class="space-y-1.5">
+        <tolle-label>Security Level</tolle-label>
+        <tolle-select placeholder="Select level" [(ngModel)]="newSiteForm.securityLevel">
+          <tolle-select-item value="low">Low</tolle-select-item>
+          <tolle-select-item value="medium">Medium</tolle-select-item>
+          <tolle-select-item value="high">High</tolle-select-item>
+          <tolle-select-item value="critical">Critical</tolle-select-item>
+        </tolle-select>
+      </div>
     </div>
-    <div>
-      <tolle-label for="region">Region</tolle-label>
-      <tolle-select id="region" placeholder="Select region">
-        <tolle-select-item value="Greater Accra">Greater Accra</tolle-select-item>
-        <tolle-select-item value="Ashanti">Ashanti</tolle-select-item>
-        <tolle-select-item value="Western">Western</tolle-select-item>
-        <tolle-select-item value="Central">Central</tolle-select-item>
-        <tolle-select-item value="Eastern">Eastern</tolle-select-item>
-      </tolle-select>
+    <div class="space-y-1.5">
+      <tolle-label>Address</tolle-label>
+      <textarea class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none" rows="2" placeholder="Enter full address" [(ngModel)]="newSiteForm.address"></textarea>
     </div>
-    <div>
-      <tolle-input
-        label="City / Town"
-        placeholder="Enter city or town"
-        type="text">
-      </tolle-input>
-    </div>
-    <div>
-      <tolle-textarea
-        label="Address"
-        placeholder="Enter full address"
-        [rows]="2">
-      </tolle-textarea>
-    </div>
-    <div>
-      <tolle-label for="securityLevel">Security Level</tolle-label>
-      <tolle-select id="securityLevel" placeholder="Select level">
-        <tolle-select-item value="Low">Low</tolle-select-item>
-        <tolle-select-item value="Medium">Medium</tolle-select-item>
-        <tolle-select-item value="High">High</tolle-select-item>
-        <tolle-select-item value="Critical">Critical</tolle-select-item>
-      </tolle-select>
+    <div class="flex justify-end gap-2 pt-2">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="submitNewSite()" [disabled]="!newSiteForm.name || !newSiteForm.code || !newSiteForm.type || !newSiteForm.region">
+        <i class="ri-map-pin-add-line mr-2"></i>Create Site
+      </tolle-button>
     </div>
   </div>
 </ng-template>

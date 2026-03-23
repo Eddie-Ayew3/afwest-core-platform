@@ -35,7 +35,7 @@ export const routes: Routes = [
             },
             {
                 path: 'shift/:id',
-                loadComponent: () => import('./features/shift-management/shift-management.component').then(m => m.ShiftManagementComponent)
+                loadComponent: () => import('./features/operations/shift-management/shift-management.component').then(m => m.ShiftManagementComponent)
             },
             {
                 path: 'guard/:id',
@@ -67,11 +67,23 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'payroll-management',
-                        loadComponent: () => import('./features/finance-management/pages/payroll-management/payroll-management.component').then(m => m.PayrollManagementComponent)
+                        loadComponent: () => import('./features/finance-management/payroll-management/payroll-management.component').then(m => m.PayrollManagementComponent)
                     },
                     {
                         path: 'payment-management',
-                        loadComponent: () => import('./features/finance-management/pages/payment-management/payment-management.component').then(m => m.PaymentManagementComponent)
+                        loadComponent: () => import('./features/finance-management/payment-management/payment-management.component').then(m => m.PaymentManagementComponent)
+                    },
+                    {
+                        path: 'invoice-management',
+                        loadComponent: () => import('./features/finance-management/pages/invoice-management/invoice-management.component').then(m => m.InvoiceManagementComponent)
+                    },
+                    {
+                        path: 'invoice-management/:id',
+                        loadComponent: () => import('./features/finance-management/pages/invoice-management/invoice-detail/invoice-detail.component').then(m => m.InvoiceDetailComponent)
+                    },
+                    {
+                        path: 'sla-report',
+                        loadComponent: () => import('./features/finance-management/sla-report/sla-report.component').then(m => m.SlaReportComponent)
                     }
                 ]
             },
@@ -105,6 +117,10 @@ export const routes: Routes = [
                         canActivate: [authGuard, loadingGuard]
                     },
                     {
+                        path: 'guard-performance',
+                        loadComponent: () => import('./features/client-management/pages/guard-management/guard-performance/guard-performance.component').then(m => m.GuardPerformanceComponent)
+                    },
+                    {
                         path: 'client-management',
                         loadComponent: () => import('./features/client-management/pages/client-management/all-clients/client-management.component').then(m => m.ClientManagementComponent)
                     },
@@ -133,12 +149,20 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'shift-management',
-                        loadComponent: () => import('./features/shift-management/shift-management.component').then(m => m.ShiftManagementComponent),
+                        loadComponent: () => import('./features/operations/shift-management/shift-management.component').then(m => m.ShiftManagementComponent),
                         canActivate: [notGuardRoleGuard]
                     },
                     {
                         path: 'check-in-out',
-                        loadComponent: () => import('./features/check-in-out/check-in-out.component').then(m => m.CheckInOutComponent)
+                        loadComponent: () => import('./features/operations/check-in-out/check-in-out.component').then(m => m.CheckInOutComponent)
+                    },
+                    {
+                        path: 'incidents',
+                        loadComponent: () => import('./features/operations/incidents/incidents-management.component').then(m => m.IncidentsManagementComponent)
+                    },
+                    {
+                        path: 'site-inspections',
+                        loadComponent: () => import('./features/operations/site-inspections/site-inspections.component').then(m => m.SiteInspectionsComponent)
                     }
                 ]
             },
@@ -148,15 +172,15 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'supplier-management',
-                        loadComponent: () => import('./features/supplier-management/pages/all-suppliers/supplier-management.component').then(m => m.SupplierManagementComponent)
+                        loadComponent: () => import('./features/procurement/supplier-management/pages/all-suppliers/supplier-management.component').then(m => m.SupplierManagementComponent)
                     },
                     {
                         path: 'logistics-management',
-                        loadComponent: () => import('./features/logistics-management/pages/all-logistics/logistics-management.component').then(m => m.LogisticsManagementComponent)
+                        loadComponent: () => import('./features/procurement/logistics-management/pages/all-logistics/logistics-management.component').then(m => m.LogisticsManagementComponent)
                     },
                     {
                         path: 'petty-cash-management',
-                        loadComponent: () => import('./features/petty-cash-management/pages/all-petty-cash/petty-cash-management.component').then(m => m.PettyCashManagementComponent)
+                        loadComponent: () => import('./features/procurement/petty-cash-management/pages/all-petty-cash/petty-cash-management.component').then(m => m.PettyCashManagementComponent)
                     }
                 ]
             },

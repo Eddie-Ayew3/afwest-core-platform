@@ -1,0 +1,281 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Procurement</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Supplier Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Supplier Management</h1>
+        <p class="text-muted-foreground mt-2">Manage supplier relationships and procurement contracts</p>
+      </div>
+      <tolle-button variant="default" (click)="openAddSheet()">
+        <i class="ri-add-line mr-2"></i>Add Supplier
+      </tolle-button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0"><i class="ri-truck-line text-green-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{activeCount}}</h3><p class="text-xs text-muted-foreground">Active Suppliers</p></div>
+        <span class="ml-auto text-xs text-green-600 font-medium">Active</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-blue-100 rounded-lg shrink-0"><i class="ri-file-text-line text-blue-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{contractCount}}</h3><p class="text-xs text-muted-foreground">Active Contracts</p></div>
+        <span class="ml-auto text-xs text-blue-600 font-medium">Contracts</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-orange-100 rounded-lg shrink-0"><i class="ri-time-line text-orange-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{pendingCount}}</h3><p class="text-xs text-muted-foreground">Pending Approval</p></div>
+        <span class="ml-auto text-xs text-orange-600 font-medium">Pending</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-purple-100 rounded-lg shrink-0"><i class="ri-star-line text-purple-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{premiumCount}}</h3><p class="text-xs text-muted-foreground">Premium Suppliers</p></div>
+        <span class="ml-auto text-xs text-purple-600 font-medium">Premium</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="flex justify-end items-center mb-3">
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Active">Active</tolle-select-item>
+          <tolle-select-item value="Inactive">Inactive</tolle-select-item>
+          <tolle-select-item value="Pending">Pending</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Category:</span>
+        <tolle-select [(ngModel)]="filterCategory" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item *ngFor="let cat of categories" [value]="cat">{{cat}}</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Tier:</span>
+        <tolle-select [(ngModel)]="filterTier" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Standard">Standard</tolle-select-item>
+          <tolle-select-item value="Premium">Premium</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>Clear
+      </tolle-button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredSuppliers"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="supplier" let-row="row">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
+              {{row.name.charAt(0)}}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="font-medium truncate">{{row.name}}</p>
+                <tolle-badge *ngIf="row.tier === 'Premium'" size="xs" variant="default">
+                  <i class="ri-star-line mr-0.5"></i>Premium
+                </tolle-badge>
+              </div>
+              <p class="text-xs font-mono text-muted-foreground">{{row.supplierCode}}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="category" let-row="row">
+          <span class="text-sm">{{row.category}}</span>
+        </ng-template>
+
+        <ng-template tolleCell="contact" let-row="row">
+          <p class="text-sm font-medium truncate">{{row.contactPerson}}</p>
+          <p class="text-xs text-muted-foreground">{{row.phone}}</p>
+        </ng-template>
+
+        <ng-template tolleCell="region" let-row="row">
+          <div class="flex items-center gap-1 min-w-0">
+            <i class="ri-map-pin-line text-muted-foreground text-xs shrink-0"></i>
+            <span class="text-sm truncate">{{row.region}}</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="rating" let-row="row">
+          <div *ngIf="row.rating > 0" class="flex items-center gap-1">
+            <span class="text-sm font-medium">{{row.rating}}</span>
+            <div class="flex">
+              <i *ngFor="let star of getRatingStars(row.rating)"
+                [class]="star === 'full' ? 'ri-star-fill text-yellow-400 text-xs' : 'ri-star-line text-muted-foreground text-xs'">
+              </i>
+            </div>
+          </div>
+          <span *ngIf="row.rating === 0" class="text-sm text-muted-foreground">Not rated</span>
+        </ng-template>
+
+        <ng-template tolleCell="contracts" let-row="row">
+          <span class="text-sm font-medium">{{row.activeContracts}}</span>
+          <span class="text-xs text-muted-foreground ml-1">active</span>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" [variant]="row.status === 'Active' ? 'default' : 'secondary'">
+              {{row.status}}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewSupplier(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="supplierMenu">
+                <i class="ri-more-2-fill"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #supplierMenu>
+                <div class="flex flex-col p-1">
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-edit-line"></i>Edit Supplier
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-file-text-line"></i>View Contracts
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors">
+                    <i class="ri-mail-line"></i>Send Email
+                  </button>
+                  <ng-container *ngIf="isApprover && row.status === 'Pending'">
+                    <div class="my-1 h-px bg-border"></div>
+                    <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-green-600 hover:bg-green-50 rounded-sm transition-colors" (click)="approveSupplier(row)">
+                      <i class="ri-checkbox-circle-line"></i>Approve Supplier
+                    </button>
+                    <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors" (click)="rejectSupplier(row)">
+                      <i class="ri-close-circle-line"></i>Reject Supplier
+                    </button>
+                  </ng-container>
+                  <div class="my-1 h-px bg-border"></div>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors">
+                    <i class="ri-delete-bin-line"></i>Remove
+                  </button>
+                </div>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Add Supplier Modal -->
+<ng-template #addSupplierModal>
+  <div class="space-y-5 p-4 max-h-[70vh] overflow-y-auto">
+    <div>
+      <tolle-label>Company Name</tolle-label>
+      <tolle-input placeholder="Enter company name" [(ngModel)]="newSupplier.name"></tolle-input>
+    </div>
+    <div>
+      <tolle-label>Contact Person</tolle-label>
+      <tolle-input placeholder="Enter contact name" [(ngModel)]="newSupplier.contactPerson"></tolle-input>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <tolle-label>Email</tolle-label>
+        <tolle-input placeholder="email@company.gh" [(ngModel)]="newSupplier.email"></tolle-input>
+      </div>
+      <div>
+        <tolle-label>Phone</tolle-label>
+        <tolle-input placeholder="0XX-XXX-XXXX" [(ngModel)]="newSupplier.phone"></tolle-input>
+      </div>
+    </div>
+    <div>
+      <tolle-label>Category</tolle-label>
+      <tolle-select [(ngModel)]="newSupplier.category">
+        <tolle-select-item value="Uniforms & Apparel">Uniforms &amp; Apparel</tolle-select-item>
+        <tolle-select-item value="Security Equipment">Security Equipment</tolle-select-item>
+        <tolle-select-item value="Fleet & Vehicles">Fleet &amp; Vehicles</tolle-select-item>
+        <tolle-select-item value="Communications">Communications</tolle-select-item>
+        <tolle-select-item value="Fuel & Energy">Fuel &amp; Energy</tolle-select-item>
+        <tolle-select-item value="Stationery & Office">Stationery &amp; Office</tolle-select-item>
+        <tolle-select-item value="IT & Technology">IT &amp; Technology</tolle-select-item>
+        <tolle-select-item value="First Aid & Medical">First Aid &amp; Medical</tolle-select-item>
+        <tolle-select-item value="Print & Branding">Print &amp; Branding</tolle-select-item>
+      </tolle-select>
+    </div>
+    <div>
+      <tolle-label>Region</tolle-label>
+      <tolle-select [(ngModel)]="newSupplier.region">
+        <tolle-select-item value="Greater Accra">Greater Accra</tolle-select-item>
+        <tolle-select-item value="Ashanti">Ashanti</tolle-select-item>
+        <tolle-select-item value="Western">Western</tolle-select-item>
+        <tolle-select-item value="Central">Central</tolle-select-item>
+        <tolle-select-item value="Eastern">Eastern</tolle-select-item>
+        <tolle-select-item value="Volta">Volta</tolle-select-item>
+        <tolle-select-item value="Northern">Northern</tolle-select-item>
+      </tolle-select>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <tolle-button class="flex-1" variant="default" (click)="submitSupplier()" [busy]="adding">Add Supplier</tolle-button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Supplier profile modal -->
+<ng-template #supplierModal let-supplier="supplier">
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">{{ supplier.name.charAt(0) }}</div>
+      <div>
+        <h4 class="font-semibold">{{ supplier.name }}</h4>
+        <p class="text-sm text-muted-foreground">{{ supplier.supplierCode }} · {{ supplier.category }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Contact Person</p><p class="font-medium mt-1">{{ supplier.contactPerson }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Region</p><p class="font-medium mt-1">{{ supplier.region }}</p></div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Email</p><p class="font-medium mt-1">{{ supplier.email }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Phone</p><p class="font-medium mt-1">{{ supplier.phone }}</p></div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Status</p><p class="font-medium mt-1">{{ supplier.status }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Contracts</p><p class="font-medium mt-1">{{ supplier.activeContracts }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Rating</p><p class="font-medium mt-1">{{ supplier.rating > 0 ? supplier.rating + ' / 5' : 'N/A' }}</p></div>
+    </div>
+  </div>
+</ng-template>

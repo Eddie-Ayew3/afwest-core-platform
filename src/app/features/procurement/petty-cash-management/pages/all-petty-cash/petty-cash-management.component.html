@@ -1,0 +1,358 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Home</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link>Procurement</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator>
+        <i class="ri-arrow-right-double-line text-muted-foreground/50"></i>
+      </tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item>
+        <tolle-breadcrumb-link [active]="true">Petty Cash</tolle-breadcrumb-link>
+      </tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Petty Cash Management</h1>
+        <p class="text-muted-foreground mt-2">Track and manage petty cash expenses and reimbursements</p>
+      </div>
+      <tolle-button variant="default" (click)="openExpenseSheet()">
+        <i class="ri-add-line mr-2"></i>
+        New Expense
+      </tolle-button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0">
+          <i class="ri-money-cny-circle-line text-green-600 text-base"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{formatGhs(currentBalance)}}</h3>
+          <p class="text-xs text-muted-foreground">Current Balance</p>
+        </div>
+        <span class="ml-auto text-xs text-green-600 font-medium">Balance</span>
+      </div>
+
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-red-100 rounded-lg shrink-0">
+          <i class="ri-arrow-up-line text-red-600 text-base"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{formatGhs(monthlyExpenses)}}</h3>
+          <p class="text-xs text-muted-foreground">This Period</p>
+        </div>
+        <span class="ml-auto text-xs text-red-600 font-medium">Expenses</span>
+      </div>
+
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-blue-100 rounded-lg shrink-0">
+          <i class="ri-arrow-down-line text-blue-600 text-base"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{formatGhs(monthlyReplenishment)}}</h3>
+          <p class="text-xs text-muted-foreground">This Period</p>
+        </div>
+        <span class="ml-auto text-xs text-blue-600 font-medium">Replenished</span>
+      </div>
+
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-orange-100 rounded-lg shrink-0">
+          <i class="ri-file-list-line text-orange-600 text-base"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold leading-tight">{{pendingCount}}</h3>
+          <p class="text-xs text-muted-foreground">Awaiting Approval</p>
+        </div>
+        <span class="ml-auto text-xs text-orange-600 font-medium">Pending</span>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="flex justify-end items-center mb-3">
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Approved">Approved</tolle-select-item>
+          <tolle-select-item value="Pending">Pending</tolle-select-item>
+          <tolle-select-item value="Rejected">Rejected</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Type:</span>
+        <tolle-select [(ngModel)]="filterType" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Expense">Expense</tolle-select-item>
+          <tolle-select-item value="Replenishment">Replenishment</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Category:</span>
+        <tolle-select [(ngModel)]="filterCategory" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item *ngFor="let cat of categories" [value]="cat">{{cat}}</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>
+        Clear
+      </tolle-button>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredTransactions"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+            <ng-template tolleCell="reference" let-row="row">
+              <div>
+                <span class="text-sm font-mono bg-muted/60 px-2 py-0.5 rounded">{{row.reference}}</span>
+                <p class="text-xs text-muted-foreground mt-1">{{row.date}}</p>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="description" let-row="row">
+              <div class="flex items-center gap-2">
+                <tolle-badge size="xs" [variant]="row.type === 'Expense' ? 'destructive' : 'default'">
+                  {{row.type}}
+                </tolle-badge>
+              </div>
+              <p class="text-sm font-medium mt-1 max-w-[200px] truncate">{{row.description}}</p>
+            </ng-template>
+
+            <ng-template tolleCell="category" let-row="row">
+              <tolle-badge size="sm" variant="secondary">
+                {{row.category}}
+              </tolle-badge>
+            </ng-template>
+
+            <ng-template tolleCell="site" let-row="row">
+              <div class="flex items-center gap-1">
+                <i class="ri-map-pin-line text-muted-foreground text-xs"></i>
+                <span class="text-sm">{{row.site}}</span>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="submittedBy" let-row="row">
+              <div class="flex items-center gap-2">
+                <div class="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">
+                  {{row.submittedBy.charAt(0)}}
+                </div>
+                <span class="text-sm">{{row.submittedBy}}</span>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="amount" let-row="row">
+              <span class="text-sm font-semibold"
+                [class.text-red-600]="row.type === 'Expense'"
+                [class.text-green-600]="row.type === 'Replenishment'">
+                {{row.type === 'Expense' ? '–' : '+'}}{{formatGhs(row.amount)}}
+              </span>
+            </ng-template>
+
+            <ng-template tolleCell="receipt" let-row="row">
+              <span *ngIf="row.receipted" class="flex items-center gap-1 text-sm text-green-600">
+                <i class="ri-checkbox-circle-line"></i> Yes
+              </span>
+              <span *ngIf="!row.receipted" class="flex items-center gap-1 text-sm text-muted-foreground">
+                <i class="ri-close-circle-line"></i> No
+              </span>
+            </ng-template>
+
+            <ng-template tolleCell="status" let-row="row">
+              <div class="flex items-center justify-center">
+                <tolle-badge size="sm" variant="outline">
+                  {{row.status}}
+                </tolle-badge>
+              </div>
+            </ng-template>
+
+            <ng-template tolleCell="actions" let-row="row">
+              <div class="flex items-center justify-end gap-2">
+                <tolle-button variant="default" size="xs" (click)="viewTransaction(row)">View</tolle-button>
+                <div class="relative">
+                  <tolle-button variant="ghost" size="icon-sm"
+                    tolleTooltip="More actions" tolleTooltipPosition="top"
+                    [tolleDropdownTrigger]="actionMenu">
+                    <i class="ri-more-2-fill"></i>
+                  </tolle-button>
+                  <tolle-dropdown-menu #actionMenu>
+                    <div class="flex flex-col p-1">
+                      <button *ngIf="isApprover && row.status === 'Pending'"
+                        class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-green-600 hover:bg-green-50 rounded-sm transition-colors"
+                        (click)="approveTransaction(row)">
+                        <i class="ri-checkbox-circle-line"></i>
+                        Approve
+                      </button>
+                      <button *ngIf="isApprover && row.status === 'Pending'"
+                        class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors"
+                        (click)="rejectTransaction(row)">
+                        <i class="ri-close-circle-line"></i>
+                        Reject
+                      </button>
+                      <div class="my-1 h-px bg-border"></div>
+                      <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors">
+                        <i class="ri-delete-bin-line"></i>
+                        Delete
+                      </button>
+                    </div>
+                  </tolle-dropdown-menu>
+                </div>
+              </div>
+            </ng-template>
+
+          </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- New Expense Modal -->
+<ng-template #newExpenseModal>
+  <div class="space-y-5 p-4 max-h-[70vh] overflow-y-auto">
+    <div>
+      <tolle-label>Description</tolle-label>
+      <tolle-input placeholder="What was purchased?" [(ngModel)]="newExpense.description"></tolle-input>
+    </div>
+    <div>
+      <tolle-label>Category</tolle-label>
+      <tolle-select [(ngModel)]="newExpense.category">
+        <tolle-select-item value="Transport">Transport</tolle-select-item>
+        <tolle-select-item value="Stationery">Stationery</tolle-select-item>
+        <tolle-select-item value="Allowances">Allowances</tolle-select-item>
+        <tolle-select-item value="Medical">Medical</tolle-select-item>
+        <tolle-select-item value="Maintenance">Maintenance</tolle-select-item>
+        <tolle-select-item value="Equipment">Equipment</tolle-select-item>
+        <tolle-select-item value="Postage">Postage</tolle-select-item>
+        <tolle-select-item value="Miscellaneous">Miscellaneous</tolle-select-item>
+      </tolle-select>
+    </div>
+    <div>
+      <tolle-label>Amount (GHS ₵)</tolle-label>
+      <tolle-input type="number" placeholder="0.00" [(ngModel)]="newExpense.amount">
+        <span prefix class="text-muted-foreground font-medium">₵</span>
+      </tolle-input>
+      <div *ngIf="newExpense.category && getCategoryLimit() !== null" class="mt-1.5 flex items-center justify-between text-xs">
+        <span class="text-muted-foreground">
+          Limit for {{newExpense.category}}: <span class="font-medium">₵{{getCategoryLimit()}}</span>
+        </span>
+        <span *ngIf="categoryLimitExceeded" class="text-destructive font-medium flex items-center gap-1">
+          <i class="ri-error-warning-line"></i> Exceeds limit
+        </span>
+      </div>
+    </div>
+    <div>
+      <tolle-label>Site</tolle-label>
+      <tolle-select [(ngModel)]="newExpense.site">
+        <tolle-select-item value="Head Office – Accra">Head Office – Accra</tolle-select-item>
+        <tolle-select-item value="Kumasi Branch">Kumasi Branch</tolle-select-item>
+        <tolle-select-item value="Takoradi Branch">Takoradi Branch</tolle-select-item>
+        <tolle-select-item value="Tema Industrial">Tema Industrial</tolle-select-item>
+        <tolle-select-item value="Cape Coast Post">Cape Coast Post</tolle-select-item>
+      </tolle-select>
+    </div>
+    <div>
+      <tolle-label>Notes (optional)</tolle-label>
+      <tolle-textarea placeholder="Additional comments..." [(ngModel)]="newExpense.notes" [rows]="3"></tolle-textarea>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <tolle-button class="flex-1" variant="default" (click)="submitExpense()" [busy]="submitting" [disabled]="categoryLimitExceeded">
+        Submit Claim
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Transaction detail modal -->
+<ng-template #transactionModal let-t="t">
+  <div class="space-y-4">
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Reference</p>
+        <p class="font-medium font-mono mt-1">{{ t.reference }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Date</p>
+        <p class="font-medium mt-1">{{ t.date }}</p>
+      </div>
+    </div>
+    <div class="p-3 bg-muted/50 rounded-lg">
+      <p class="text-xs text-muted-foreground uppercase font-semibold">Description</p>
+      <p class="font-medium mt-1">{{ t.description }}</p>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Amount</p>
+        <p class="font-semibold mt-1 text-lg"
+           [class.text-red-600]="t.type === 'Expense'"
+           [class.text-green-600]="t.type === 'Replenishment'">
+          {{ t.type === 'Expense' ? '–' : '+' }}₵{{ t.amount | number }}
+        </p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Type</p>
+        <p class="font-medium mt-1">{{ t.type }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Category</p>
+        <p class="font-medium mt-1">{{ t.category }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Submitted By</p>
+        <p class="font-medium mt-1">{{ t.submittedBy }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Approved By</p>
+        <p class="font-medium mt-1">{{ t.approvedBy ?? '—' }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-3 bg-muted/50 rounded-lg">
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Status</p>
+        <p class="font-medium mt-1">{{ t.status }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Receipt</p>
+        <p class="font-medium mt-1">{{ t.receipted ? 'Attached' : 'Not attached' }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Site</p>
+        <p class="font-medium mt-1">{{ t.site }}</p>
+      </div>
+    </div>
+  </div>
+</ng-template>
+

@@ -1,156 +1,150 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { DataTableComponent, TableColumn, TolleCellDirective, BadgeComponent } from '@tolle_/tolle-ui';
+import {
+  ButtonComponent, BadgeComponent,
+  DataTableComponent, TolleCellDirective, TableColumn
+} from '@tolle_/tolle-ui';
+import { PermissionsService } from '../../../core/services/permissions.service';
+
+interface SiteCoverage {
+  site: string;
+  region: string;
+  guardsPresent: number;
+  guardsAssigned: number;
+  activeShift: string;
+  shiftStatus: 'Active' | 'Upcoming' | 'No Shift';
+  openIncidents: number;
+}
+
+interface AlertItem {
+  id: string;
+  message: string;
+  site: string;
+  severity: 'High' | 'Medium' | 'Low';
+  time: string;
+}
+
+interface RecentIncident {
+  id: string;
+  type: string;
+  site: string;
+  severity: 'High' | 'Medium' | 'Low';
+  time: string;
+  status: 'Open' | 'Investigating' | 'Resolved';
+}
 
 @Component({
   selector: 'app-main-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
+    ButtonComponent,
     BadgeComponent,
+    DataTableComponent,
+    TolleCellDirective,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashBoardComponent implements OnInit {
+export class DashBoardComponent {
   private router = inject(Router);
+  permissions = inject(PermissionsService);
 
-  // Dashboard statistics
-  totalUsers = 2543;
-  activeProjects = 12;
-  completedTasks = 892;
-  pendingReviews = 127;
+  guardsOnDuty = 42;
+  activeShifts = 8;
+  absentToday = 5;
+  openIncidents = 3;
 
-  // Projects data for table
-  projects = [
-    {
-      name: 'Design System',
-      status: 'Active',
-      progress: 75,
-      team: [
-        { initials: 'JD', color: 'bg-blue-500' },
-        { initials: 'SC', color: 'bg-green-500' },
-        { initials: 'MR', color: 'bg-purple-500' }
-      ],
-      dueDate: 'Dec 15, 2023'
-    },
-    {
-      name: 'Mobile App',
-      status: 'In Review',
-      progress: 45,
-      team: [
-        { initials: 'AK', color: 'bg-red-500' },
-        { initials: 'PL', color: 'bg-indigo-500' }
-      ],
-      dueDate: 'Jan 5, 2024'
-    },
-    {
-      name: 'Marketing Website',
-      status: 'Planning',
-      progress: 20,
-      team: [
-        { initials: 'LN', color: 'bg-teal-500' },
-        { initials: 'KW', color: 'bg-pink-500' },
-        { initials: 'RJ', color: 'bg-cyan-500' }
-      ],
-      dueDate: 'Feb 28, 2024'
-    }
+  siteCoverageColumns: TableColumn[] = [
+    { key: 'site',          label: 'Site' },
+    { key: 'region',        label: 'Region' },
+    { key: 'coverage',      label: 'Coverage' },
+    { key: 'shiftStatus',   label: 'Shift Status' },
+    { key: 'openIncidents', label: 'Incidents' },
   ];
 
-  columns: TableColumn[] = [
-    { key: 'name', label: 'Project Name' },
-    { key: 'status', label: 'Status' },
-    { key: 'progress', label: 'Progress' },
-    { key: 'team', label: 'Team' },
-    { key: 'dueDate', label: 'Due Date' }
-  ];
-  recentActivity = [
-    {
-      id: 1,
-      user: 'Sarah Chen',
-      action: 'joined team',
-      description: 'Added as Senior Developer',
-      time: '2 minutes ago',
-      icon: 'ri-user-add-line',
-      color: 'text-blue-600'
-    },
-    {
-      id: 2,
-      user: 'Mike Ross',
-      action: 'uploaded file',
-      description: 'Q4 Report uploaded',
-      time: '1 hour ago',
-      icon: 'ri-file-copy-line',
-      color: 'text-green-600'
-    },
-    {
-      id: 3,
-      user: 'Project Alpha',
-      action: 'completed',
-      description: 'Mobile app development finished',
-      time: '3 hours ago',
-      icon: 'ri-check-line',
-      color: 'text-purple-600'
-    },
-    {
-      id: 4,
-      user: 'Mike Ross',
-      action: 'comment',
-      description: 'New comment on Q4 report',
-      time: '5 hours ago',
-      icon: 'ri-chat-1-line',
-      color: 'text-orange-600'
-    }
+  siteCoverage: SiteCoverage[] = [
+    { site: 'Head Office – Accra', region: 'Greater Accra', guardsPresent: 12, guardsAssigned: 14, activeShift: 'SH-001', shiftStatus: 'Active',   openIncidents: 1 },
+    { site: 'Kumasi Branch',       region: 'Ashanti',       guardsPresent: 8,  guardsAssigned: 8,  activeShift: 'SH-002', shiftStatus: 'Active',   openIncidents: 0 },
+    { site: 'Takoradi Branch',     region: 'Western',       guardsPresent: 7,  guardsAssigned: 9,  activeShift: 'SH-003', shiftStatus: 'Active',   openIncidents: 2 },
+    { site: 'Tema Industrial',     region: 'Greater Accra', guardsPresent: 10, guardsAssigned: 10, activeShift: 'SH-004', shiftStatus: 'Active',   openIncidents: 0 },
+    { site: 'Cape Coast Post',     region: 'Central',       guardsPresent: 5,  guardsAssigned: 6,  activeShift: 'SH-005', shiftStatus: 'Upcoming', openIncidents: 0 },
   ];
 
-  ngOnInit(): void {
-    console.log('Dashboard component initialized');
+  alerts: AlertItem[] = [
+    { id: 'ALT-001', message: 'Guard Kwame Asante has not checked in for 2+ hours',      site: 'Takoradi Branch',     severity: 'High',   time: '08:42 AM' },
+    { id: 'ALT-002', message: 'Incident report submitted — unauthorized access at gate', site: 'Takoradi Branch',     severity: 'High',   time: '09:15 AM' },
+    { id: 'ALT-003', message: 'Patrol route deviation detected on Zone B',               site: 'Head Office – Accra', severity: 'Medium', time: '10:03 AM' },
+  ];
+
+  recentIncidents: RecentIncident[] = [
+    { id: 'INC-2025-011', type: 'Unauthorized Access', site: 'Takoradi Branch',     severity: 'High',   time: '09:15 AM',   status: 'Open' },
+    { id: 'INC-2025-010', type: 'Guard Misconduct',    site: 'Head Office – Accra', severity: 'Medium', time: 'Yesterday',  status: 'Investigating' },
+    { id: 'INC-2025-009', type: 'Equipment Missing',   site: 'Takoradi Branch',     severity: 'Medium', time: 'Yesterday',  status: 'Open' },
+    { id: 'INC-2025-008', type: 'Suspicious Activity', site: 'Kumasi Branch',       severity: 'Low',    time: '2 days ago', status: 'Resolved' },
+    { id: 'INC-2025-007', type: 'Medical Emergency',   site: 'Tema Industrial',     severity: 'High',   time: '2 days ago', status: 'Resolved' },
+  ];
+
+  getCoveragePct(row: SiteCoverage): number {
+    return Math.round((row.guardsPresent / row.guardsAssigned) * 100);
   }
 
-  viewAllProjects(): void {
-    console.log('View all projects');
-    // Navigate to projects page
-  }
-
-  createNewProject(): void {
-    console.log('Create new project');
-    // Open project creation dialog
-  }
-
-  viewAllActivity(): void {
-    console.log('View all activity');
-    // Navigate to activity page
-  }
-
-  generateReport(): void {
-    console.log('Generate report');
-    // Generate dashboard report
-  }
-
-  getStatusColor(status: string): string {
-    const colorMap: { [key: string]: string } = {
-      'active': 'default',
-      'in-review': 'secondary',
-      'completed': 'default',
-      'pending': 'outline'
+  getShiftStatusBg(status: string): string {
+    const map: Record<string, string> = {
+      'Active':   'rgba(34, 197, 94, 0.15)',
+      'Upcoming': 'rgba(234, 179, 8, 0.15)',
+      'No Shift': 'rgba(239, 68, 68, 0.15)',
     };
-    return colorMap[status] || 'default';
+    return map[status] ?? 'rgba(148, 163, 184, 0.15)';
   }
 
-  getPriorityColor(priority: string): string {
-    const colorMap: { [key: string]: string } = {
-      'high': 'destructive',
-      'medium': 'secondary',
-      'low': 'outline'
+  getShiftStatusFg(status: string): string {
+    const map: Record<string, string> = {
+      'Active':   '#16a34a',
+      'Upcoming': '#ca8a04',
+      'No Shift': '#dc2626',
     };
-    return colorMap[priority] || 'default';
+    return map[status] ?? '#64748b';
   }
 
-  getProgressColor(progress: number): string {
-    if (progress >= 75) return 'default';
-    if (progress >= 50) return 'secondary';
-    return 'outline';
+  getSeverityBg(severity: string): string {
+    const map: Record<string, string> = {
+      'High':   'rgba(239, 68, 68, 0.15)',
+      'Medium': 'rgba(234, 179, 8, 0.15)',
+      'Low':    'rgba(34, 197, 94, 0.15)',
+    };
+    return map[severity] ?? 'rgba(148, 163, 184, 0.15)';
+  }
+
+  getSeverityFg(severity: string): string {
+    const map: Record<string, string> = {
+      'High':   '#dc2626',
+      'Medium': '#ca8a04',
+      'Low':    '#16a34a',
+    };
+    return map[severity] ?? '#64748b';
+  }
+
+  getIncidentStatusBg(status: string): string {
+    const map: Record<string, string> = {
+      'Open':          'rgba(239, 68, 68, 0.15)',
+      'Investigating': 'rgba(234, 179, 8, 0.15)',
+      'Resolved':      'rgba(34, 197, 94, 0.15)',
+    };
+    return map[status] ?? 'rgba(148, 163, 184, 0.15)';
+  }
+
+  getIncidentStatusFg(status: string): string {
+    const map: Record<string, string> = {
+      'Open':          '#dc2626',
+      'Investigating': '#ca8a04',
+      'Resolved':      '#16a34a',
+    };
+    return map[status] ?? '#64748b';
+  }
+
+  navigateTo(path: string): void {
+    this.router.navigate([path]);
   }
 }

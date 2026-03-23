@@ -1,0 +1,267 @@
+<div class="flex h-full bg-background">
+  <div class="flex-1 p-6 overflow-auto">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-6">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Finance</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link (click)="goBack()" class="cursor-pointer hover:underline">Client Invoices</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">{{ invoice?.id ?? 'Detail' }}</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    @if (!invoice) {
+      <div class="flex flex-col items-center justify-center h-64 text-muted-foreground">
+        <i class="ri-file-search-line text-4xl mb-2"></i>
+        <p class="font-medium">Invoice not found</p>
+        <tolle-button variant="outline" size="sm" class="mt-4" (click)="goBack()">Back to Invoices</tolle-button>
+      </div>
+    }
+
+    @if (invoice) {
+      <!-- Header -->
+      <div class="flex justify-between items-start mb-6">
+        <div class="flex items-center gap-4">
+          <tolle-button variant="ghost" size="sm" (click)="goBack()">
+            <i class="ri-arrow-left-line mr-1"></i>Back
+          </tolle-button>
+          <div>
+            <div class="flex items-center gap-3">
+              <h1 class="text-2xl font-bold font-mono">{{ invoice.id }}</h1>
+              <tolle-badge size="sm" variant="outline"
+                [style.background]="getStatusBg(invoice.status)"
+                [style.color]="getStatusFg(invoice.status)">
+                {{ invoice.status | titlecase }}
+              </tolle-badge>
+            </div>
+            <p class="text-muted-foreground mt-1">{{ invoice.servicePeriod }} · {{ invoice.clientName }}</p>
+          </div>
+        </div>
+        <!-- Action Bar -->
+        <div class="flex gap-2">
+          @if (invoice.status === 'draft') {
+            <tolle-button variant="outline" (click)="markAsSent()">
+              <i class="ri-send-plane-line mr-2"></i>Mark as Sent
+            </tolle-button>
+          }
+          @if (invoice.status === 'sent' || invoice.status === 'overdue') {
+            <tolle-button variant="default" (click)="openRecordPayment()">
+              <i class="ri-money-dollar-circle-line mr-2"></i>Record Payment
+            </tolle-button>
+          }
+          <tolle-button variant="outline">
+            <i class="ri-printer-line mr-2"></i>Print
+          </tolle-button>
+          @if (invoice.status !== 'cancelled' && invoice.status !== 'paid') {
+            <tolle-button variant="destructive" (click)="cancelInvoice()">
+              <i class="ri-close-circle-line mr-2"></i>Cancel Invoice
+            </tolle-button>
+          }
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+
+        <!-- Left column: Invoice + Line Items -->
+        <div class="col-span-2 space-y-6">
+
+          <!-- Client & Invoice Info -->
+          <div class="bg-white border border-border rounded-xl p-6">
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <p class="text-xs text-muted-foreground uppercase font-semibold mb-3">Bill To</p>
+                <p class="font-semibold text-lg">{{ invoice.clientName }}</p>
+                <p class="text-sm text-muted-foreground font-mono">{{ invoice.clientId }}</p>
+                @if (invoice.clientContact) {
+                  <p class="text-sm text-muted-foreground mt-1">{{ invoice.clientContact }}</p>
+                }
+              </div>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="text-xs text-muted-foreground uppercase font-semibold">Issue Date</p>
+                  <p class="font-medium mt-1">{{ invoice.issueDate }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground uppercase font-semibold">Due Date</p>
+                  <p class="font-medium mt-1" [class.text-destructive]="invoice.status === 'overdue'">{{ invoice.dueDate }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground uppercase font-semibold">Service Period</p>
+                  <p class="font-medium mt-1">{{ invoice.servicePeriod }}</p>
+                </div>
+                @if (invoice.sentDate) {
+                  <div>
+                    <p class="text-xs text-muted-foreground uppercase font-semibold">Sent Date</p>
+                    <p class="font-medium mt-1">{{ invoice.sentDate }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <div class="bg-white border border-border rounded-xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-border">
+              <h3 class="font-semibold">Line Items</h3>
+            </div>
+            <table class="w-full text-sm">
+              <thead class="bg-muted/30 text-muted-foreground">
+                <tr>
+                  <th class="text-left px-6 py-3 font-medium">Description</th>
+                  <th class="text-right px-4 py-3 font-medium w-20">Qty</th>
+                  <th class="text-right px-4 py-3 font-medium w-28">Unit Price</th>
+                  <th class="text-right px-6 py-3 font-medium w-28">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of invoice.lineItems; track item.id) {
+                  <tr class="border-t border-border/50">
+                    <td class="px-6 py-3">{{ item.description }}</td>
+                    <td class="px-4 py-3 text-right text-muted-foreground">{{ item.quantity }}</td>
+                    <td class="px-4 py-3 text-right text-muted-foreground">₵{{ item.unitPrice.toLocaleString() }}</td>
+                    <td class="px-6 py-3 text-right font-medium">₵{{ item.total.toLocaleString() }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot class="border-t-2 border-border bg-muted/20">
+                <tr>
+                  <td colspan="3" class="px-6 py-2 text-right text-muted-foreground text-xs uppercase font-semibold">Subtotal</td>
+                  <td class="px-6 py-2 text-right font-medium">₵{{ invoice.subtotal.toLocaleString() }}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="px-6 py-2 text-right text-muted-foreground text-xs uppercase font-semibold">VAT ({{ (invoice.taxRate * 100).toFixed(0) }}%)</td>
+                  <td class="px-6 py-2 text-right font-medium">₵{{ invoice.taxAmount.toLocaleString() }}</td>
+                </tr>
+                <tr class="border-t border-border">
+                  <td colspan="3" class="px-6 py-3 text-right font-bold">Total</td>
+                  <td class="px-6 py-3 text-right font-bold text-lg">₵{{ invoice.totalAmount.toLocaleString() }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          @if (invoice.notes) {
+            <div class="bg-white border border-border rounded-xl p-6">
+              <p class="text-xs text-muted-foreground uppercase font-semibold mb-2">Notes</p>
+              <p class="text-sm">{{ invoice.notes }}</p>
+            </div>
+          }
+
+        </div>
+
+        <!-- Right column: Payment Summary + History -->
+        <div class="space-y-6">
+
+          <!-- Payment Summary Card -->
+          <div class="bg-white border border-border rounded-xl p-6 space-y-4">
+            <h3 class="font-semibold">Payment Summary</h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-muted-foreground">Invoice Total</span>
+                <span class="font-medium">₵{{ invoice.totalAmount.toLocaleString() }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-muted-foreground">Amount Paid</span>
+                <span class="font-medium text-green-600">₵{{ invoice.amountPaid.toLocaleString() }}</span>
+              </div>
+              <div class="h-px bg-border"></div>
+              <div class="flex justify-between font-bold">
+                <span>Outstanding</span>
+                <span [class.text-destructive]="getBalance() > 0" [class.text-green-600]="getBalance() === 0">
+                  ₵{{ getBalance().toLocaleString() }}
+                </span>
+              </div>
+              @if (invoice.totalAmount > 0) {
+                <div class="w-full bg-muted rounded-full h-2 mt-2">
+                  <div class="h-2 rounded-full bg-green-500 transition-all"
+                    [style.width.%]="(invoice.amountPaid / invoice.totalAmount) * 100">
+                  </div>
+                </div>
+                <p class="text-xs text-muted-foreground text-center">
+                  {{ ((invoice.amountPaid / invoice.totalAmount) * 100).toFixed(0) }}% collected
+                </p>
+              }
+            </div>
+            @if (invoice.status === 'sent' || invoice.status === 'overdue') {
+              <tolle-button variant="default" class="w-full" (click)="openRecordPayment()">
+                <i class="ri-money-dollar-circle-line mr-2"></i>Record Payment
+              </tolle-button>
+            }
+          </div>
+
+          <!-- Payment History -->
+          <div class="bg-white border border-border rounded-xl p-6">
+            <h3 class="font-semibold mb-4">Payment History</h3>
+            @if (invoicePayments.length === 0) {
+              <p class="text-sm text-muted-foreground text-center py-4">No payments recorded yet.</p>
+            }
+            <div class="space-y-3">
+              @for (pay of invoicePayments; track pay.id) {
+                <div class="flex items-start gap-3 pb-3 border-b border-border/50 last:border-0 last:pb-0">
+                  <div class="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                    <i class="ri-checkbox-circle-line text-green-600 text-sm"></i>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex justify-between">
+                      <span class="text-sm font-medium">₵{{ pay.amount.toLocaleString() }}</span>
+                      <span class="text-xs text-muted-foreground">{{ pay.paymentDate }}</span>
+                    </div>
+                    <p class="text-xs text-muted-foreground capitalize">{{ pay.method.replace('_', ' ') }}</p>
+                    @if (pay.bankRef) {
+                      <p class="text-xs font-mono text-muted-foreground">{{ pay.bankRef }}</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Record Payment Modal -->
+<ng-template #recordPaymentModal>
+  <div class="space-y-4 p-1" *ngIf="invoice">
+    <div class="p-3 bg-muted/40 border border-border rounded-lg text-sm">
+      <div class="flex justify-between mb-1">
+        <span class="text-muted-foreground">Outstanding Balance</span>
+        <span class="font-bold text-destructive">₵{{ getBalance().toLocaleString() }}</span>
+      </div>
+    </div>
+    <div class="space-y-1.5">
+      <tolle-label>Amount (₵) <span class="text-destructive">*</span></tolle-label>
+      <tolle-input type="number" [(ngModel)]="paymentForm.amount" class="w-full"></tolle-input>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="space-y-1.5">
+        <tolle-label>Payment Method <span class="text-destructive">*</span></tolle-label>
+        <tolle-select [(ngModel)]="paymentForm.method" class="w-full">
+          <tolle-select-item value="bank_transfer">Bank Transfer</tolle-select-item>
+          <tolle-select-item value="mobile_money">Mobile Money</tolle-select-item>
+          <tolle-select-item value="cash">Cash</tolle-select-item>
+          <tolle-select-item value="cheque">Cheque</tolle-select-item>
+        </tolle-select>
+      </div>
+      <div class="space-y-1.5">
+        <tolle-label>Payment Date <span class="text-destructive">*</span></tolle-label>
+        <tolle-input type="date" [(ngModel)]="paymentForm.paymentDate" class="w-full"></tolle-input>
+      </div>
+    </div>
+    <div class="space-y-1.5">
+      <tolle-label>Bank / Reference No.</tolle-label>
+      <tolle-input type="text" placeholder="e.g. GCB-TXN-20250328" [(ngModel)]="paymentForm.bankRef" class="w-full"></tolle-input>
+    </div>
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="submitPayment()" [disabled]="!paymentForm.amount || !paymentForm.paymentDate">
+        <i class="ri-checkbox-circle-line mr-1"></i>Record Payment
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>

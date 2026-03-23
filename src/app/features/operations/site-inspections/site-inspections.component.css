@@ -1,0 +1,14 @@
+/* Site Inspections Component Styles */
+
+/* Stat card text colors */
+.stat-pass {
+  color: #16a34a;
+}
+
+.stat-fail {
+  color: #dc2626;
+}
+
+.stat-pending {
+  color: #ca8a04;
+}

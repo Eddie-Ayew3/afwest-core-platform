@@ -10,3 +10,30 @@
 .progress-20 {
   width: 20%;
 }
+
+/* Pending request icon styles */
+.pending-request-icon {
+  background: rgba(234,179,8,0.1);
+}
+
+.pending-request-icon i {
+  color: #ca8a04;
+}
+
+/* SLA compliance icon styles */
+.sla-compliance-icon {
+  background: rgba(34,197,94,0.1);
+}
+
+.sla-compliance-icon i {
+  color: #16a34a;
+}
+
+/* Active sites icon styles */
+.active-sites-icon {
+  background: rgba(59,130,246,0.1);
+}
+
+.active-sites-icon i {
+  color: #2563eb;
+}

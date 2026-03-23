@@ -1,0 +1,12 @@
+/* Performance metric colors */
+.stat-excellent {
+  color: #16a34a;
+}
+
+.stat-good {
+  color: #2563eb;
+}
+
+.stat-poor {
+  color: #dc2626;
+}

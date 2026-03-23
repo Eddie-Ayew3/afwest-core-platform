@@ -55,7 +55,6 @@ interface Assignment {
     BreadcrumbItemComponent,
     BreadcrumbLinkComponent,
     BreadcrumbSeparatorComponent,
-    InputComponent
 ],
   templateUrl: './guard-assignment.component.html',
   styleUrls: ['./guard-assignment.component.css']
