@@ -67,23 +67,23 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'payroll-management',
-                        loadComponent: () => import('./features/finance-management/payroll-management/payroll-management.component').then(m => m.PayrollManagementComponent)
+                        loadComponent: () => import('./features/finance-management/payroll-management/pages/payroll-management.component').then(m => m.PayrollManagementComponent)
                     },
                     {
                         path: 'payment-management',
-                        loadComponent: () => import('./features/finance-management/payment-management/payment-management.component').then(m => m.PaymentManagementComponent)
+                        loadComponent: () => import('./features/finance-management/payment-management/pages/payment-management.component').then(m => m.PaymentManagementComponent)
                     },
                     {
                         path: 'invoice-management',
-                        loadComponent: () => import('./features/finance-management/pages/invoice-management/invoice-management.component').then(m => m.InvoiceManagementComponent)
+                        loadComponent: () => import('./features/finance-management/invoice-management/pages/invoice-management.component').then(m => m.InvoiceManagementComponent)
                     },
                     {
                         path: 'invoice-management/:id',
-                        loadComponent: () => import('./features/finance-management/pages/invoice-management/invoice-detail/invoice-detail.component').then(m => m.InvoiceDetailComponent)
+                        loadComponent: () => import('./features/finance-management/invoice-management/invoice-detail/invoice-detail.component').then(m => m.InvoiceDetailComponent)
                     },
                     {
                         path: 'sla-report',
-                        loadComponent: () => import('./features/finance-management/sla-report/sla-report.component').then(m => m.SlaReportComponent)
+                        loadComponent: () => import('./features/finance-management/sla-report/pages/sla-report.component').then(m => m.SlaReportComponent)
                     }
                 ]
             },

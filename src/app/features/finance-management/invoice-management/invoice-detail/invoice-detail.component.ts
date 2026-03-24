@@ -8,7 +8,7 @@ import {
   BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
   ModalService, AlertDialogService, ToastService
 } from '@tolle_/tolle-ui';
-import { Invoice, InvoicePaymentRecord, PaymentMethod } from '../invoice-management.component';
+import { Invoice, InvoicePaymentRecord, PaymentMethod } from '../pages/invoice-management.component';
 
 @Component({
   selector: 'app-invoice-detail',

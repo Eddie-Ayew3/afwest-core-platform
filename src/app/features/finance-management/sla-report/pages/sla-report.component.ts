@@ -8,7 +8,7 @@ import {
   DataTableComponent, TolleCellDirective, TableColumn,
   ModalService, ToastService
 } from '@tolle_/tolle-ui';
-import { PermissionsService } from '../../../core/services/permissions.service';
+import { PermissionsService } from '../../../../core/services/permissions.service';
 
 interface SlaRecord {
   id: string;
