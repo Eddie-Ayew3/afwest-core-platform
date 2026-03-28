@@ -44,3 +44,12 @@ Thumbs.db
 # Environment files (contain secrets - keep local only)
 src/environments/environment.ts
 src/environments/environment.prod.ts
+
+# Exclude other projects and folders
+Personal Documents/
+Personal Projects/
+UI Projects/
+afwest-mobile-platform/
+create-web-app/
+ENTERPRISE*
+SKILL.md
