@@ -1,0 +1,204 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>HR</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Guard Performance</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Guard Performance & Discipline</h1>
+        <p class="text-muted-foreground mt-1">Track individual guard performance, attendance, and disciplinary records.</p>
+      </div>
+      <tolle-button variant="outline" size="default">
+        <i class="ri-download-line mr-2"></i>Export Report
+      </tolle-button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-4 gap-4 mb-4">
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-excellent">{{excellentCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Excellent Guards</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-good">{{goodCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Good Performers</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold stat-poor">{{poorCount}}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Needs Improvement</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold" [style.color]="getScoreColor(avgScore)">{{avgScore}}%</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Avg Performance Score</p>
+      </div>
+    </div>
+
+    <!-- Search + Filter Bar -->
+    <div class="flex justify-between items-center mb-3">
+      <tolle-input
+        placeholder="Search by name, ID, or site..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        class="w-80">
+      </tolle-input>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{activeFilterCount}})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="mb-3 p-4 bg-muted/30 border border-border rounded-lg">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Grade</label>
+          <tolle-select [(ngModel)]="selectedGrade" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Grades</tolle-select-item>
+            <tolle-select-item *ngFor="let g of gradeOptions" [value]="g">{{g}}</tolle-select-item>
+          </tolle-select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Site</label>
+          <tolle-select [(ngModel)]="selectedSite" (ngModelChange)="applyFilter()" size="default" class="w-full">
+            <tolle-select-item value="all">All Sites</tolle-select-item>
+            <tolle-select-item *ngFor="let s of siteOptions" [value]="s">{{s}}</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-close-line mr-1"></i>Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredGuards"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25, 50]">
+
+        <ng-template tolleCell="guard" let-row="row">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span class="text-xs font-semibold text-primary">{{getInitials(row.fullName)}}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium truncate">{{row.fullName}}</p>
+              <p class="text-xs text-muted-foreground">{{row.guardId}}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="attendance" let-row="row">
+          <div class="text-sm">
+            <span *ngIf="row.absences === 0 && row.lateArrivals === 0" class="text-green-600 font-medium">Perfect</span>
+            <span *ngIf="row.absences > 0 || row.lateArrivals > 0" class="text-muted-foreground">
+              {{row.absences}} abs · {{row.lateArrivals}} late
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="patrolCompliance" let-row="row">
+          <div class="flex items-center gap-2">
+            <div class="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div class="h-full rounded-full"
+                   [style.width.%]="row.patrolCompliancePct"
+                   [style.background]="getScoreColor(row.patrolCompliancePct)"></div>
+            </div>
+            <span class="text-sm" [style.color]="getScoreColor(row.patrolCompliancePct)">{{row.patrolCompliancePct}}%</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="clientRating" let-row="row">
+          <div class="flex items-center gap-1">
+            <i class="ri-star-fill text-yellow-400 text-xs"></i>
+            <span class="text-sm font-medium">{{row.clientRating}}</span>
+            <span class="text-xs text-muted-foreground">/5</span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="performanceScore" let-row="row">
+          <span class="font-bold text-sm" [style.color]="getScoreColor(row.performanceScore)">{{row.performanceScore}}%</span>
+        </ng-template>
+
+        <ng-template tolleCell="grade" let-row="row">
+          <div class="flex items-center justify-center">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                  [style.background]="getGradeBg(row.grade)"
+                  [style.color]="getGradeFg(row.grade)">
+              {{row.grade}}
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewGuard(row)">View</tolle-button>
+            <tolle-button variant="outline" size="xs" (click)="openReviewSheet(row)">Review</tolle-button>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Review Sheet -->
+<tolle-sheet [(isOpen)]="showReviewSheet">
+  <tolle-sheet-content side="right" class="w-[440px]">
+    <div class="p-6 h-full flex flex-col">
+      <h2 class="text-lg font-semibold mb-1">Performance Review</h2>
+      <p class="text-sm text-muted-foreground mb-6" *ngIf="selectedGuard">
+        Recording review for <strong>{{selectedGuard.fullName}}</strong> ({{selectedGuard.guardId}})
+      </p>
+
+      <div class="flex-1 overflow-y-auto space-y-4">
+
+        <div class="space-y-1.5">
+          <tolle-label>Review Notes</tolle-label>
+          <tolle-textarea
+            placeholder="Summarise this guard's performance, strengths, and areas for improvement..."
+            [(ngModel)]="reviewForm.notes"
+            [rows]="5">
+          </tolle-textarea>
+        </div>
+
+        <div class="space-y-1.5">
+          <tolle-label>Disciplinary Action</tolle-label>
+          <tolle-select class="w-full" [(ngModel)]="reviewForm.disciplinaryAction" placeholder="Select action">
+            <tolle-select-item value="none">None</tolle-select-item>
+            <tolle-select-item value="verbal">Verbal Warning</tolle-select-item>
+            <tolle-select-item value="written">Written Warning</tolle-select-item>
+            <tolle-select-item value="suspension">Suspension Notice</tolle-select-item>
+          </tolle-select>
+        </div>
+
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-border mt-4">
+        <tolle-button variant="outline" class="flex-1" (click)="showReviewSheet = false">Cancel</tolle-button>
+        <tolle-button variant="default" class="flex-1" (click)="submitReview()"
+          [disabled]="!reviewForm.notes">
+          Save Review
+        </tolle-button>
+      </div>
+    </div>
+  </tolle-sheet-content>
+</tolle-sheet>

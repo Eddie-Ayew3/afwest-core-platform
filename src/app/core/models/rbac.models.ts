@@ -40,12 +40,16 @@ export const LS = {
   isAuthenticated: 'isAuthenticated',
   accessToken:     'access_token',
   refreshToken:    'refresh_token',
+  userId:          'userId',
   userStaffId:     'userStaffId',
+  userEmail:       'userEmail',
   userDisplayName: 'userDisplayName',
+  userFullName:    'userFullName',
   userRole:        'userRole',
   userScope:       'userScope',
   userRegion:      'userRegion',
-  userSite:        'userSite'
+  userSite:        'userSite',
+  userPermissions: 'userPermissions',
 } as const;
 
 export interface DemoAccount {

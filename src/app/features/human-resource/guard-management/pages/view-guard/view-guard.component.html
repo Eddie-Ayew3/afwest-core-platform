@@ -1,0 +1,205 @@
+<!-- Toolbar (hidden on print) -->
+<div class="no-print flex items-center justify-between px-8 py-4 bg-background border-b border-border sticky top-0 z-10">
+  <button (click)="goBack()" class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+    <i class="ri-arrow-left-line"></i>
+    Back to Guard Management
+  </button>
+  <div class="flex items-center gap-3">
+    <span class="text-xs text-muted-foreground">Document Ref: AFWS-GD-{{ guard?.createdAt | date:'yyyy' }}-{{ guard?.employeeId }}</span>
+    <tolle-button 
+        [hidden]="true"
+        printSectionId="guard-print-section"
+        ngxPrint
+        [useExistingCss]="true"
+        [closeWindow]="true"
+        #printer
+        title="Print guard details"
+    >Print
+    </tolle-button>
+  </div>
+</div>
+
+<!-- Print area -->
+<div id="guard-print-section" class="print-wrapper bg-muted/30 min-h-screen py-8 flex flex-col items-center no-print-bg">
+
+  @if (guard) {
+  <div class="a4-sheet bg-white shadow-md">
+
+    <!-- Header band -->
+    <div class="header-band flex items-center justify-between px-10 py-6 border-b-2 border-red-600">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
+          <span class="text-white font-bold text-xl">AW</span>
+        </div>
+        <div>
+          <p class="text-xl font-bold text-gray-900 leading-tight">AFWest Security Services</p>
+          <p class="text-xs text-gray-500">Guard Personnel File — Confidential</p>
+        </div>
+      </div>
+      <div class="text-right text-xs text-gray-500 space-y-0.5">
+        <p class="font-semibold text-gray-700">AFWS-GD-{{ guard.createdAt | date:'yyyy' }}-{{ guard.employeeId }}</p>
+        <p>Printed: {{ today | date:'d MMM yyyy' }}</p>
+      </div>
+    </div>
+
+    <!-- Identity strip -->
+    <div class="identity-strip flex items-start gap-6 px-10 py-6 bg-gray-50 border-b border-gray-200">
+      <!-- Photo placeholder -->
+      <div class="flex-shrink-0">
+        <div class="w-28 h-28 rounded-lg bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
+          <span class="text-3xl font-bold text-gray-500">{{ getInitials(guard.fullName) }}</span>
+        </div>
+      </div>
+
+      <!-- Name + badges -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">{{ guard.fullName }}</h1>
+            <p class="text-sm text-gray-600 mt-0.5">Guard</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold border"
+            [class.border-green-300]="guard.status === 'Active'"
+            [class.bg-green-50]="guard.status === 'Active'"
+            [class.text-green-700]="guard.status === 'Active'"
+            [class.border-red-300]="guard.status === 'Suspended' || guard.status === 'Rejected'"
+            [class.bg-red-50]="guard.status === 'Suspended' || guard.status === 'Rejected'"
+            [class.text-red-700]="guard.status === 'Suspended' || guard.status === 'Rejected'"
+            [class.border-yellow-300]="guard.status === 'PendingApproval'"
+            [class.bg-yellow-50]="guard.status === 'PendingApproval'"
+            [class.text-yellow-700]="guard.status === 'PendingApproval'">
+            {{ guard.status }}
+          </span>
+        </div>
+
+        <div class="mt-3 grid grid-cols-3 gap-x-6 gap-y-1.5 text-sm">
+          <div>
+            <span class="text-gray-500">Guard ID</span>
+            <p class="font-semibold text-gray-800">{{ guard.id }}</p>
+          </div>
+          <div>
+            <span class="text-gray-500">Employee ID</span>
+            <p class="font-semibold text-gray-800">{{ guard.employeeId }}</p>
+          </div>
+          <div>
+            <span class="text-gray-500">Site</span>
+            <p class="font-semibold text-gray-800">{{ guard.siteName || '—' }}</p>
+          </div>
+          <div>
+            <span class="text-gray-500">Region</span>
+            <p class="font-semibold text-gray-800">{{ guard.regionName || '—' }}</p>
+          </div>
+          <div>
+            <span class="text-gray-500">License No.</span>
+            <p class="font-semibold text-gray-800">{{ guard.guardLicense || '—' }}</p>
+          </div>
+          <div>
+            <span class="text-gray-500">License Expiry</span>
+            <p class="font-semibold text-gray-800">{{ guard.licenseExpiry || '—' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content grid -->
+    <div class="px-10 py-6 space-y-6">
+
+      <!-- Section: Personal Information -->
+      <div>
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+          Personal Information
+        </h2>
+        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+          <div>
+            <p class="text-gray-500">Full Name</p>
+            <p class="font-medium text-gray-800">{{ guard.fullName }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Email</p>
+            <p class="font-medium text-gray-800">{{ guard.email }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Phone</p>
+            <p class="font-medium text-gray-800">{{ guard.phoneNumber || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Date of Birth</p>
+            <p class="font-medium text-gray-800">{{ guard.dateOfBirth || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">National ID</p>
+            <p class="font-medium text-gray-800">{{ guard.nationalId || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Hire Date</p>
+            <p class="font-medium text-gray-800">{{ guard.hireDate || '—' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Security Details -->
+      <div>
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+          Security Details
+        </h2>
+        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+          <div>
+            <p class="text-gray-500">Security License No.</p>
+            <p class="font-medium text-gray-800">{{ guard.guardLicense || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">License Expiry</p>
+            <p class="font-medium text-gray-800">{{ guard.licenseExpiry || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Employee ID</p>
+            <p class="font-medium text-gray-800">{{ guard.employeeId }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Assigned Site</p>
+            <p class="font-medium text-gray-800">{{ guard.siteName || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Region</p>
+            <p class="font-medium text-gray-800">{{ guard.regionName || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Status</p>
+            <p class="font-medium text-gray-800">{{ guard.status }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Metadata -->
+      <div>
+        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-red-600 mb-3 pb-1 border-b border-red-200">
+          Record Information
+        </h2>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <div>
+            <p class="text-gray-500">Created At</p>
+            <p class="font-medium text-gray-800">{{ guard.createdAt | date:'d MMM yyyy, HH:mm' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">User ID</p>
+            <p class="font-medium text-gray-800">{{ guard.userId }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-10 py-6 border-t border-gray-200 text-xs text-gray-500 text-center">
+      <p>This is a confidential personnel record. For internal use only.</p>
+      <p class="mt-1">© {{ today | date:'yyyy' }} AFWest Security Services</p>
+    </div>
+
+  </div>
+  } @else {
+  <div class="text-center py-12">
+    <p class="text-gray-500">Loading guard information...</p>
+  </div>
+  }
+
+</div>

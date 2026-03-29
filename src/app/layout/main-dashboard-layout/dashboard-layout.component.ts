@@ -61,13 +61,13 @@ export class DashboardLayoutComponent {
       ];
       this.pageTitle = 'Client Management';
       this.pageSubtitle = 'Manage clients and their information.';
-    } else if (url === '/zone-management') {
+    } else if (url === '/region-management') {
       this.breadcrumbItems = [
         { label: 'Home', url: '/dashboard' },
-        { label: 'Zone Management', active: true }
+        { label: 'Region Management', active: true }
       ];
-      this.pageTitle = 'Zone Management';
-      this.pageSubtitle = 'Manage security patrol zones and coverage areas across Ghana.';
+      this.pageTitle = 'Region Management';
+      this.pageSubtitle = 'Manage security patrol regions and coverage areas across Ghana.';
     } else if (url.startsWith('/finance/')) {
       const section = url.replace('/finance/', '');
       const sectionName = this.formatSectionName(section);
@@ -123,11 +123,12 @@ export class DashboardLayoutComponent {
       'staff-management':      'Staff Management',
       'guard-management':      'Guard Management',
       'client-management':     'Client Management',
+      'department-management': 'Department Management',
       'leave-management':      'Leave Management',
       'user-management':       'User Management',
       'shift-management':      'Shift Management',
       'check-in-out':          'Check In/Check Out',
-      'zone-management':       'Zone Management',
+      'region-management':     'Region Management',
       'payroll-management':    'Payroll Management',
       'payment-management':    'Payment Management',
       'invoice-management':    'Client Invoices',

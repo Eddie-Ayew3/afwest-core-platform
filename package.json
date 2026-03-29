@@ -24,6 +24,8 @@
     "@angular/ssr": "^18.2.21",
     "@floating-ui/dom": "^1.7.5",
     "@ng-icons/remixicon": "^33.1.0",
+    "@ngrx/effects": "^18.1.1",
+    "@ngrx/store": "^18.1.1",
     "@tolle_/tolle-ui": "^18.2.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

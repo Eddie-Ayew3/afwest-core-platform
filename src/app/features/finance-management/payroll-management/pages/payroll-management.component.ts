@@ -1,31 +1,20 @@
-import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ButtonComponent, BadgeComponent, InputComponent,
   SelectComponent, SelectItemComponent,
   DropdownMenuComponent, DropdownTriggerDirective, TooltipDirective,
   BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
   LabelComponent, ModalService,
-  DataTableComponent, TolleCellDirective, TableColumn
+  DataTableComponent, TolleCellDirective, TableColumn,
+  AlertDialogService, ToastService
 } from '@tolle_/tolle-ui';
-
-export interface Payroll {
-  id: string;
-  staffId: string;
-  staffName: string;
-  department: string;
-  position: string;
-  baseSalary: number;
-  allowances: number;
-  deductions: number;
-  overtime: number;
-  netSalary: number;
-  payPeriod: string;
-  status: 'pending' | 'processed' | 'paid';
-  paymentDate: string;
-  bankAccount: string;
-}
+import { PayrollActions } from '../stores/payroll.actions';
+import { selectPayrollRecords, selectPayrollLoading, selectPayrollSaving } from '../stores/payroll.selectors';
+import { PayrollRecordDto } from '../models/payroll.model';
 
 @Component({
   selector: 'app-payroll-management',
@@ -36,191 +25,206 @@ export interface Payroll {
     SelectComponent, SelectItemComponent,
     DropdownMenuComponent, DropdownTriggerDirective, TooltipDirective,
     BreadcrumbComponent, BreadcrumbItemComponent, BreadcrumbLinkComponent, BreadcrumbSeparatorComponent,
-    DataTableComponent, TolleCellDirective
+    DataTableComponent, TolleCellDirective,
   ],
   templateUrl: './payroll-management.component.html',
   styleUrl: './payroll-management.component.css'
 })
 export class PayrollManagementComponent implements OnInit {
+  private store = inject(Store);
   private modalService = inject(ModalService);
+  private alertDialog = inject(AlertDialogService);
+  private toast = inject(ToastService);
+  private destroyRef = inject(DestroyRef);
+
   @ViewChild('payrollModal') payrollModal!: TemplateRef<any>;
 
   columns: TableColumn[] = [
     { key: 'staff',      label: 'Staff Member'  },
     { key: 'department', label: 'Department'     },
-    { key: 'baseSalary', label: 'Base Salary'    },
-    { key: 'breakdown',  label: 'Allowances / Deductions' },
-    { key: 'netSalary',  label: 'Net Salary'     },
-    { key: 'payPeriod',  label: 'Pay Period'     },
+    { key: 'period',     label: 'Pay Period'     },
+    { key: 'baseSalary', label: 'Base (₵)'       },
+    { key: 'allowances', label: 'Allowances (₵)' },
+    { key: 'deductions', label: 'Deductions (₵)' },
+    { key: 'netPay',     label: 'Net Pay (₵)'    },
     { key: 'status',     label: 'Status'         },
     { key: 'actions',    label: ''               },
   ];
 
-  payrollData: Payroll[] = [
-    {
-      id: 'PR-001', staffId: 'GD-011', staffName: 'Kwame Mensah',
-      department: 'Security', position: 'Senior Guard',
-      baseSalary: 3200, allowances: 450, deductions: 180, overtime: 280,
-      netSalary: 3750, payPeriod: 'March 2025',
-      status: 'paid', paymentDate: '2025-03-28', bankAccount: '0012345678'
-    },
-    {
-      id: 'PR-002', staffId: 'GD-022', staffName: 'Ama Asante',
-      department: 'Operations', position: 'Operations Supervisor',
-      baseSalary: 4800, allowances: 600, deductions: 240, overtime: 0,
-      netSalary: 5160, payPeriod: 'March 2025',
-      status: 'processed', paymentDate: '', bankAccount: '0098765432'
-    },
-    {
-      id: 'PR-003', staffId: 'GD-033', staffName: 'Kofi Boateng',
-      department: 'Security', position: 'Guard',
-      baseSalary: 2600, allowances: 300, deductions: 130, overtime: 195,
-      netSalary: 2965, payPeriod: 'March 2025',
-      status: 'pending', paymentDate: '', bankAccount: '0011223344'
-    },
-    {
-      id: 'PR-004', staffId: 'GD-015', staffName: 'Abena Owusu',
-      department: 'HR', position: 'HR Officer',
-      baseSalary: 3800, allowances: 500, deductions: 190, overtime: 0,
-      netSalary: 4110, payPeriod: 'March 2025',
-      status: 'processed', paymentDate: '', bankAccount: '0033445566'
-    },
-    {
-      id: 'PR-005', staffId: 'GD-041', staffName: 'Yaw Darko',
-      department: 'Security', position: 'Guard',
-      baseSalary: 2600, allowances: 300, deductions: 350, overtime: 130,
-      netSalary: 2680, payPeriod: 'March 2025',
-      status: 'pending', paymentDate: '', bankAccount: '0055667788'
-    },
-    {
-      id: 'PR-006', staffId: 'GD-008', staffName: 'Nana Frimpong',
-      department: 'Finance', position: 'Finance Manager',
-      baseSalary: 5500, allowances: 750, deductions: 275, overtime: 0,
-      netSalary: 5975, payPeriod: 'March 2025',
-      status: 'paid', paymentDate: '2025-03-28', bankAccount: '0077889900'
-    },
-    {
-      id: 'PR-007', staffId: 'GD-055', staffName: 'Efua Mensah',
-      department: 'Logistics', position: 'Logistics Officer',
-      baseSalary: 3100, allowances: 400, deductions: 155, overtime: 240,
-      netSalary: 3585, payPeriod: 'March 2025',
-      status: 'paid', paymentDate: '2025-03-28', bankAccount: '0044556677'
-    },
-    {
-      id: 'PR-008', staffId: 'GD-062', staffName: 'Akosua Sarpong',
-      department: 'Security', position: 'Senior Guard',
-      baseSalary: 3200, allowances: 450, deductions: 160, overtime: 320,
-      netSalary: 3810, payPeriod: 'March 2025',
-      status: 'pending', paymentDate: '', bankAccount: '0022334455'
-    },
-  ];
+  payrollRecords: PayrollRecordDto[] = [];
+  filteredRecords: PayrollRecordDto[] = [];
+  get filteredPayroll() { return this.filteredRecords; }
+  loading = false;
+  saving = false;
+  showCreateModal = false;
+  showFilterPanel = false;
+  filterDepartment = 'All';
+  filterStatus = 'All';
+  filterPayPeriod = 'All';
+  searchQuery = '';
+  searchTerm = '';
 
-  filteredPayroll: Payroll[] = [];
-  searchTerm        = '';
-  filterDepartment  = 'All';
-  filterStatus      = 'All';
-  filterPayPeriod   = 'All';
-  showFilterPanel   = false;
+  readonly payPeriods: string[] = [];
+  readonly statuses = ['Pending', 'Processed', 'Paid'];
+  readonly departments = ['Operations', 'HR', 'Finance', 'Admin', 'Security'];
 
-  readonly departments = ['Security', 'Operations', 'HR', 'Finance', 'Logistics'];
-  readonly statuses    = ['pending', 'processed', 'paid'];
-  readonly payPeriods  = ['March 2025', 'February 2025', 'January 2025'];
-
-  get totalPayroll():    number { return this.filteredPayroll.reduce((s, p) => s + p.netSalary, 0); }
-  get pendingCount():    number { return this.filteredPayroll.filter(p => p.status === 'pending').length; }
-  get processedCount():  number { return this.filteredPayroll.filter(p => p.status === 'processed').length; }
-  get paidCount():       number { return this.filteredPayroll.filter(p => p.status === 'paid').length; }
+  get totalPayroll() { return this.payrollRecords.reduce((sum, p) => sum + p.netPay, 0); }
+  get pendingCount() { return this.payrollRecords.filter(p => p.statusName === 'Pending').length; }
+  get processedCount() { return this.payrollRecords.filter(p => p.statusName === 'Processed').length; }
+  get paidCount() { return this.payrollRecords.filter(p => p.statusName === 'Paid').length; }
 
   get activeFilterCount(): number {
-    let n = 0;
-    if (this.filterDepartment !== 'All') n++;
-    if (this.filterStatus !== 'All')     n++;
-    if (this.filterPayPeriod !== 'All')  n++;
-    return n;
+    let count = 0;
+    if (this.filterDepartment !== 'All') count++;
+    if (this.filterStatus !== 'All') count++;
+    if (this.filterPayPeriod !== 'All') count++;
+    return count;
   }
 
-  ngOnInit(): void {
-    this.applyFilters();
+  ngOnInit() {
+    this.store.dispatch(PayrollActions.loadPayrollRecords({ params: { pageNumber: 1, pageSize: 100 } }));
+    
+    this.store.select(selectPayrollRecords)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(records => {
+        this.payrollRecords = records;
+        this.applyFilter();
+      });
+
+    this.store.select(selectPayrollLoading)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(loading => this.loading = loading);
+
+    this.store.select(selectPayrollSaving)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(saving => this.saving = saving);
   }
 
-  applyFilters(): void {
-    const q = this.searchTerm.toLowerCase().trim();
-    this.filteredPayroll = this.payrollData.filter(p => {
-      const matchesSearch = !q ||
-        p.staffName.toLowerCase().includes(q) ||
-        p.staffId.toLowerCase().includes(q) ||
-        p.position.toLowerCase().includes(q);
-      const matchesDept      = this.filterDepartment === 'All' || p.department === this.filterDepartment;
-      const matchesStatus    = this.filterStatus === 'All'     || p.status     === this.filterStatus;
-      const matchesPeriod    = this.filterPayPeriod === 'All'  || p.payPeriod  === this.filterPayPeriod;
-      return matchesSearch && matchesDept && matchesStatus && matchesPeriod;
-    });
+  applyFilter() { this.applyFilters(); }
+
+  applyFilters() {
+    let result = [...this.payrollRecords];
+    if (this.searchTerm.trim()) {
+      const q = this.searchTerm.toLowerCase();
+      result = result.filter(p => p.employeeName.toLowerCase().includes(q) || p.employeeStaffId.toLowerCase().includes(q));
+    }
+    if (this.filterStatus !== 'All') result = result.filter(p => p.statusName === this.filterStatus);
+    if (this.filterPayPeriod !== 'All') result = result.filter(p => p.periodLabel === this.filterPayPeriod);
+    this.filteredRecords = result;
   }
 
-  clearFilters(): void {
-    this.searchTerm = '';
+  clearFilters() {
     this.filterDepartment = 'All';
     this.filterStatus = 'All';
     this.filterPayPeriod = 'All';
+    this.searchTerm = '';
     this.applyFilters();
   }
 
-  toggleFilterPanel(): void { this.showFilterPanel = !this.showFilterPanel; }
+  toggleFilterPanel() { this.showFilterPanel = !this.showFilterPanel; }
 
-  viewPayroll(payroll: Payroll): void {
-    this.modalService.open({
-      title: `Payslip — ${payroll.staffName}`,
-      backdropClose: true,
-      size: 'default',
-      showCloseButton: true,
-      content: this.payrollModal,
-      context: { payroll }
+  deletePayroll(payroll: PayrollRecordDto) {
+    const ref = this.alertDialog.open({
+      title: 'Delete Payroll Record?',
+      description: `Delete payroll for "${payroll.employeeName}"? This cannot be undone.`,
+      actionText: 'Delete',
+      variant: 'destructive'
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (confirmed) {
+        this.store.dispatch(PayrollActions.deletePayrollRecord({ id: payroll.id }));
+      }
     });
   }
 
-  getStatusBg(status: string): string {
-    const map: Record<string, string> = {
-      paid:       'rgba(34,197,94,0.15)',
-      processed:  'rgba(59,130,246,0.15)',
-      pending:    'rgba(249,115,22,0.15)',
-    };
-    return map[status] ?? 'rgba(113,113,122,0.15)';
+  processPayroll(payroll: PayrollRecordDto) {
+    const ref = this.alertDialog.open({
+      title: 'Process Payroll?',
+      description: `Process payroll for "${payroll.employeeName}"?`,
+      actionText: 'Process',
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (confirmed) {
+        this.store.dispatch(PayrollActions.processPayroll({ id: payroll.id }));
+      }
+    });
   }
 
-  getStatusFg(status: string): string {
-    const map: Record<string, string> = {
-      paid:       '#16a34a',
-      processed:  '#2563eb',
-      pending:    '#ea580c',
-    };
-    return map[status] ?? '#71717a';
+  payPayroll(payroll: PayrollRecordDto) {
+    const ref = this.alertDialog.open({
+      title: 'Record Payment?',
+      description: `Record payment for "${payroll.employeeName}"?`,
+      actionText: 'Pay',
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (confirmed) {
+        this.store.dispatch(PayrollActions.payPayroll({ id: payroll.id }));
+      }
+    });
   }
 
   getDeptBg(dept: string): string {
     const map: Record<string, string> = {
-      Security:   'rgba(239,68,68,0.12)',
-      Operations: 'rgba(99,102,241,0.12)',
-      HR:         'rgba(168,85,247,0.12)',
-      Finance:    'rgba(34,197,94,0.12)',
-      Logistics:  'rgba(234,179,8,0.15)',
+      'Operations': 'rgba(33, 150, 243, 0.15)',
+      'HR': 'rgba(139, 92, 246, 0.15)',
+      'Finance': 'rgba(34, 197, 94, 0.15)',
+      'Admin': 'rgba(234, 179, 8, 0.15)',
+      'Security': 'rgba(244, 67, 54, 0.15)',
     };
-    return map[dept] ?? 'rgba(113,113,122,0.12)';
+    return map[dept] ?? 'rgba(120,120,120,0.15)';
   }
 
   getDeptFg(dept: string): string {
     const map: Record<string, string> = {
-      Security:   '#dc2626',
-      Operations: '#4f46e5',
-      HR:         '#7c3aed',
-      Finance:    '#16a34a',
-      Logistics:  '#ca8a04',
+      'Operations': '#2196F3',
+      'HR': '#7C3AED',
+      'Finance': '#16a34a',
+      'Admin': '#ca8a04',
+      'Security': '#dc2626',
     };
-    return map[dept] ?? '#71717a';
+    return map[dept] ?? '#555';
+  }
+
+  getStatusBg(status: string): string {
+    const map: Record<string, string> = {
+      'Pending': 'rgba(234, 179, 8, 0.15)',
+      'Processed': 'rgba(33, 150, 243, 0.15)',
+      'Paid': 'rgba(34, 197, 94, 0.15)'
+    };
+    return map[status] ?? '';
+  }
+
+  getStatusFg(status: string): string {
+    const map: Record<string, string> = {
+      'Pending': '#ca8a04',
+      'Processed': '#2563eb',
+      'Paid': '#16a34a'
+    };
+    return map[status] ?? '';
+  }
+
+  formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   getInitials(name: string): string {
-    const parts = name.trim().split(' ').filter(p => p.length > 1);
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    return name.substring(0, 2).toUpperCase();
+    return (name ?? '').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  viewPayroll(payroll: PayrollRecordDto) {
+    this.modalService.open({
+      title: `Payroll — ${payroll.employeeName}`,
+      content: this.payrollModal,
+      context: {
+        payroll: {
+          ...payroll,
+          staffName: payroll.employeeName,
+          staffId: payroll.employeeStaffId,
+          position: '',
+        }
+      },
+      size: 'default',
+      showCloseButton: true,
+    });
   }
 }

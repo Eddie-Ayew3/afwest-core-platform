@@ -10,6 +10,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/auth/pages/sign-in/sign-in.component').then(m => m.SignInComponent)
     },
     {
+        path: 'setup',
+        loadComponent: () => import('./features/auth/pages/setup/setup.component').then(m => m.SetupComponent)
+    },
+    {
         path: 'reset-password',
         loadComponent: () => import('./features/auth/pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
     },
@@ -35,11 +39,11 @@ export const routes: Routes = [
             },
             {
                 path: 'shift/:id',
-                loadComponent: () => import('./features/operations/shift-management/shift-management.component').then(m => m.ShiftManagementComponent)
+                loadComponent: () => import('./features/operations/shift-management/pages/shift-management.component').then(m => m.ShiftManagementComponent)
             },
             {
                 path: 'guard/:id',
-                loadComponent: () => import('./features/client-management/pages/guard-management/all-guards/guard-management.component').then(m => m.GuardManagementComponent)
+                loadComponent: () => import('./features/human-resource/guard-management/pages/all-guards/guard-management.component').then(m => m.GuardManagementComponent)
             }
         ]
     },
@@ -56,11 +60,11 @@ export const routes: Routes = [
             },
             {
                 path: 'client-management',
-                loadComponent: () => import('./features/client-management/pages/client-management/all-clients/client-management.component').then(m => m.ClientManagementComponent)
+                loadComponent: () => import('./features/human-resource/client-management/pages/all-clients/client-management.component').then(m => m.ClientManagementComponent)
             },
             {
-                path: 'zone-management',
-                loadComponent: () => import('./features/zone-management/pages/all-zones/zone-management.component').then(m => m.ZoneManagementComponent)
+                path: 'region-management',
+                loadComponent: () => import('./features/operations/zone-management/pages/all-zones/region-management.component').then(m => m.RegionManagementComponent)
             },
             {
                 path: 'finance',
@@ -92,54 +96,58 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'staff-management',
-                        loadComponent: () => import('./features/staff-management/pages/all-staff/staff-management.component').then(m => m.StaffManagementComponent)
+                        loadComponent: () => import('./features/human-resource/staff-management/pages/all-staff/staff-management.component').then(m => m.StaffManagementComponent)
                     },
                     {
                         path: 'staff-management/new-staff',
-                        loadComponent: () => import('./features/staff-management/pages/new-staff/new-staff-management.component').then(m => m.NewStaffManagementComponent)
+                        loadComponent: () => import('./features/human-resource/staff-management/pages/new-staff/new-staff-management.component').then(m => m.NewStaffManagementComponent)
                     },
                     {
                         path: 'staff-management/view-staff/:id',
-                        loadComponent: () => import('./features/staff-management/pages/view-staff/view-staff.component').then(m => m.ViewStaffComponent),
+                        loadComponent: () => import('./features/human-resource/staff-management/pages/view-staff/view-staff.component').then(m => m.ViewStaffComponent),
                         canActivate: [authGuard, loadingGuard]
                     },
                     {
                         path: 'guard-management',
-                        loadComponent: () => import('./features/client-management/pages/guard-management/all-guards/guard-management.component').then(m => m.GuardManagementComponent)
+                        loadComponent: () => import('./features/human-resource/guard-management/pages/all-guards/guard-management.component').then(m => m.GuardManagementComponent)
                     },
                     {
                         path: 'guard-management/new-guard',
-                        loadComponent: () => import('./features/client-management/pages/guard-management/new-guard/new-guard.component').then(m => m.NewGuardComponent)
+                        loadComponent: () => import('./features/human-resource/guard-management/pages/new-guard/new-guard.component').then(m => m.NewGuardComponent)
                     },
                     {
                         path: 'guard-management/view-guard/:id',
-                        loadComponent: () => import('./features/client-management/pages/guard-management/view-guard/view-guard.component').then(m => m.ViewGuardComponent),
+                        loadComponent: () => import('./features/human-resource/guard-management/pages/view-guard/view-guard.component').then(m => m.ViewGuardComponent),
                         canActivate: [authGuard, loadingGuard]
                     },
                     {
                         path: 'guard-performance',
-                        loadComponent: () => import('./features/client-management/pages/guard-management/guard-performance/guard-performance.component').then(m => m.GuardPerformanceComponent)
+                        loadComponent: () => import('./features/human-resource/guard-management/pages/guard-performance/guard-performance.component').then(m => m.GuardPerformanceComponent)
                     },
                     {
                         path: 'client-management',
-                        loadComponent: () => import('./features/client-management/pages/client-management/all-clients/client-management.component').then(m => m.ClientManagementComponent)
+                        loadComponent: () => import('./features/human-resource/client-management/pages/all-clients/client-management.component').then(m => m.ClientManagementComponent)
                     },
                     {
                         path: 'client-management/new-client',
-                        loadComponent: () => import('./features/client-management/pages/client-management/new-client/new-client-management.component').then(m => m.NewClientManagementComponent)
+                        loadComponent: () => import('./features/human-resource/client-management/pages/new-client/new-client-management.component').then(m => m.NewClientManagementComponent)
+                    },
+                    {
+                        path: 'department-management',
+                        loadComponent: () => import('./features/human-resource/department-management/pages/department-management.component').then(m => m.DepartmentManagementComponent)
                     },
                     {
                         path: 'leave-management',
-                        loadComponent: () => import('./features/leave-management/pages/all-leaves/leave-management.component').then(m => m.LeaveManagementComponent)
+                        loadComponent: () => import('./features/human-resource/leave-management/pages/all-leaves/leave-management.component').then(m => m.LeaveManagementComponent)
                     },
                     {
                         path: 'user-management',
-                        loadComponent: () => import('./features/user-management/user-management.component').then(m => m.UserManagementComponent),
+                        loadComponent: () => import('./features/human-resource/user-management/pages/user-management.component').then(m => m.UserManagementComponent),
                         canActivate: [globalOnlyGuard]
                     },
                     {
                         path: 'permissions-management',
-                        loadComponent: () => import('./features/permissions-management/permissions-management.component').then(m => m.PermissionsManagementComponent),
+                        loadComponent: () => import('./features/human-resource/permissions-management/pages/permissions-management.component').then(m => m.PermissionsManagementComponent),
                         canActivate: [globalOnlyGuard]
                     }
                 ]
@@ -149,7 +157,7 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'shift-management',
-                        loadComponent: () => import('./features/operations/shift-management/shift-management.component').then(m => m.ShiftManagementComponent),
+                        loadComponent: () => import('./features/operations/shift-management/pages/shift-management.component').then(m => m.ShiftManagementComponent),
                         canActivate: [notGuardRoleGuard]
                     },
                     {
@@ -158,7 +166,7 @@ export const routes: Routes = [
                     },
                     {
                         path: 'incidents',
-                        loadComponent: () => import('./features/operations/incidents/incidents-management.component').then(m => m.IncidentsManagementComponent)
+                        loadComponent: () => import('./features/operations/incidents/pages/incidents-management.component').then(m => m.IncidentsManagementComponent)
                     },
                     {
                         path: 'site-inspections',

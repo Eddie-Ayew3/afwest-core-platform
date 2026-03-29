@@ -32,30 +32,19 @@
         </p>
       </header>
 
-      <!-- Dev: Quick demo account selector -->
-      <div class="w-2/3 p-3 border border-dashed border-gray-300 rounded-md text-left">
-        <p class="text-xs font-semibold text-gray-400 mb-2">Quick Sign-In (Dev)</p>
-        <select class="w-full text-sm p-1.5 border border-gray-300 rounded bg-white"
-                aria-label="Select demo account for quick sign-in"
-                [(ngModel)]="selectedDemoId" name="demoSelect" (change)="selectDemo()">
-          <option value="">-- Select a demo account --</option>
-          <option *ngFor="let a of demoAccounts" [value]="a.staffId">{{ a.label }}</option>
-        </select>
-      </div>
-
       <!-- Form using your Tolle UI library component -->
       <form class="w-2/3 space-y-6" (ngSubmit)="onSubmit()">
         <div class="space-y-2">
-          <tolle-label for="staffId" class="justify-left">Staff ID</tolle-label>
+          <tolle-label for="email" class="justify-left">Email</tolle-label>
           <tolle-input
-          size="lg"
-          id="staffId"
-          type="text"
-          placeholder="Enter your staff ID"
-          [(ngModel)]="staffId"
-          name="staffId"
-          required>
-        </tolle-input>
+            size="lg"
+            id="email"
+            type="email"
+            placeholder="Enter your email address"
+            [(ngModel)]="email"
+            name="email"
+            required>
+          </tolle-input>
         </div>
 
         <!-- Password Input with visibility toggle -->
@@ -63,7 +52,7 @@
           <tolle-label for="password">Password</tolle-label>
           <div class="relative">
             <tolle-input
-            size="lg"
+              size="lg"
               id="password"
               [type]="showPassword ? 'text' : 'password'"
               placeholder="Enter your password"
@@ -71,6 +60,11 @@
               name="password"
               required>
             </tolle-input>
+            <button type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+              (click)="togglePasswordVisibility()">
+              <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-lg"></i>
+            </button>
           </div>
         </div>
 
@@ -82,7 +76,7 @@
           type="submit"
           variant="default"
           size="lg"
-          [disabled]="!staffId || !password"
+          [disabled]="!email || !password"
           [busy]="isLoading"
           class="w-full">
           Sign In

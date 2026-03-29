@@ -1,0 +1,415 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>HR</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">Region Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">Region Management</h1>
+        <p class="text-muted-foreground mt-2">Operational regions and zones managed by AFWest Security</p>
+      </div>
+      <tolle-button variant="default" (click)="openCreateModal()">
+        <i class="ri-add-line mr-2"></i>New Region
+      </tolle-button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-primary/10 rounded-lg shrink-0"><i class="ri-map-2-line text-primary text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{ totalCount }}</h3><p class="text-xs text-muted-foreground">Total Regions</p></div>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-green-100 rounded-lg shrink-0"><i class="ri-checkbox-circle-line text-green-600 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{ activeRegions }}</h3><p class="text-xs text-muted-foreground">Active Regions</p></div>
+        <span class="ml-auto text-xs text-green-600 font-medium">Active</span>
+      </div>
+      <div class="bg-white rounded-lg border border-border p-3 flex items-center gap-3">
+        <div class="p-1.5 bg-zinc-100 rounded-lg shrink-0"><i class="ri-pause-circle-line text-zinc-500 text-base"></i></div>
+        <div><h3 class="text-xl font-bold leading-tight">{{ inactiveRegions }}</h3><p class="text-xs text-muted-foreground">Inactive Regions</p></div>
+        <span class="ml-auto text-xs text-zinc-500 font-medium">Inactive</span>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="flex justify-end items-center mb-3">
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{ activeFilterCount }})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="bg-muted/30 border border-border rounded-lg p-4 mb-3 flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium">Status:</span>
+        <tolle-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()" size="sm">
+          <tolle-select-item value="All">All</tolle-select-item>
+          <tolle-select-item value="Active">Active</tolle-select-item>
+          <tolle-select-item value="Inactive">Inactive</tolle-select-item>
+        </tolle-select>
+      </div>
+      <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+        <i class="ri-refresh-line mr-1"></i>Clear
+      </tolle-button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredRegions"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[5, 10, 25]">
+
+        <ng-template tolleCell="region" let-row="row">
+          <div class="flex items-center gap-2">
+            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <i class="ri-map-2-line text-sm"></i>
+            </div>
+            <div>
+              <p class="font-medium">{{ row.name }}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="code" let-row="row">
+          <span class="text-sm font-mono">{{ row.code }}</span>
+        </ng-template>
+
+        <ng-template tolleCell="capital" let-row="row">
+          <span class="text-sm">{{ row.capital || '—' }}</span>
+        </ng-template>
+
+        <ng-template tolleCell="rolesScoped" let-row="row">
+          <tolle-button variant="outline" size="xs" (click)="openAssignUserModal(row)">
+            <i class="ri-user-add-line mr-1"></i>Assign Role
+          </tolle-button>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <div class="flex items-center justify-center">
+            <tolle-badge size="sm" [style.background]="getStatusBg(row.isActive)" [style.color]="getStatusFg(row.isActive)">
+              {{ row.isActive ? 'Active' : 'Inactive' }}
+            </tolle-badge>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="default" size="xs" (click)="viewRegion(row)">View</tolle-button>
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" tolleTooltip="More actions" tolleTooltipPosition="top" [tolleDropdownTrigger]="regionMenu">
+                <i class="ri-more-2-fill"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #regionMenu>
+                <div class="flex flex-col p-1">
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors" (click)="editRegion(row)">
+                    <i class="ri-edit-line"></i>Edit Region
+                  </button>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-accent rounded-sm transition-colors" (click)="openAssignUserModal(row)">
+                    <i class="ri-user-add-line"></i>Assign Role
+                  </button>
+                  <div class="my-1 h-px bg-border"></div>
+                  <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-left text-destructive hover:bg-destructive/10 rounded-sm transition-colors" (click)="deleteRegion(row)">
+                    <i class="ri-delete-bin-line"></i>Delete Region
+                  </button>
+                </div>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Create Region Modal ────────────────────────────────────────────────── -->
+@if (showCreateModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCreateModal()"></div>
+
+    <!-- Dialog -->
+    <div class="relative bg-background rounded-xl shadow-2xl w-full max-w-[520px] flex flex-col max-h-[88vh]"
+         (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+        <div>
+          <h2 class="text-lg font-semibold">Create New Region</h2>
+          <p class="text-sm text-muted-foreground mt-0.5">
+            {{ createStep === 0 ? 'Enter region details' : 'Review and confirm' }}
+          </p>
+        </div>
+        <tolle-button (click)="closeCreateModal()"
+          class="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+          <i class="ri-close-line text-lg"></i>
+        </tolle-button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="px-6 py-3 border-b border-border shrink-0">
+        <div class="flex items-center gap-3">
+          <!-- Step 1 -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ' +
+              (createStep === 0 ? 'bg-primary text-white ring-2 ring-primary/30' : 'bg-primary text-white')">
+              @if (createStep > 0) {
+                <i class="ri-check-line text-xs"></i>
+              } @else {
+                1
+              }
+            </div>
+            <span [class]="'text-sm font-medium ' + (createStep === 0 ? 'text-foreground' : 'text-muted-foreground')">
+              Region Info
+            </span>
+          </div>
+          <!-- Connector -->
+          <div class="flex-1 h-px bg-border"></div>
+          <!-- Step 2 -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ' +
+              (createStep === 1 ? 'bg-primary text-white ring-2 ring-primary/30' : 'bg-muted text-muted-foreground')">
+              2
+            </div>
+            <span [class]="'text-sm font-medium ' + (createStep === 1 ? 'text-foreground' : 'text-muted-foreground')">
+              Review
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-auto p-6">
+
+        <!-- ── Step 0: Region Info ── -->
+        @if (createStep === 0) {
+          <div class="space-y-4">
+
+            <!-- Region Name (full width) -->
+            <div class="space-y-1.5">
+              <tolle-label>Region Name <span class="text-destructive">*</span></tolle-label>
+              <tolle-input
+                type="text"
+                placeholder="e.g. Greater Accra"
+                [(ngModel)]="newRegion.name"
+                class="w-full">
+              </tolle-input>
+            </div>
+
+            <!-- Code + Capital -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1.5">
+                <tolle-label>Region Code</tolle-label>
+                <tolle-input
+                  type="text"
+                  placeholder="e.g. GA"
+                  [(ngModel)]="newRegion.code"
+                  class="w-full">
+                </tolle-input>
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Capital City</tolle-label>
+                <tolle-input
+                  type="text"
+                  placeholder="e.g. Accra"
+                  [(ngModel)]="newRegion.capital"
+                  class="w-full">
+                </tolle-input>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-1.5">
+              <tolle-label>Description</tolle-label>
+              <tolle-textarea
+                placeholder="Brief description of the region..."
+                [(ngModel)]="newRegion.description"
+                class="w-full"
+                [rows]="3">
+              </tolle-textarea>
+            </div>
+
+            <!-- Validation error -->
+            @if (step1Error) {
+              <div class="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <i class="ri-error-warning-line text-destructive shrink-0"></i>
+                <p class="text-sm text-destructive">{{ step1Error }}</p>
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- ── Step 1: Review ── -->
+        @if (createStep === 1) {
+          <div class="space-y-4">
+            <div class="p-4 bg-muted/50 rounded-lg border border-border">
+              <h4 class="font-semibold mb-3">Region Details Preview</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Name:</span>
+                  <span class="font-medium">{{ newRegion.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Code:</span>
+                  <span class="font-mono">{{ newRegion.code }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Capital:</span>
+                  <span class="font-medium">{{ newRegion.capital || '—' }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Description:</span>
+                  <span class="font-medium">{{ newRegion.description || '—' }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-muted-foreground">Status:</span>
+                  <tolle-badge size="sm" [style.background]="getStatusBg(newRegion.isActive)" [style.color]="getStatusFg(newRegion.isActive)">
+                    {{ newRegion.isActive ? 'Active' : 'Inactive' }}
+                  </tolle-badge>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+              <i class="ri-information-line text-primary shrink-0"></i>
+              <p class="text-sm text-primary font-medium">
+                After creating the region, you can assign roles scoped to this region from the User Management screen.
+              </p>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 border-t border-border shrink-0 flex items-center justify-between">
+        @if (createStep === 0) {
+          <tolle-button variant="outline" (click)="closeCreateModal()">Cancel</tolle-button>
+          <tolle-button variant="default" (click)="nextCreateStep()">
+            Next <i class="ri-arrow-right-line ml-1"></i>
+          </tolle-button>
+        } @else {
+          <tolle-button variant="outline" (click)="prevCreateStep()">
+            <i class="ri-arrow-left-line mr-1"></i>Back
+          </tolle-button>
+          <tolle-button variant="default" (click)="submitRegion()" [busy]="creating">
+            <i class="ri-check-line mr-1"></i>Create Region
+          </tolle-button>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ── Assign User to Region Modal ──────────────────────────────────────── -->
+<ng-template #assignUserModal>
+  <div class="space-y-4 p-5">
+    <div class="space-y-1.5">
+      <tolle-label>Select User <span class="text-red-500">*</span></tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="assignUserForm.userId" placeholder="Choose a user">
+        <tolle-select-item *ngFor="let u of availableUsers" [value]="u.userId">
+          {{ u.fullName }} ({{ u.email }}) - {{ u.type }}
+        </tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Role <span class="text-red-500">*</span></tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="assignUserForm.roleId" placeholder="Select a role">
+        <tolle-select-item *ngFor="let role of availableRoles" [value]="role.id">{{ role.name }}</tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <div class="border border-border rounded-lg p-3 space-y-3">
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="isActingRegion" [(ngModel)]="assignUserForm.isActing"
+               class="w-4 h-4 rounded border-border accent-primary cursor-pointer" />
+        <label for="isActingRegion" class="text-sm font-medium cursor-pointer">Acting role</label>
+        <span class="text-xs text-muted-foreground">(temporary, max 30 days)</span>
+      </div>
+      <div *ngIf="assignUserForm.isActing" class="space-y-1.5">
+        <tolle-label>Acting End Date <span class="text-red-500">*</span></tolle-label>
+        <tolle-input type="date" [(ngModel)]="assignUserForm.actingEndDate"
+                     [attr.min]="minActingDate" [attr.max]="maxActingDate" class="w-full" />
+        <p class="text-xs text-muted-foreground">Must be within 30 days from today.</p>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="submitAssignUser()"
+        [disabled]="!assignUserForm.userId || !assignUserForm.roleId || (assignUserForm.isActing && (!assignUserForm.actingEndDate || !isValidActingDate()))">
+        Assign User
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- ── Region Detail Modal Template ──────────────────────────────────────── -->
+<ng-template #regionModal let-region="region">
+  <div class="space-y-6 p-7">
+    
+    <!-- Header Section -->
+    <div class="text-center pb-4 border-b border-border">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-3">
+        <i class="ri-map-2-line text-2xl text-primary"></i>
+      </div>
+      <div>
+        <h4 class="font-semibold">{{ region.name }}</h4>
+        <p class="text-sm text-muted-foreground font-mono">{{ region.code }} · {{ region.id }}</p>
+      </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Capital</p>
+        <p class="font-medium mt-1">{{ region.capital || '—' }}</p>
+      </div>
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold">Status</p>
+        <tolle-badge size="sm" class="mt-1" [style.background]="getStatusBg(region.isActive)" [style.color]="getStatusFg(region.isActive)">
+          {{ region.isActive ? 'Active' : 'Inactive' }}
+        </tolle-badge>
+      </div>
+    </div>
+
+    <!-- Description -->
+    @if (region.description) {
+      <div class="p-3 bg-muted/50 rounded-lg">
+        <p class="text-xs text-muted-foreground uppercase font-semibold mb-2">Description</p>
+        <p class="text-sm">{{ region.description }}</p>
+      </div>
+    }
+
+    <!-- Role Assignment CTA -->
+    <div class="pt-4 border-t border-border">
+      <tolle-button variant="default" class="w-full" (click)="openAssignUserModal(region)">
+        <i class="ri-user-add-line mr-2"></i>Assign User to Region
+      </tolle-button>
+      <p class="text-xs text-muted-foreground text-center mt-2">
+        Assign users with roles scoped to this region
+      </p>
+    </div>
+  </div>
+</ng-template>

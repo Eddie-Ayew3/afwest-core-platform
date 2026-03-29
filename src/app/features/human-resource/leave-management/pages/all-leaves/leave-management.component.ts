@@ -1,6 +1,8 @@
-import { Component, OnInit, inject, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import {
   ButtonComponent, BadgeComponent, SelectComponent, SelectItemComponent, DatePickerComponent, TextareaComponent,
   LabelComponent, ModalService, DataTableComponent, TolleCellDirective, TableColumn,
@@ -9,30 +11,11 @@ import {
   AlertDialogService, ToastService
 } from '@tolle_/tolle-ui';
 import { InputComponent } from '@tolle_/tolle-ui';
+import { LeaveService } from '../../services/leave.service';
+import { LeaveRequestDto, CreateLeaveRequestDto, LeaveStatus, LeaveType, LeaveBalanceDto, InitializeLeaveBalanceDto, LeaveBalanceEntryDto } from '../../models/leave.model';
+import { LeaveActions } from '../../stores/leave.actions';
+import { selectLeaves, selectLeaveLoading, selectLeaveError, selectBalances } from '../../stores/leave.selectors';
 
-interface LeaveRequest {
-  id: number;
-  employee: string;
-  department: string;
-  type: string;
-  start: Date;
-  end: Date;
-  status: 'Pending' | 'Approved' | 'Rejected';
-  manager: string;
-  reason: string;
-  suggestedOfficer: string;
-  leaveContactAddress: { address: string; phone: string; email: string; };
-  leaveEntitlement: {
-    currentLeaveDays: number; accruedLeaveDays: number; leaveTaken: number;
-    leaveBalance: number; outstandingLeave: number; leaveGranted: number;
-    commencementDate: Date; resumptionDate: Date;
-  };
-  approvals: {
-    supervisor: { name: string; date?: Date; signature?: string; approved: boolean; };
-    operationalManager: { name: string; date?: Date; signature?: string; approved: boolean; };
-    humanResourceOfficer: { name: string; remarks?: string; date?: Date; signature?: string; approved: boolean; };
-  };
-}
 
 @Component({
   selector: 'app-leave-management',
@@ -48,12 +31,18 @@ interface LeaveRequest {
   ],
   templateUrl: './leave-management.component.html'
 })
-export class LeaveManagementComponent implements OnInit {
-  private modalService = inject(ModalService);
+export class LeaveManagementComponent implements OnInit, OnDestroy {
+  private store = inject(Store);
+  private leaveService = inject(LeaveService);
+  public modalService = inject(ModalService);
   private alertDialog = inject(AlertDialogService);
   private toast = inject(ToastService);
   @ViewChild('requestModal') requestModal!: TemplateRef<any>;
   @ViewChild('requestLeaveModal') requestLeaveModal!: TemplateRef<any>;
+  @ViewChild('balanceModal') balanceModal!: TemplateRef<any>;
+  @ViewChild('initializeBalanceModal') initializeBalanceModal!: TemplateRef<any>;
+
+  private subscriptions = new Subscription();
 
   columns: TableColumn[] = [
     { key: 'employee', label: 'Employee' },
@@ -61,104 +50,83 @@ export class LeaveManagementComponent implements OnInit {
     { key: 'duration', label: 'Duration' },
     { key: 'status', label: 'Status' },
     { key: 'manager', label: 'Manager' },
-    { key: 'actions', label: '' },
+    { key: 'actions', label: 'Actions' },
   ];
 
-  requests: LeaveRequest[] = [
-    {
-      id: 1, employee: 'Ama Boateng', department: 'Operations', type: 'Vacation',
-      start: new Date('2024-12-10'), end: new Date('2024-12-15'), status: 'Approved',
-      manager: 'Kwame Mensah', reason: 'Family vacation', suggestedOfficer: 'Kofi Asante',
-      leaveContactAddress: { address: '14 Ring Road, Accra, Ghana', phone: '+233-24-123-4567', email: 'ama.b@afwest.com.gh' },
-      leaveEntitlement: { currentLeaveDays: 21, accruedLeaveDays: 5, leaveTaken: 10, leaveBalance: 16, outstandingLeave: 0, leaveGranted: 5, commencementDate: new Date('2024-12-10'), resumptionDate: new Date('2024-12-16') },
-      approvals: {
-        supervisor: { name: 'Kwame Mensah', date: new Date('2024-12-05'), signature: 'KM', approved: true },
-        operationalManager: { name: 'Yaw Acheampong', date: new Date('2024-12-06'), signature: 'YA', approved: true },
-        humanResourceOfficer: { name: 'HR Team', remarks: 'Approved as per company policy', date: new Date('2024-12-07'), signature: 'HR', approved: true }
-      }
-    },
-    {
-      id: 2, employee: 'Kofi Asante', department: 'Security', type: 'Sick',
-      start: new Date('2024-12-20'), end: new Date('2024-12-22'), status: 'Pending',
-      manager: 'Abena Frimpong', reason: 'Flu symptoms', suggestedOfficer: 'Nana Osei',
-      leaveContactAddress: { address: '7 Asokwa Road, Kumasi, Ghana', phone: '+233-24-987-6543', email: 'kofi.a@afwest.com.gh' },
-      leaveEntitlement: { currentLeaveDays: 21, accruedLeaveDays: 3, leaveTaken: 8, leaveBalance: 16, outstandingLeave: 0, leaveGranted: 3, commencementDate: new Date('2024-12-20'), resumptionDate: new Date('2024-12-23') },
-      approvals: {
-        supervisor: { name: 'Abena Frimpong', approved: false },
-        operationalManager: { name: 'Yaw Darko', approved: false },
-        humanResourceOfficer: { name: 'HR Team', approved: false }
-      }
-    },
-    {
-      id: 3, employee: 'Akosua Frimpong', department: 'Finance', type: 'Personal',
-      start: new Date('2024-12-24'), end: new Date('2024-12-26'), status: 'Rejected',
-      manager: 'Nana Acheampong', reason: 'Family event', suggestedOfficer: 'Efua Mensah',
-      leaveContactAddress: { address: '22 Harbour Road, Takoradi, Ghana', phone: '+233-24-555-1234', email: 'akosua.f@afwest.com.gh' },
-      leaveEntitlement: { currentLeaveDays: 21, accruedLeaveDays: 2, leaveTaken: 12, leaveBalance: 11, outstandingLeave: 0, leaveGranted: 0, commencementDate: new Date('2024-12-24'), resumptionDate: new Date('2024-12-27') },
-      approvals: {
-        supervisor: { name: 'Nana Acheampong', date: new Date('2024-12-20'), signature: 'NA', approved: false },
-        operationalManager: { name: 'Kweku Baffoe', date: new Date('2024-12-21'), signature: 'KB', approved: false },
-        humanResourceOfficer: { name: 'HR Team', remarks: 'Insufficient leave balance', date: new Date('2024-12-22'), signature: 'HR', approved: false }
-      }
-    },
-    {
-      id: 4, employee: 'Yaw Acheampong', department: 'Logistics', type: 'Vacation',
-      start: new Date('2024-12-28'), end: new Date('2025-01-03'), status: 'Approved',
-      manager: 'Adwoa Kyei', reason: 'Holiday trip', suggestedOfficer: 'Kweku Baffoe',
-      leaveContactAddress: { address: '5 Market Circle, Tema, Ghana', phone: '+233-24-777-8888', email: 'yaw.a@afwest.com.gh' },
-      leaveEntitlement: { currentLeaveDays: 21, accruedLeaveDays: 8, leaveTaken: 5, leaveBalance: 24, outstandingLeave: 0, leaveGranted: 6, commencementDate: new Date('2024-12-28'), resumptionDate: new Date('2025-01-04') },
-      approvals: {
-        supervisor: { name: 'Adwoa Kyei', date: new Date('2024-12-25'), signature: 'AK', approved: true },
-        operationalManager: { name: 'Kojo Agyemang', date: new Date('2024-12-26'), signature: 'KA', approved: true },
-        humanResourceOfficer: { name: 'HR Team', remarks: 'Approved within policy limits', date: new Date('2024-12-27'), signature: 'HR', approved: true }
-      }
-    },
-    {
-      id: 5, employee: 'Abena Osei', department: 'Administration', type: 'Sick',
-      start: new Date('2024-12-30'), end: new Date('2025-01-01'), status: 'Pending',
-      manager: 'Kwame Mensah', reason: 'Migraine treatment', suggestedOfficer: 'Ama Boateng',
-      leaveContactAddress: { address: '9 Independence Avenue, Accra, Ghana', phone: '+233-24-999-0000', email: 'abena.o@afwest.com.gh' },
-      leaveEntitlement: { currentLeaveDays: 21, accruedLeaveDays: 4, leaveTaken: 7, leaveBalance: 18, outstandingLeave: 0, leaveGranted: 2, commencementDate: new Date('2024-12-30'), resumptionDate: new Date('2025-01-02') },
-      approvals: {
-        supervisor: { name: 'Kwame Mensah', approved: false },
-        operationalManager: { name: 'Yaw Acheampong', approved: false },
-        humanResourceOfficer: { name: 'HR Team', approved: false }
-      }
-    },
-    {
-      id: 6, employee: 'Nana Acheampong', department: 'Security', type: 'Unpaid',
-      start: new Date('2025-01-05'), end: new Date('2025-01-10'), status: 'Approved',
-      manager: 'Abena Frimpong', reason: 'Personal matters', suggestedOfficer: 'Kofi Asante',
-      leaveContactAddress: { address: '3 Adum Road, Kumasi, Ghana', phone: '+233-24-333-4444', email: 'nana.a@afwest.com.gh' },
-      leaveEntitlement: { currentLeaveDays: 21, accruedLeaveDays: 0, leaveTaken: 15, leaveBalance: 6, outstandingLeave: 0, leaveGranted: 5, commencementDate: new Date('2025-01-05'), resumptionDate: new Date('2025-01-13') },
-      approvals: {
-        supervisor: { name: 'Abena Frimpong', date: new Date('2025-01-03'), signature: 'AF', approved: true },
-        operationalManager: { name: 'Yaw Darko', date: new Date('2025-01-04'), signature: 'YD', approved: true },
-        humanResourceOfficer: { name: 'HR Team', remarks: 'Unpaid leave approved', date: new Date('2025-01-05'), signature: 'HR', approved: true }
-      }
-    }
-  ];
-
-  filteredRequests: LeaveRequest[] = [];
+  leaves$ = this.store.select(selectLeaves);
+  loading$ = this.store.select(selectLeaveLoading);
+  error$ = this.store.select(selectLeaveError);
+  balances$ = this.store.select(selectBalances);
+  
+  leaves: LeaveRequestDto[] = [];
+  filteredRequests: LeaveRequestDto[] = [];
+  balances: LeaveBalanceDto[] = [];
+  loading = false;
+  error: string | null = null;
   showFilterPanel = false;
   filterStatus: 'All' | 'Pending' | 'Approved' | 'Rejected' = 'All';
   private modalRef: any;
 
+  // Balance management properties
+  selectedUserIdForBalance = '';
+  balanceYear = new Date().getFullYear();
+  initializeBalanceForm: InitializeLeaveBalanceDto = {
+    year: new Date().getFullYear(),
+    balances: []
+  };
+
   submitting = false;
   newRequest = {
-    type: 'Sick', start: new Date(), end: new Date(), reason: '',
-    suggestedOfficer: '',
-    leaveContactAddress: { address: '', phone: '', email: '' }
+    leaveType: 'Annual' as LeaveType,
+    startDate: '',
+    endDate: '',
+    reason: ''
   };
 
   ngOnInit() {
-    this.applyFilter();
+    this.store.dispatch(LeaveActions.loadLeaves({}));
+    
+    this.subscriptions.add(
+      this.leaves$.subscribe(leaves => {
+        this.leaves = leaves;
+        this.applyFilter();
+      })
+    );
+    
+    this.subscriptions.add(
+      this.loading$.subscribe(loading => {
+        this.loading = loading;
+      })
+    );
+    
+    this.subscriptions.add(
+      this.error$.subscribe(error => {
+        this.error = error;
+        if (error) {
+          this.toast.show({
+            title: 'Error',
+            description: error,
+            variant: 'destructive'
+          });
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.balances$.subscribe(balances => {
+        this.balances = balances;
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 
   applyFilter() {
     this.filteredRequests = this.filterStatus === 'All'
-      ? [...this.requests]
-      : this.requests.filter(r => r.status === this.filterStatus);
+      ? [...this.leaves]
+      : this.leaves.filter(r => r.status === this.filterStatus);
   }
 
   get activeFilterCount(): number { return this.filterStatus !== 'All' ? 1 : 0; }
@@ -170,52 +138,59 @@ export class LeaveManagementComponent implements OnInit {
     this.applyFilter();
   }
 
-  deleteLeave(leave: LeaveRequest) {
+  deleteLeave(leave: LeaveRequestDto) {
     const ref = this.alertDialog.open({
       title: 'Delete Leave Request?',
-      description: `Delete the leave request for "${leave.employee}"? This cannot be undone.`,
+      description: `Delete the leave request for "${leave.guardName}"? This cannot be undone.`,
       actionText: 'Delete',
       variant: 'destructive'
     });
     ref.afterClosed$.subscribe(confirmed => {
       if (!confirmed) return;
-      this.requests = this.requests.filter(r => r.id !== leave.id);
-      this.applyFilter();
+      // TODO: Implement delete functionality in service and store
       this.toast.show({ title: 'Leave Deleted', description: 'The leave request has been deleted.', variant: 'destructive' });
     });
   }
 
-  viewRequest(request: LeaveRequest) {
+  viewRequest(request: LeaveRequestDto) {
     this.modalService.open({
-      title: `Leave Request – ${request.employee}`,
+      title: `Leave Request – ${request.guardName}`,
       backdropClose: true, size: 'lg', showCloseButton: true,
       content: this.requestModal, context: { request }
     });
   }
 
-  calculateRequestDays(request: LeaveRequest): number {
-    if (!request.start || !request.end) return 0;
-    return Math.ceil(Math.abs(request.end.getTime() - request.start.getTime()) / (1000 * 3600 * 24)) + 1;
+  calculateRequestDays(request: LeaveRequestDto): number {
+    if (!request.startDate || !request.endDate) return 0;
+    const start = new Date(request.startDate);
+    const end = new Date(request.endDate);
+    return Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
   }
 
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  formatDuration(start: Date, end: Date): string {
+  formatDuration(startDate: string, endDate: string): string {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
     const days = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
     return `${days} day${days !== 1 ? 's' : ''}`;
   }
 
   calculateDays(): number {
-    if (!this.newRequest.start || !this.newRequest.end) return 0;
-    return Math.ceil(Math.abs(this.newRequest.end.getTime() - this.newRequest.start.getTime()) / (1000 * 3600 * 24)) + 1;
+    if (!this.newRequest.startDate || !this.newRequest.endDate) return 0;
+    const start = new Date(this.newRequest.startDate);
+    const end = new Date(this.newRequest.endDate);
+    return Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 3600 * 24)) + 1;
   }
 
   openRequestLeaveModal() {
     this.newRequest = {
-      type: 'Sick', start: new Date(), end: new Date(), reason: '',
-      suggestedOfficer: '', leaveContactAddress: { address: '', phone: '', email: '' }
+      leaveType: 'Annual' as LeaveType,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0],
+      reason: ''
     };
     this.modalRef = this.modalService.open({
       title: 'Request Leave', backdropClose: true, size: 'lg', showCloseButton: true,
@@ -225,28 +200,82 @@ export class LeaveManagementComponent implements OnInit {
 
   submitRequest() {
     this.submitting = true;
-    setTimeout(() => {
-      this.requests.unshift({
-        id: Date.now(), employee: 'You', department: 'Your Department',
-        type: this.newRequest.type, start: this.newRequest.start, end: this.newRequest.end,
-        status: 'Pending', manager: 'HR Team', reason: this.newRequest.reason,
-        suggestedOfficer: this.newRequest.suggestedOfficer,
-        leaveContactAddress: this.newRequest.leaveContactAddress,
-        leaveEntitlement: {
-          currentLeaveDays: 21, accruedLeaveDays: 0, leaveTaken: 0, leaveBalance: 21,
-          outstandingLeave: 0, leaveGranted: this.calculateDays(),
-          commencementDate: this.newRequest.start, resumptionDate: this.newRequest.end
-        },
-        approvals: {
-          supervisor: { name: 'Pending Supervisor', approved: false },
-          operationalManager: { name: 'Pending Manager', approved: false },
-          humanResourceOfficer: { name: 'HR Team', approved: false }
-        }
-      });
-      this.applyFilter();
-      this.submitting = false;
-      if (this.modalRef) this.modalRef.close();
-      this.toast.show({ title: 'Leave Request Submitted', description: 'Your leave request has been submitted successfully and is pending approval.', variant: 'success' });
-    }, 800);
+    
+    const createDto: CreateLeaveRequestDto = {
+      leaveType: this.newRequest.leaveType,
+      startDate: this.newRequest.startDate,
+      endDate: this.newRequest.endDate,
+      reason: this.newRequest.reason
+    };
+    
+    this.store.dispatch(LeaveActions.submitLeave({ dto: createDto }));
+    
+    // Subscribe to the result
+    this.subscriptions.add(
+      this.leaves$.subscribe(() => {
+        this.submitting = false;
+        if (this.modalRef) this.modalRef.close();
+        this.toast.show({ 
+          title: 'Leave Request Submitted', 
+          description: 'Your leave request has been submitted successfully and is pending approval.', 
+          variant: 'success' 
+        });
+      })
+    );
+  }
+
+  // Balance management methods
+  openBalanceModal(userId: string): void {
+    this.selectedUserIdForBalance = userId;
+    this.store.dispatch(LeaveActions.loadLeaveBalances({ userId, year: this.balanceYear }));
+    this.modalRef = this.modalService.open({
+      title: 'Leave Balance',
+      content: this.balanceModal,
+      size: 'default'
+    });
+  }
+
+  openInitializeBalanceModal(userId: string): void {
+    this.selectedUserIdForBalance = userId;
+    this.initializeBalanceForm = {
+      year: new Date().getFullYear(),
+      balances: [
+        { leaveType: 'Annual', year: new Date().getFullYear(), totalDays: 21, usedDays: 0 },
+        { leaveType: 'Sick', year: new Date().getFullYear(), totalDays: 10, usedDays: 0 },
+        { leaveType: 'Emergency', year: new Date().getFullYear(), totalDays: 3, usedDays: 0 },
+        { leaveType: 'Maternity', year: new Date().getFullYear(), totalDays: 90, usedDays: 0 },
+        { leaveType: 'Paternity', year: new Date().getFullYear(), totalDays: 14, usedDays: 0 },
+        { leaveType: 'Unpaid', year: new Date().getFullYear(), totalDays: 365, usedDays: 0 }
+      ]
+    };
+    this.modalRef = this.modalService.open({
+      title: 'Initialize Leave Balance',
+      content: this.initializeBalanceModal,
+      size: 'default'
+    });
+  }
+
+  autoInitializeBalance(userId: string): void {
+    this.store.dispatch(LeaveActions.autoInitializeLeaveBalance({ userId }));
+  }
+
+  submitInitializeBalance(): void {
+    if (!this.selectedUserIdForBalance) return;
+    
+    this.store.dispatch(LeaveActions.initializeLeaveBalance({ 
+      userId: this.selectedUserIdForBalance, 
+      dto: this.initializeBalanceForm 
+    }));
+    
+    if (this.modalRef) this.modalRef.close();
+  }
+
+  updateBalanceYear(): void {
+    if (this.selectedUserIdForBalance) {
+      this.store.dispatch(LeaveActions.loadLeaveBalances({ 
+        userId: this.selectedUserIdForBalance, 
+        year: this.balanceYear 
+      }));
+    }
   }
 }

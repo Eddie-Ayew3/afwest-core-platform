@@ -1,0 +1,230 @@
+<div class="flex h-full bg-background">
+  <div class="flex-1 p-6 overflow-auto">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-5 block">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><span class="text-muted-foreground">HR</span></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><span>Permissions Management</span></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">Permissions Management</h1>
+        <p class="text-sm text-muted-foreground mt-1">Configure what each role can do across the platform.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div *ngIf="unsaved" class="flex items-center gap-1.5 text-amber-500 text-sm">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          Unsaved changes
+        </div>
+        <div *ngIf="savedIndicatorVisible && !unsaved" class="flex items-center gap-1.5 text-green-600 text-sm">
+          <i class="ri-checkbox-circle-line"></i> Saved
+        </div>
+        <tolle-button variant="outline" (click)="openCreateRoleModal()">
+          <i class="ri-add-line mr-1"></i> New Role
+        </tolle-button>
+        <tolle-button variant="outline" (click)="resetRole()" [disabled]="!unsaved">
+          <i class="ri-refresh-line mr-1"></i> Reset
+        </tolle-button>
+        <tolle-button variant="default" (click)="savePermissions()" [disabled]="!unsaved" [busy]="roleSaving">
+          <i class="ri-save-line mr-1"></i> Save Changes
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="roleLoading || permissionLoading" class="flex items-center justify-center py-16">
+      <i class="ri-loader-4-line animate-spin text-2xl text-muted-foreground mr-2"></i>
+      <span class="text-muted-foreground">Loading...</span>
+    </div>
+
+    <!-- Two-panel layout -->
+    <div *ngIf="!roleLoading && !permissionLoading" class="flex gap-6">
+
+      <!-- LEFT: Role selector -->
+      <div class="w-72 flex-shrink-0">
+        <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Roles ({{ roles.length }})</p>
+        <div class="space-y-2">
+          <div *ngFor="let role of roles"
+               (click)="selectRole(role.id)"
+               class="p-3 rounded-lg border cursor-pointer transition-all"
+               [ngClass]="selectedRoleId === role.id
+                 ? 'border-primary bg-primary/5'
+                 : 'border-border hover:bg-muted/40'">
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-sm font-medium truncate">{{ role.name }}</span>
+                <span *ngIf="role.isSystem" class="text-xs px-1 py-0.5 rounded bg-muted text-muted-foreground">sys</span>
+              </div>
+              <span class="text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0"
+                    [style.background]="getScopeBg(role.scopeLevel)"
+                    [style.color]="getScopeFg(role.scopeLevel)">
+                {{ role.scopeLevel }}
+              </span>
+            </div>
+            <p *ngIf="role.description" class="text-xs text-muted-foreground leading-tight mb-2">{{ role.description }}</p>
+            <!-- Permission bar -->
+            <div>
+              <div class="h-1 bg-muted rounded-full overflow-hidden">
+                <div class="h-full bg-primary rounded-full transition-all"
+                     [style.width]="getEnabledBarWidth(role)">
+                </div>
+              </div>
+              <p class="text-xs text-muted-foreground mt-1">
+                {{ getEnabledCount(role) }} / {{ allPermissions.length }} permissions
+              </p>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="roles.length === 0" class="text-center py-8 text-muted-foreground text-sm">
+            <i class="ri-shield-line text-2xl block mb-2"></i>
+            No roles found
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Permission toggles -->
+      <div class="flex-1 min-w-0">
+
+        <!-- No role selected -->
+        <div *ngIf="!selectedRole" class="flex items-center justify-center h-48 text-muted-foreground text-sm">
+          <div class="text-center">
+            <i class="ri-cursor-line text-2xl block mb-2"></i>
+            Select a role to manage its permissions
+          </div>
+        </div>
+
+        <!-- Role detail -->
+        <div *ngIf="selectedRole">
+          <!-- Role header -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <h2 class="text-lg font-semibold">{{ selectedRole.name }}</h2>
+              <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                    [style.background]="getScopeBg(selectedRole.scopeLevel)"
+                    [style.color]="getScopeFg(selectedRole.scopeLevel)">
+                {{ selectedRole.scopeLevel }}
+              </span>
+            </div>
+            <div class="flex gap-2">
+              <tolle-button variant="ghost" size="sm" (click)="expandAllCategories()">
+                <i class="ri-expand-up-down-line mr-1 text-xs"></i>Expand All
+              </tolle-button>
+              <tolle-button variant="ghost" size="sm" (click)="collapseAllCategories()">
+                <i class="ri-collapse-diagonal-line mr-1 text-xs"></i>Collapse All
+              </tolle-button>
+              <tolle-button *ngIf="!selectedRole.isSystem" variant="ghost" size="sm"
+                            class="text-destructive" (click)="deleteRole(selectedRole)">
+                <i class="ri-delete-bin-line mr-1"></i>Delete
+              </tolle-button>
+            </div>
+          </div>
+
+          <!-- Permission categories -->
+          <div class="space-y-4">
+            <tolle-card *ngFor="let cat of categories; trackBy: trackCategory" class="overflow-hidden">
+              <tolle-card-content class="p-0">
+
+                <!-- Category header -->
+                <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/30 transition-colors"
+                     (click)="toggleCategory(cat)">
+                  <div class="flex items-center gap-3">
+                    <i [class]="getCategoryIcon(cat)" class="text-primary text-lg"></i>
+                    <div>
+                      <span class="font-semibold text-sm">{{ cat }}</span>
+                      <span class="text-xs text-muted-foreground ml-2">
+                        ({{ getEnabledCountInCategory(cat) }}/{{ getPermissionsInCategory(cat).length }})
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-muted-foreground">{{ getEnabledCountInCategory(cat) }} enabled</span>
+                    <i class="text-muted-foreground text-lg"
+                       [class.ri-arrow-up-s-line]="isCategoryExpanded(cat)"
+                       [class.ri-arrow-down-s-line]="!isCategoryExpanded(cat)"></i>
+                  </div>
+                </div>
+
+                <!-- Permission rows -->
+                <div *ngIf="isCategoryExpanded(cat)" class="border-t border-border">
+                  <div *ngFor="let perm of getPermissionsInCategory(cat)"
+                       class="flex items-center justify-between px-6 py-4 border-b border-border/50 last:border-0 hover:bg-muted/10 transition-colors">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm font-medium">{{ perm.action }}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                              [style.background]="getTypeBg(perm.type)"
+                              [style.color]="getTypeFg(perm.type)">
+                          {{ perm.type }}
+                        </span>
+                      </div>
+                      <p class="text-xs text-muted-foreground mt-1">{{ perm.description }}</p>
+                    </div>
+                    <!-- Toggle -->
+                    <div class="ml-4 flex-shrink-0">
+                       <tolle-switch
+                        type="button"
+                        class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none"
+                        [class]="getToggleClasses(perm.id)"
+                        (click)="toggle(perm.id)">
+                        <span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform"
+                              [class]="isEnabled(perm.id) ? 'translate-x-4' : 'translate-x-1'">
+                        </span>
+                      </tolle-switch>
+                    </div>
+                  </div>
+                </div>
+
+              </tolle-card-content>
+            </tolle-card>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Create Role Modal -->
+<ng-template #createRoleModal>
+  <div class="space-y-4 p-6">
+    <p class="text-sm text-muted-foreground">Define a new role and its access scope.</p>
+
+    <div class="space-y-1.5">
+      <tolle-label>Role Name <span class="text-red-500">*</span></tolle-label>
+      <tolle-input placeholder="e.g., Regional HR Officer" [(ngModel)]="createForm.name"></tolle-input>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Description</tolle-label>
+      <tolle-input placeholder="Brief description of this role" [(ngModel)]="createForm.description"></tolle-input>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Scope Level <span class="text-red-500">*</span></tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="createForm.scopeLevel">
+        <tolle-select-item *ngFor="let s of scopeOptions" [value]="s">{{ s }}</tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Approval Level <span class="text-red-500">*</span></tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="createForm.approvalLevel">
+        <tolle-select-item *ngFor="let a of approvalOptions" [value]="a">{{ a }}</tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="closeModal()">Cancel</tolle-button>
+      <tolle-button variant="default" [disabled]="!createForm.name.trim()" (click)="submitCreateRole()">
+        Create Role
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>

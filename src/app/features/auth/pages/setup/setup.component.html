@@ -1,0 +1,114 @@
+<div class="bg-white text-gray-900 h-screen flex flex-col justify-center items-center font-sans antialiased overflow-hidden">
+
+  <div class="w-full max-w-[440px] px-4">
+    <!-- Logo -->
+    <div class="flex justify-center mb-8">
+      <img src="Progress_2.png" class="mx-auto" alt="Afwest Logo">
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-black mb-2">Welcome to Afwest</h1>
+      <p class="text-[#a1a1aa] text-sm">Create your administrator account to get started.</p>
+    </div>
+
+    <!-- Form -->
+    <form class="space-y-4" (ngSubmit)="onSubmit()">
+      <!-- Name row -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <tolle-label for="firstName">First Name</tolle-label>
+          <tolle-input
+            id="firstName"
+            type="text"
+            placeholder="First name"
+            [(ngModel)]="form.firstName"
+            name="firstName"
+            required>
+          </tolle-input>
+        </div>
+        <div class="space-y-1">
+          <tolle-label for="lastName">Last Name</tolle-label>
+          <tolle-input
+            id="lastName"
+            type="text"
+            placeholder="Last name"
+            [(ngModel)]="form.lastName"
+            name="lastName"
+            required>
+          </tolle-input>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="space-y-1">
+        <tolle-label for="email">Email Address</tolle-label>
+        <tolle-input
+          id="email"
+          type="email"
+          placeholder="admin@example.com"
+          [(ngModel)]="form.email"
+          name="email"
+          required>
+        </tolle-input>
+      </div>
+
+      <!-- Password -->
+      <div class="space-y-1">
+        <tolle-label for="password">Password</tolle-label>
+        <div class="relative">
+          <tolle-input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Min. 8 characters"
+            [(ngModel)]="form.password"
+            name="password"
+            required>
+          </tolle-input>
+          <tolle-button type="button"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+            (click)="showPassword = !showPassword">
+            <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-lg"></i>
+          </tolle-button>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="space-y-1">
+        <tolle-label for="confirmPassword">Confirm Password</tolle-label>
+        <div class="relative">
+          <tolle-input
+            id="confirmPassword"
+            [type]="showConfirm ? 'text' : 'password'"
+            placeholder="Re-enter password"
+            [(ngModel)]="form.confirmPassword"
+            name="confirmPassword"
+            required>
+          </tolle-input>
+          <tolle-button type="button"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+            (click)="showConfirm = !showConfirm">
+            <i [class]="showConfirm ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-lg"></i>
+          </tolle-button>
+        </div>
+        <p *ngIf="passwordMismatch" class="text-xs text-red-500 mt-1">Passwords do not match.</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage" class="text-sm text-red-600 text-center">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Submit -->
+      <tolle-button
+        type="submit"
+        variant="default"
+        size="lg"
+        [disabled]="!isValid"
+        [busy]="isLoading"
+        class="w-full mt-2">
+        Create Admin Account
+      </tolle-button>
+    </form>
+  </div>
+</div>

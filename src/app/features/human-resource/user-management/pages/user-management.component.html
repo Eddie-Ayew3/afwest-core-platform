@@ -1,0 +1,214 @@
+<div class="flex h-full bg-background overflow-hidden">
+  <div class="flex-1 flex flex-col p-6 overflow-hidden min-h-0">
+
+    <!-- Breadcrumb -->
+    <tolle-breadcrumb class="mb-3">
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>Home</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link>HR</tolle-breadcrumb-link></tolle-breadcrumb-item>
+      <tolle-breadcrumb-separator><i class="ri-arrow-right-double-line text-muted-foreground/50"></i></tolle-breadcrumb-separator>
+      <tolle-breadcrumb-item><tolle-breadcrumb-link [active]="true">User Management</tolle-breadcrumb-link></tolle-breadcrumb-item>
+    </tolle-breadcrumb>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">User Management & Role Assignment</h1>
+        <p class="text-muted-foreground mt-1">Manage user roles, permissions, and access rights.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <tolle-button variant="outline" size="default" (click)="openAssignRoleDialog()">
+          <i class="ri-user-add-line mr-2"></i>Assign New Role
+        </tolle-button>
+        <tolle-button variant="outline" size="default">
+          <i class="ri-download-line mr-2"></i>Export
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold">{{ totalCount }}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Total Users</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold text-green-600">{{ activeCount }}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Active</p>
+      </div>
+      <div class="bg-background border border-border rounded-lg p-4">
+        <p class="text-2xl font-bold text-slate-400">{{ inactiveCount }}</p>
+        <p class="text-sm text-muted-foreground mt-0.5">Inactive</p>
+      </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="flex justify-between items-center mb-3">
+      <tolle-input
+        placeholder="Search by name, email or staff ID..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        class="w-80">
+      </tolle-input>
+      <div class="flex gap-2">
+        <tolle-button variant="outline" size="default" *ngIf="activeFilterCount > 0">
+          <i class="ri-filter-line mr-2"></i>Filters ({{ activeFilterCount }})
+        </tolle-button>
+        <tolle-button variant="outline" size="default" (click)="toggleFilterPanel()">
+          <i class="ri-equalizer-line mr-2"></i>Filter
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div *ngIf="showFilterPanel" class="mb-3 p-4 bg-muted/30 border border-border rounded-lg">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-muted-foreground mb-2">Status</label>
+          <tolle-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilter()" class="w-full">
+            <tolle-select-item value="all">All Status</tolle-select-item>
+            <tolle-select-item value="active">Active</tolle-select-item>
+            <tolle-select-item value="inactive">Inactive</tolle-select-item>
+          </tolle-select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <tolle-button variant="ghost" size="sm" (click)="clearFilters()">
+          <i class="ri-close-line mr-1"></i>Clear Filters
+        </tolle-button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="flex-1 min-h-0">
+      <tolle-data-table
+        [data]="filteredUsers"
+        [columns]="columns"
+        [stickyHeader]="true"
+        [paginate]="true"
+        [pageSizeOptions]="[10, 25, 50]">
+
+        <ng-template tolleCell="user" let-row="row">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <span class="text-xs font-semibold text-primary">{{ getInitials(row.fullName) }}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="font-medium truncate">{{ row.fullName }}</p>
+              <p class="text-xs text-muted-foreground truncate">{{ row.email }}</p>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template tolleCell="role" let-row="row">
+          <span class="text-xs px-2 py-0.5 rounded font-medium role-badge">
+            {{ getPrimaryRole(row) }}
+          </span>
+        </ng-template>
+
+        <ng-template tolleCell="scope" let-row="row">
+          <span class="text-sm text-muted-foreground">{{ getPrimaryScope(row) }}</span>
+        </ng-template>
+
+        <ng-template tolleCell="status" let-row="row">
+          <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                [style.background]="row.isActive ? 'rgba(34,197,94,0.15)' : 'rgba(148,163,184,0.15)'"
+                [style.color]="row.isActive ? '#16a34a' : '#9CA3AF'">
+            {{ row.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </ng-template>
+
+        <ng-template tolleCell="actions" let-row="row">
+          <div class="flex items-center justify-end gap-2">
+            <tolle-button variant="outline" size="xs" (click)="openAssignRoleDialog(row)">Assign Role</tolle-button>
+            @if (row.isActive) {
+              <tolle-button variant="outline" size="xs" (click)="deactivateUser(row)">
+                <i class="ri-user-unfollow-line"></i> Deactivate
+              </tolle-button>
+            } @else {
+              <tolle-button variant="default" size="xs" (click)="activateUser(row)">
+                <i class="ri-user-follow-line"></i> Activate
+              </tolle-button>
+            }
+            <div class="relative">
+              <tolle-button variant="ghost" size="icon-sm" [tolleDropdownTrigger]="userMenu">
+                <i class="ri-more-2-fill text-muted-foreground"></i>
+              </tolle-button>
+              <tolle-dropdown-menu #userMenu>
+                <button class="w-full text-left px-3 py-2 hover:bg-muted text-sm flex items-center gap-2 rounded-sm text-destructive"
+                  (click)="deleteUser(row)">
+                  <i class="ri-delete-bin-line"></i> Delete
+                </button>
+              </tolle-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+
+      </tolle-data-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Assign Role Modal -->
+<ng-template #assignRoleModal>
+  <div class="space-y-4 p-5">
+
+    <div class="space-y-1.5">
+      <tolle-label>User <span class="text-red-500">*</span></tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="assignRoleForm.userId" placeholder="Choose a user">
+        <tolle-select-item *ngFor="let u of users" [value]="u.id">{{ u.fullName }} ({{ u.email }})</tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <div class="space-y-1.5">
+      <tolle-label>Role <span class="text-red-500">*</span></tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="assignRoleForm.roleId" placeholder="Select a role">
+        <tolle-select-item *ngFor="let role of availableRoles" [value]="role.id">
+          {{ role.name }}
+          <span class="text-xs text-muted-foreground ml-1">({{ role.scopeLevel }})</span>
+        </tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <!-- Region scope — shown when pre-populated from Region Management -->
+    <div *ngIf="regionIdFromParam" class="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+      <p class="text-sm text-primary">
+        <i class="ri-map-pin-line mr-2"></i>Assigning to region: <strong>{{ getRegionName() }}</strong>
+      </p>
+    </div>
+
+    <!-- Region scope — shown when role is Regional or Site scoped and not pre-populated -->
+    <div *ngIf="(selectedRoleForForm?.scopeLevel === 'Regional' || selectedRoleForForm?.scopeLevel === 'Site') && !regionIdFromParam"
+         class="space-y-1.5">
+      <tolle-label>Region</tolle-label>
+      <tolle-select class="w-full" [(ngModel)]="assignRoleForm.regionId" placeholder="Select a region">
+        <tolle-select-item *ngFor="let r of availableRegions" [value]="r.id">{{ r.name }}</tolle-select-item>
+      </tolle-select>
+    </div>
+
+    <!-- Acting role -->
+    <div class="border border-border rounded-lg p-3 space-y-3">
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="isActing" [(ngModel)]="assignRoleForm.isActing"
+               class="w-4 h-4 rounded border-border accent-primary cursor-pointer" />
+        <label for="isActing" class="text-sm font-medium cursor-pointer">Acting role</label>
+        <span class="text-xs text-muted-foreground">(temporary, max 30 days)</span>
+      </div>
+      <div *ngIf="assignRoleForm.isActing" class="space-y-1.5">
+        <tolle-label>Acting End Date <span class="text-red-500">*</span></tolle-label>
+        <tolle-input type="date" [(ngModel)]="assignRoleForm.actingEndDate"
+                     [attr.min]="minActingDate" [attr.max]="maxActingDate" class="w-full" />
+        <p class="text-xs text-muted-foreground">Must be within 30 days from today.</p>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="submitAssignRole()"
+        [disabled]="!assignRoleForm.userId || !assignRoleForm.roleId || (assignRoleForm.isActing && !assignRoleForm.actingEndDate)">
+        Assign Role
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>

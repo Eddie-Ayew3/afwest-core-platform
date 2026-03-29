@@ -95,15 +95,24 @@
 
             <div class="border-t border-border"></div>
 
-            <!-- Name + Staff ID -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- First Name + Last Name + Staff ID -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="space-y-1.5">
-                <tolle-label>Full Name <span class="text-destructive">*</span></tolle-label>
-                <tolle-input type="text" formControlName="fullName"
-                  placeholder="e.g. Kwame Mensah" class="w-full">
+                <tolle-label>First Name <span class="text-destructive">*</span></tolle-label>
+                <tolle-input type="text" formControlName="firstName"
+                  placeholder="e.g. Kwame" class="w-full">
                 </tolle-input>
-                @if (isFieldInvalid('fullName')) {
-                  <p class="text-destructive text-xs">{{ getErrorMessage('fullName') }}</p>
+                @if (isFieldInvalid('firstName')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('firstName') }}</p>
+                }
+              </div>
+              <div class="space-y-1.5">
+                <tolle-label>Last Name <span class="text-destructive">*</span></tolle-label>
+                <tolle-input type="text" formControlName="lastName"
+                  placeholder="e.g. Mensah" class="w-full">
+                </tolle-input>
+                @if (isFieldInvalid('lastName')) {
+                  <p class="text-destructive text-xs">{{ getErrorMessage('lastName') }}</p>
                 }
               </div>
               <div class="space-y-1.5">
@@ -570,6 +579,44 @@
               </div>
             </div>
 
+            <div class="border-t border-border"></div>
+
+            <!-- Next of Kin Section -->
+            <div>
+              <h4 class="text-sm font-semibold text-foreground mb-4">Next of Kin Information</h4>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <tolle-label>Next of Kin Name <span class="text-destructive">*</span></tolle-label>
+                  <tolle-input type="text" formControlName="nextOfKinName" 
+                    placeholder="Enter next of kin name" class="w-full">
+                  </tolle-input>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Relationship <span class="text-destructive">*</span></tolle-label>
+                  <tolle-select formControlName="nextOfKinRelationship" class="w-full" placeholder="Select relationship">
+                    <tolle-select-item value="Spouse">Spouse</tolle-select-item>
+                    <tolle-select-item value="Child">Child</tolle-select-item>
+                    <tolle-select-item value="Parent">Parent</tolle-select-item>
+                    <tolle-select-item value="Sibling">Sibling</tolle-select-item>
+                    <tolle-select-item value="Other">Other</tolle-select-item>
+                  </tolle-select>
+                </div>
+                <div class="space-y-1.5 sm:col-span-2">
+                  <tolle-label>Address <span class="text-destructive">*</span></tolle-label>
+                  <tolle-input type="text" formControlName="nextOfKinAddress" 
+                    placeholder="Residential address" class="w-full">
+                  </tolle-input>
+                </div>
+                <div class="space-y-1.5">
+                  <tolle-label>Telephone <span class="text-destructive">*</span></tolle-label>
+                  <tolle-input type="tel" formControlName="nextOfKinPhone" 
+                    placeholder="Phone number" class="w-full">
+                  </tolle-input>
+                </div>
+              </div>
+            </div>
+
           </tolle-card-content>
           <tolle-card-footer class="flex justify-between border-t border-border pt-4">
             <tolle-button type="button" variant="outline" (click)="prevStep()">
@@ -682,13 +729,55 @@
                   <div class="flex items-center justify-between mb-3">
                     <h5 class="text-sm font-medium">Previous Employment {{ i + 1 }}</h5>
                     @if (workExperience.length > 1) {
+                      <tolle-button type="button" variant="ghost" size="icon-sm" (click)="removeWorkExperience(i)">
+                        <i class="ri-delete-bin-line text-destructive"></i>
+                      </tolle-button>
                     }
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                      <tolle-label>Company Name <span class="text-destructive">*</span></tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'companyName')" 
+                        placeholder="Enter company name" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Position <span class="text-destructive">*</span></tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'position')" 
+                        placeholder="Enter position" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>Start Date</tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'startDate')" 
+                        placeholder="e.g. Jan 2020" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5">
+                      <tolle-label>End Date</tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'endDate')" 
+                        placeholder="e.g. Dec 2022 or Present" class="w-full">
+                      </tolle-input>
+                    </div>
+                    <div class="space-y-1.5 sm:col-span-2">
+                      <tolle-label>Responsibilities</tolle-label>
+                      <tolle-textarea [formControl]="getWorkExperienceControl(i, 'responsibilities')"
+                        placeholder="Describe your main responsibilities..."
+                        class="w-full" [rows]="2">
+                      </tolle-textarea>
+                    </div>
+                    <div class="space-y-1.5 sm:col-span-2">
+                      <tolle-label>Reason for Leaving</tolle-label>
+                      <tolle-input type="text" [formControl]="getWorkExperienceControl(i, 'reasonForLeaving')" 
+                        placeholder="Why did you leave this position?" class="w-full">
+                      </tolle-input>
+                    </div>
                   </div>
                 </div>
               }
             </div>
 
-            @if (workExperience.length < 2) {
+            @if (workExperience.length < 3) {
               <tolle-button type="button" variant="outline" (click)="addWorkExperience()">
                 <i class="ri-add-line mr-2"></i>Add Previous Employment
               </tolle-button>
@@ -728,7 +817,7 @@
                 }
               </div>
               <div>
-                <p class="font-semibold text-lg">{{ formValues.fullName || '—' }}</p>
+                <p class="font-semibold text-lg">{{ formValues.firstName || '—' }} {{ formValues.lastName || '—' }}</p>
                 <p class="text-sm text-muted-foreground font-mono">{{ formValues.staffId }}</p>
               </div>
             </div>
@@ -913,7 +1002,7 @@
               <tolle-button type="button" variant="ghost" (click)="onCancel()" [disabled]="isSubmitting">
                 Cancel
               </tolle-button>
-              <tolle-button type="submit" [busy]="isSubmitting" [disabled]="isSubmitting">
+              <tolle-button type="submit" [busy]="isSubmitting" [disabled]="isSubmitting || staffForm.invalid">
                 <i class="ri-user-add-line mr-1"></i>
                 Add Staff Member
               </tolle-button>

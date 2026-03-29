@@ -197,9 +197,9 @@
         <div class="space-y-1.5">
           <tolle-label>Staff Member <span class="text-destructive">*</span></tolle-label>
           @if (absentRecords.length > 0) {
-            <tolle-select [(ngModel)]="checkInRecordId" placeholder="Select staff member" class="w-full">
-              @for (r of absentRecords; track r.id) {
-                <tolle-select-item [value]="r.id">
+            <tolle-select [(ngModel)]="checkInShiftId" placeholder="Select staff member" class="w-full">
+              @for (r of absentRecords; track r.shiftId) {
+                <tolle-select-item [value]="r.shiftId">
                   {{ r.name }} <span class="text-muted-foreground ml-1">· {{ r.staffId }} · {{ r.site }}</span>
                 </tolle-select-item>
               }
@@ -265,9 +265,9 @@
         <div class="space-y-1.5">
           <tolle-label>Staff Member <span class="text-destructive">*</span></tolle-label>
           @if (onSiteRecords.length > 0) {
-            <tolle-select [(ngModel)]="checkOutRecordId" placeholder="Select staff member" class="w-full">
-              @for (r of onSiteRecords; track r.id) {
-                <tolle-select-item [value]="r.id">
+            <tolle-select [(ngModel)]="checkOutShiftId" placeholder="Select staff member" class="w-full">
+              @for (r of onSiteRecords; track r.shiftId) {
+                <tolle-select-item [value]="r.shiftId">
                   {{ r.name }} <span class="text-muted-foreground ml-1">· {{ r.staffId }} · in {{ r.checkIn }}</span>
                 </tolle-select-item>
               }

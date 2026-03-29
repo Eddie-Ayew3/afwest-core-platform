@@ -10,21 +10,22 @@ export type NavFeature =
   | 'hr_leave'
   | 'hr_user'
   | 'hr_permissions'
+  | 'hr_department'
   | 'hr_guard_performance'
   | 'control_shift'
   | 'control_checkin'
   | 'control_incidents'
   | 'control_inspections'
   | 'procurement'
-  | 'zone_management'
+  | 'region_management'
   | 'finance_payroll'
   | 'finance_payment'
   | 'finance_invoice'
   | 'finance_sla';
 
 const NAV_PERMISSIONS: Record<UserScope, NavFeature[]> = {
-  global:   ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_user', 'hr_permissions', 'hr_guard_performance', 'control_shift', 'control_checkin', 'control_incidents', 'control_inspections', 'procurement', 'zone_management', 'finance_payroll', 'finance_payment', 'finance_invoice', 'finance_sla'],
-  regional: ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_guard_performance', 'control_shift', 'control_checkin', 'control_incidents', 'control_inspections', 'zone_management', 'finance_payroll', 'finance_invoice', 'finance_sla'],
+  global:   ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_user', 'hr_permissions', 'hr_department', 'hr_guard_performance', 'control_shift', 'control_checkin', 'control_incidents', 'control_inspections', 'procurement', 'region_management', 'finance_payroll', 'finance_payment', 'finance_invoice', 'finance_sla'],
+  regional: ['overview', 'hr_staff', 'hr_guard', 'hr_client', 'hr_leave', 'hr_department', 'hr_guard_performance', 'control_shift', 'control_checkin', 'control_incidents', 'control_inspections', 'region_management', 'finance_payroll', 'finance_invoice', 'finance_sla'],
   site:     ['overview', 'hr_staff', 'hr_guard', 'control_shift', 'control_checkin', 'control_incidents', 'control_inspections']
 };
 
@@ -95,6 +96,7 @@ export class PermissionsService {
     if (this.canSee('hr_guard'))             hrItems.push({ title: 'Guard Management',   url: '/hr/guard-management' });
     if (this.canSee('hr_guard_performance')) hrItems.push({ title: 'Guard Performance',  url: '/hr/guard-performance' });
     if (this.canSee('hr_client')) hrItems.push({ title: 'Client Management',       url: '/hr/client-management' });
+    if (this.canSee('hr_department')) hrItems.push({ title: 'Department Management', url: '/hr/department-management' });
     if (this.canSee('hr_leave'))  hrItems.push({ title: 'Leave Management',        url: '/hr/leave-management' });
     if (this.canSee('hr_user'))        hrItems.push({ title: 'User Management',        url: '/hr/user-management' });
     if (this.canSee('hr_permissions')) hrItems.push({ title: 'Permissions',            url: '/hr/permissions-management' });
@@ -103,10 +105,10 @@ export class PermissionsService {
     // Control Unit
     const controlItems: any[] = [];
     if (this.canSee('control_shift'))    controlItems.push({ title: 'Shift Management',  url: '/control-unit/shift-management' });
-    if (this.canSee('control_checkin'))     controlItems.push({ title: 'Check In/Check Out', url: '/control-unit/check-in-out' });
-    if (this.canSee('control_incidents'))   controlItems.push({ title: 'Incident Reports',  url: '/control-unit/incidents' });
-    if (this.canSee('control_inspections')) controlItems.push({ title: 'Site Inspections',  url: '/control-unit/site-inspections' });
-    if (this.canSee('zone_management'))     controlItems.push({ title: 'Zone Management',   url: '/zone-management' });
+    if (this.canSee('control_checkin'))      controlItems.push({ title: 'Check In/Check Out', url: '/control-unit/check-in-out' });
+    if (this.canSee('control_incidents'))    controlItems.push({ title: 'Incident Reports',  url: '/control-unit/incidents' });
+    if (this.canSee('control_inspections'))  controlItems.push({ title: 'Site Inspections',  url: '/control-unit/site-inspections' });
+    if (this.canSee('region_management'))    controlItems.push({ title: 'Region Management', url: '/region-management' });
     if (controlItems.length) platformItems.push({ title: 'Control Unit', icon: 'ri-shield-check-line', expanded: false, items: controlItems });
 
     // Finance

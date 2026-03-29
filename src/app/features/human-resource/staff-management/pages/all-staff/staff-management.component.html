@@ -41,31 +41,31 @@
         [paginate]="true"
         [pageSizeOptions]="[5, 10, 25, 50]">
 
-        <ng-template tolleCell="name" let-row="row">
+        <ng-template tolleCell="fullName" let-row="row">
           <div class="flex items-center gap-3">
             <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
-              {{ row.name.charAt(0) }}
+              {{ row.fullName.charAt(0) }}
             </div>
             <div class="min-w-0">
-              <p class="font-medium truncate">{{ row.name }}</p>
-              <p class="text-xs text-muted-foreground truncate">ID: {{ row.id }}</p>
+              <p class="font-medium truncate">{{ row.fullName }}</p>
+              <p class="text-xs text-muted-foreground truncate">ID: {{ row.staffId || row.id }}</p>
             </div>
           </div>
         </ng-template>
 
         <ng-template tolleCell="role" let-row="row">
-          <p class="text-sm truncate">{{ row.role }}</p>
-          <p class="text-xs text-muted-foreground truncate">{{ row.site }}</p>
+          <p class="text-sm truncate">{{ getPrimaryRole(row.roles) }}</p>
+          <p class="text-xs text-muted-foreground truncate">{{ row.email }}</p>
         </ng-template>
 
         <ng-template tolleCell="status" let-row="row">
-          <tolle-badge [variant]="row.status === 'Active' ? 'default' : 'secondary'" size="sm">
-            {{ row.status }}
+          <tolle-badge [variant]="row.isActive ? 'default' : 'secondary'" size="sm">
+            {{ row.isActive ? 'Active' : 'Inactive' }}
           </tolle-badge>
         </ng-template>
 
         <ng-template tolleCell="contact" let-row="row">
-          <p class="text-sm truncate">{{ row.contact }}</p>
+          <p class="text-sm truncate">{{ row.phoneNumber || row.email }}</p>
         </ng-template>
 
         <ng-template tolleCell="actions" let-row="row">

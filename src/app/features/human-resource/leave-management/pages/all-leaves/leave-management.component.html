@@ -64,11 +64,11 @@
         <ng-template tolleCell="employee" let-row="row">
           <div class="flex items-center gap-3">
             <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
-              {{row.employee.charAt(0)}}
+              {{row.guardName.charAt(0)}}
             </div>
             <div class="min-w-0">
-              <p class="font-medium truncate">{{row.employee}}</p>
-              <p class="text-xs text-muted-foreground truncate">{{row.department}}</p>
+              <p class="font-medium truncate">{{row.guardName}}</p>
+              <p class="text-xs text-muted-foreground truncate">{{row.guardId}}</p>
             </div>
           </div>
         </ng-template>
@@ -76,7 +76,7 @@
         <ng-template tolleCell="duration" let-row="row">
           <div class="flex items-center gap-2">
             <i class="ri-calendar-line text-muted-foreground shrink-0"></i>
-            <span class="text-sm">{{formatDuration(row.start, row.end)}}</span>
+            <span class="text-sm">{{formatDuration(row.startDate, row.endDate)}}</span>
           </div>
         </ng-template>
 
@@ -91,7 +91,7 @@
         <ng-template tolleCell="manager" let-row="row">
           <div class="flex items-center gap-2 min-w-0">
             <i class="ri-user-line text-muted-foreground shrink-0"></i>
-            <span class="text-sm truncate">{{row.manager}}</span>
+            <span class="text-sm truncate">{{row.approvedBy || 'Pending'}}</span>
           </div>
         </ng-template>
 
@@ -131,20 +131,20 @@
   <div class="space-y-4 p-4 max-h-[70vh] overflow-y-auto">
     <div class="flex items-center gap-3">
       <div class="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
-        {{ request.employee.charAt(0) }}
+        {{ request.guardName.charAt(0) }}
       </div>
       <div>
-        <h4 class="font-semibold">{{ request.employee }}</h4>
-        <p class="text-sm text-muted-foreground">{{ request.department }}</p>
+        <h4 class="font-semibold">{{ request.guardName }}</h4>
+        <p class="text-sm text-muted-foreground">{{ request.guardId }}</p>
       </div>
     </div>
     <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
-      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Leave Type</p><p class="font-medium mt-1">{{ request.type }}</p></div>
-      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Manager</p><p class="font-medium mt-1">{{ request.manager }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Leave Type</p><p class="font-medium mt-1">{{ request.leaveType }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Approved By</p><p class="font-medium mt-1">{{ request.approvedBy || 'Pending' }}</p></div>
     </div>
     <div class="grid grid-cols-2 gap-4 p-3 bg-muted/50 rounded-lg">
-      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Start Date</p><p class="font-medium mt-1">{{ formatDate(request.start) }}</p></div>
-      <div><p class="text-xs text-muted-foreground uppercase font-semibold">End Date</p><p class="font-medium mt-1">{{ formatDate(request.end) }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">Start Date</p><p class="font-medium mt-1">{{ formatDate(request.startDate) }}</p></div>
+      <div><p class="text-xs text-muted-foreground uppercase font-semibold">End Date</p><p class="font-medium mt-1">{{ formatDate(request.endDate) }}</p></div>
     </div>
     <div class="p-3 bg-muted/50 rounded-lg">
       <p class="text-xs text-muted-foreground uppercase font-semibold">Total Duration</p>
@@ -166,40 +166,28 @@
   <div class="space-y-6 p-4 max-h-[70vh] overflow-y-auto">
     <div>
       <tolle-label for="modalType">Leave Type</tolle-label>
-      <tolle-select id="modalType" [(ngModel)]="newRequest.type">
+      <tolle-select id="modalType" [(ngModel)]="newRequest.leaveType">
         <tolle-select-item value="Sick">Sick Leave</tolle-select-item>
-        <tolle-select-item value="Vacation">Vacation</tolle-select-item>
-        <tolle-select-item value="Personal">Personal</tolle-select-item>
+        <tolle-select-item value="Annual">Annual Leave</tolle-select-item>
+        <tolle-select-item value="Emergency">Emergency Leave</tolle-select-item>
+        <tolle-select-item value="Maternity">Maternity Leave</tolle-select-item>
+        <tolle-select-item value="Paternity">Paternity Leave</tolle-select-item>
         <tolle-select-item value="Unpaid">Unpaid Leave</tolle-select-item>
       </tolle-select>
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div>
         <tolle-label for="modalStart">Start Date</tolle-label>
-        <tolle-date-picker id="modalStart" [(ngModel)]="newRequest.start"></tolle-date-picker>
+        <tolle-date-picker id="modalStart" [(ngModel)]="newRequest.startDate" class="w-full px-3 py-2 border border-border rounded-lg bg-background"></tolle-date-picker>
       </div>
       <div>
         <tolle-label for="modalEnd">End Date</tolle-label>
-        <tolle-date-picker id="modalEnd" [(ngModel)]="newRequest.end"></tolle-date-picker>
+        <tolle-date-picker id="modalEnd" [(ngModel)]="newRequest.endDate" class="w-full px-3 py-2 border border-border rounded-lg bg-background"></tolle-date-picker>
       </div>
     </div>
     <div>
       <tolle-label>Total Days</tolle-label>
       <div class="bg-muted/50 border border-border rounded-lg px-4 py-3 text-lg font-medium">{{ calculateDays() || 0 }}</div>
-    </div>
-    <div>
-      <tolle-label for="modalSuggestedOfficer">Suggested Officer to Take Over</tolle-label>
-      <tolle-input id="modalSuggestedOfficer" [(ngModel)]="newRequest.suggestedOfficer" placeholder="Enter name of suggested officer"></tolle-input>
-    </div>
-    <div class="space-y-3">
-      <tolle-label>Leave Contact Address</tolle-label>
-      <div class="space-y-2">
-        <tolle-input [(ngModel)]="newRequest.leaveContactAddress.address" placeholder="Address while on leave"></tolle-input>
-        <div class="grid grid-cols-2 gap-2">
-          <tolle-input [(ngModel)]="newRequest.leaveContactAddress.phone" placeholder="Phone number"></tolle-input>
-          <tolle-input [(ngModel)]="newRequest.leaveContactAddress.email" placeholder="Email address"></tolle-input>
-        </div>
-      </div>
     </div>
     <div>
       <tolle-label for="modalReason">Reason / Comments</tolle-label>
@@ -208,6 +196,92 @@
     <div class="flex gap-3 pt-4">
       <tolle-button class="flex-1" variant="default" (click)="submitRequest()" [busy]="submitting">
         Submit Request
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- ── Leave Balance Modal ──────────────────────────────────────── -->
+<ng-template #balanceModal>
+  <div class="space-y-4 p-5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold">Leave Balance</h3>
+      <div class="flex items-center gap-2">
+        <tolle-label for="balanceYear">Year:</tolle-label>
+        <tolle-input type="number" id="balanceYear" [(ngModel)]="balanceYear" (ngModelChange)="updateBalanceYear()" 
+               class="w-20 px-2 py-1 border border-border rounded" min="2020" max="2030" />
+      </div>
+    </div>
+    
+    <div class="space-y-2">
+      <div *ngIf="balances.length === 0" class="text-center py-8 text-muted-foreground">
+        No balance data found for this user.
+      </div>
+      
+      <div *ngFor="let balance of balances" class="bg-muted/30 border border-border rounded-lg p-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="font-medium">{{ balance.leaveType }}</span>
+            <span class="text-sm text-muted-foreground ml-2">({{ balance.year }})</span>
+          </div>
+          <div class="text-right">
+            <div class="text-sm font-medium">{{ balance.remainingDays }} days left</div>
+            <div class="text-xs text-muted-foreground">{{ balance.usedDays }} / {{ balance.totalDays }} used</div>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="w-full bg-background rounded-full h-2">
+            <div class="bg-primary h-2 rounded-full transition-all" 
+                 [style.width.%]="(balance.usedDays / balance.totalDays) * 100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Close</tolle-button>
+      <tolle-button variant="default" (click)="openInitializeBalanceModal(selectedUserIdForBalance)">
+        <i class="ri-settings-3-line mr-2"></i>Initialize Balance
+      </tolle-button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- ── Initialize Balance Modal ──────────────────────────────────────── -->
+<ng-template #initializeBalanceModal>
+  <div class="space-y-4 p-5">
+    <div>
+      <tolle-label for="initYear">Year</tolle-label>
+      <tolle-input type="number" id="initYear" [(ngModel)]="initializeBalanceForm.year" 
+             class="w-full px-3 py-2 border border-border rounded-lg" min="2020" max="2030" />
+    </div>
+    
+    <div class="space-y-3">
+      <tolle-label>Leave Types</tolle-label>
+      <div *ngFor="let balance of initializeBalanceForm.balances; let i = index" class="border border-border rounded-lg p-3 space-y-2">
+        <div class="flex justify-between items-center">
+          <span class="font-medium">{{ balance.leaveType }}</span>
+          <div class="flex items-center gap-2">
+            <label class="text-sm">Total Days:</label>
+            <tolle-input type="number" [(ngModel)]="initializeBalanceForm.balances[i].totalDays" 
+                   class="w-20 px-2 py-1 border border-border rounded" min="0" max="365" />
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm">Used Days:</label>
+          <tolle-input type="number" [(ngModel)]="initializeBalanceForm.balances[i].usedDays" 
+                 class="w-20 px-2 py-1 border border-border rounded" min="0" />
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex justify-end gap-2 pt-2 border-t border-border">
+      <tolle-button variant="outline" (click)="modalService.closeAll()">Cancel</tolle-button>
+      <tolle-button variant="default" (click)="autoInitializeBalance(selectedUserIdForBalance)">
+        <i class="ri-magic-line mr-2"></i>Auto Initialize
+      </tolle-button>
+      <tolle-button variant="default" (click)="submitInitializeBalance()">
+        <i class="ri-save-line mr-2"></i>Save Balance
       </tolle-button>
     </div>
   </div>

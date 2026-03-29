@@ -7,8 +7,7 @@ import {
   ButtonComponent,
   LabelComponent
 } from '@tolle_/tolle-ui';
-import { DEMO_ACCOUNTS } from '../../../../core/data/demo-accounts.data';
-import { LS } from '../../../../core/models/rbac.models';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -28,62 +27,43 @@ export class SignInComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  staffId = '';
+  email = '';
   password = '';
 
-  demoAccounts = DEMO_ACCOUNTS;
-  selectedDemoId = '';
-
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
-    if (localStorage.getItem(LS.isAuthenticated) === 'true') {
+    if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
+      return;
     }
+    this.authService.checkSetupStatus().subscribe({
+      next: (status) => {
+        if (status.isRequired) this.router.navigate(['/setup']);
+      },
+      error: () => {} // ignore — backend may not be running yet
+    });
   }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
-  selectDemo(): void {
-    const account = this.demoAccounts.find(a => a.staffId === this.selectedDemoId);
-    if (account) {
-      this.staffId = account.staffId;
-      this.password = account.password;
-    }
-  }
-
   onSubmit(): void {
-    if (!this.staffId.trim() || !this.password.trim()) return;
+    if (!this.email.trim() || !this.password.trim()) return;
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Use demo data authentication instead of API call
-    setTimeout(() => {
-      const account = this.demoAccounts.find(a => 
-        a.staffId === this.staffId && a.password === this.password
-      );
-
-      if (account) {
-        // Simulate successful login with demo data
-        localStorage.setItem(LS.isAuthenticated, 'true');
-        localStorage.setItem(LS.accessToken, 'demo-access-token-' + Date.now());
-        localStorage.setItem(LS.refreshToken, 'demo-refresh-token-' + Date.now());
-        localStorage.setItem(LS.userStaffId, account.staffId);
-        localStorage.setItem(LS.userDisplayName, account.displayName);
-        localStorage.setItem(LS.userRole, account.role);
-        localStorage.setItem(LS.userScope, account.scope);
-        localStorage.setItem(LS.userRegion, account.region ?? '');
-        localStorage.setItem(LS.userSite, account.site ?? '');
-        
+    this.authService.login(this.email.trim(), this.password).subscribe({
+      next: () => {
         this.isLoading = false;
         this.router.navigate(['/dashboard']);
-      } else {
+      },
+      error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Invalid staff ID or password.';
+        this.errorMessage = 'Invalid email or password.';
       }
-    }, 500); // Simulate network delay
+    });
   }
 }

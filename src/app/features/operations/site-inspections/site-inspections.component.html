@@ -160,19 +160,19 @@
 
         <div class="space-y-1.5">
           <tolle-label>Site</tolle-label>
-          <tolle-select class="w-full" [(ngModel)]="newForm.site" placeholder="Select site">
+          <tolle-select class="w-full" [(ngModel)]="newForm.siteId" placeholder="Select site">
             <tolle-select-item *ngFor="let s of siteOptions" [value]="s">{{s}}</tolle-select-item>
           </tolle-select>
         </div>
 
         <div class="space-y-1.5">
           <tolle-label>Inspector Name</tolle-label>
-          <tolle-input placeholder="Name of inspector" [(ngModel)]="newForm.inspector"></tolle-input>
+          <tolle-input placeholder="Name of inspector" [(ngModel)]="newForm.inspectorName"></tolle-input>
         </div>
 
         <div class="space-y-1.5">
           <tolle-label>Inspection Type</tolle-label>
-          <tolle-select class="w-full" [(ngModel)]="newForm.type" placeholder="Select type">
+          <tolle-select class="w-full" [(ngModel)]="newForm.inspectionType" placeholder="Select type">
             <tolle-select-item value="Routine">Routine</tolle-select-item>
             <tolle-select-item value="Surprise">Surprise</tolle-select-item>
             <tolle-select-item value="Follow-up">Follow-up</tolle-select-item>
@@ -182,17 +182,17 @@
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-1.5">
             <tolle-label>Date</tolle-label>
-            <tolle-input type="date" [(ngModel)]="newForm.date"></tolle-input>
+            <tolle-input type="date" [(ngModel)]="newForm.scheduledDate"></tolle-input>
           </div>
           <div class="space-y-1.5">
             <tolle-label>Time</tolle-label>
-            <tolle-input type="time" [(ngModel)]="newForm.time"></tolle-input>
+            <tolle-input type="time" [(ngModel)]="inspectionTime"></tolle-input>
           </div>
         </div>
 
         <div class="space-y-1.5">
           <tolle-label>Findings / Notes</tolle-label>
-          <tolle-textarea placeholder="Describe findings, issues, or observations..." [(ngModel)]="newForm.findings" [rows]="4"></tolle-textarea>
+          <tolle-textarea placeholder="Describe findings, issues, or observations..." [(ngModel)]="newForm.notes" [rows]="4"></tolle-textarea>
         </div>
 
       </div>
@@ -200,7 +200,7 @@
       <div class="flex gap-3 pt-4 border-t border-border mt-4">
         <tolle-button variant="outline" class="flex-1" (click)="showCreateSheet = false">Cancel</tolle-button>
         <tolle-button variant="default" class="flex-1" (click)="submitInspection()"
-          [disabled]="!newForm.site || !newForm.inspector || !newForm.type">
+          [disabled]="!newForm.siteId || !newForm.inspectorName || !newForm.inspectionType">
           Log Inspection
         </tolle-button>
       </div>

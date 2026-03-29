@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 import {
   ButtonComponent,
@@ -20,6 +21,9 @@ import {
   AlertDialogService,
   ToastService
 } from '@tolle_/tolle-ui';
+import { StaffActions } from '../../stores/staff.actions';
+import { CreateStaffDto } from '../../models/staff.model';
+import { selectStaffSaving } from '../../stores/staff.selectors';
 
 @Component({
   selector: 'app-new-staff-management',
@@ -47,6 +51,7 @@ import {
   styleUrls: ['./new-staff-management.component.css']
 })
 export class NewStaffManagementComponent implements OnInit {
+  private store = inject(Store);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private alertDialog = inject(AlertDialogService);
@@ -55,6 +60,7 @@ export class NewStaffManagementComponent implements OnInit {
   currentStep = 0;
   readonly totalSteps = 7;
   isSubmitting = false;
+  saving$ = this.store.select(selectStaffSaving);
 
   readonly stepTitles = ['Personal Info', 'Contact Details', 'Employment & Banking', 'Family', 'Medical & Education', 'Work Experience', 'Review'];
 
@@ -110,7 +116,8 @@ export class NewStaffManagementComponent implements OnInit {
 
     this.staffForm = this.fb.group({
       // Personal
-      fullName:      ['', Validators.required],
+      firstName:     ['', Validators.required],
+      lastName:      ['', Validators.required],
       staffId:       [{ value: '', disabled: true }],
       dateOfBirth:   [null],
       placeOfBirth:  [''],
@@ -143,10 +150,10 @@ export class NewStaffManagementComponent implements OnInit {
       momoName:         [''],
       momoNumber:       [''],
       // Next of Kin
-      nextOfKinName:        [''],
-      nextOfKinRelationship: [''],
-      nextOfKinAddress:     [''],
-      nextOfKinPhone:       [''],
+      nextOfKinName:        ['', Validators.required],
+      nextOfKinRelationship: ['', Validators.required],
+      nextOfKinAddress:     ['', Validators.required],
+      nextOfKinPhone:       ['', Validators.required],
       // Family
       numberOfChildren: [0],
       children: this.childrenArray,
@@ -244,7 +251,18 @@ export class NewStaffManagementComponent implements OnInit {
 
   onSubmit(): void {
     Object.values(this.staffForm.controls).forEach(c => c.markAsTouched());
-    if (this.staffForm.invalid) return;
+    
+    if (this.staffForm.invalid) {
+      console.log('Form is invalid. Errors:', this.staffForm.errors);
+      Object.keys(this.staffForm.controls).forEach(key => {
+        const control = this.staffForm.get(key);
+        if (control?.invalid) {
+          console.log(`${key} is invalid:`, control.errors);
+        }
+      });
+      this.toast.show({ title: 'Validation Error', description: 'Please fill in all required fields.', variant: 'destructive' });
+      return;
+    }
 
     const dialogRef = this.alertDialog.open({
       title: 'Add Staff Member?',
@@ -255,13 +273,22 @@ export class NewStaffManagementComponent implements OnInit {
 
     dialogRef.afterClosed$.subscribe(confirmed => {
       if (!confirmed) return;
-      this.isSubmitting = true;
-      setTimeout(() => {
-        console.log('New staff submitted:', this.staffForm.getRawValue());
-        this.isSubmitting = false;
-        this.toast.show({ title: 'Staff Member Added!', description: `${this.formValues.fullName} has been successfully added.`, variant: 'success' });
-        setTimeout(() => this.router.navigate(['/hr/staff-management']), 2500);
-      }, 1500);
+      
+      const formValue = this.staffForm.getRawValue();
+      const dto: CreateStaffDto = {
+        email: formValue.email,
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        phoneNumber: formValue.phone,
+        password: 'TempPass123!',
+        staffId: formValue.staffId || `ST-${Date.now().toString().slice(-6)}`
+      };
+
+      console.log('Creating staff:', dto);
+      this.store.dispatch(StaffActions.createStaff({ dto }));
+      
+      this.toast.show({ title: 'Staff Member Added!', description: `${formValue.firstName} ${formValue.lastName} has been successfully added.`, variant: 'success' });
+      setTimeout(() => this.router.navigate(['/hr/staff-management']), 2500);
     });
   }
 
@@ -301,11 +328,10 @@ export class NewStaffManagementComponent implements OnInit {
     const workGroup = this.fb.group({
       companyName: ['', Validators.required],
       position: ['', Validators.required],
-      startDate: [null],
-      endDate: [null],
-      reasonForLeaving: [''],
-      contactPerson: [''],
-      contactPhone: ['']
+      startDate: [''],
+      endDate: [''],
+      responsibilities: [''],
+      reasonForLeaving: ['']
     });
     this.workExperienceArray.push(workGroup);
   }

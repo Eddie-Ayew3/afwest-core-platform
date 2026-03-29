@@ -5,8 +5,7 @@
     Back to Staff Management
   </button>
   <div class="flex items-center gap-3">
-    <span class="text-xs text-muted-foreground">Document Ref: {{ staff?.documentRef }}</span>
-    <!-- Hidden print button for ngxPrint -->
+    <span class="text-xs text-muted-foreground">Document Ref: AFWS-ST-{{ staff?.createdAt | date:'yyyy' }}-{{ staff?.staffId || 'N/A' }}</span>
     <tolle-button 
         [hidden]="true"
         printSectionId="staff-print-section"
@@ -16,15 +15,11 @@
   </div>
 </div>
 
-
-
 <!-- Print area -->
 <div id="staff-print-section" class="print-wrapper bg-muted/30 min-h-screen py-8 flex flex-col items-center no-print-bg">
 
   @if (staff) {
   <div class="a4-sheet bg-white shadow-md">
-
-    <!-- ── PAGE 1 ─────────────────────────────────────────────── -->
 
     <!-- Header band -->
     <div class="header-band flex items-center justify-between px-10 py-6 border-b-2 border-blue-600">
@@ -38,70 +33,50 @@
         </div>
       </div>
       <div class="text-right text-xs text-gray-500 space-y-0.5">
-        <p class="font-semibold text-gray-700">{{ staff.documentRef }}</p>
+        <p class="font-semibold text-gray-700">AFWS-ST-{{ staff.createdAt | date:'yyyy' }}-{{ staff.staffId || 'N/A' }}</p>
         <p>Printed: {{ today | date:'d MMM yyyy' }}</p>
       </div>
     </div>
 
     <!-- Identity strip -->
     <div class="identity-strip flex items-start gap-6 px-10 py-6 bg-gray-50 border-b border-gray-200">
-      <!-- Photo -->
+      <!-- Photo placeholder -->
       <div class="flex-shrink-0">
-        @if (staff.photo) {
-          <img [src]="staff.photo" alt="Staff photo"
-               class="w-28 h-28 rounded-lg object-cover border-2 border-gray-300" />
-        } @else {
-          <div class="w-28 h-28 rounded-lg bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
-            <span class="text-3xl font-bold text-gray-500">{{ getInitials(staff.name) }}</span>
-          </div>
-        }
+        <div class="w-28 h-28 rounded-lg bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
+          <span class="text-3xl font-bold text-gray-500">{{ getInitials(staff.fullName) }}</span>
+        </div>
       </div>
 
       <!-- Name + badges -->
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ staff.name }}</h1>
-            <p class="text-sm text-gray-600 mt-0.5">{{ staff.role }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ staff.fullName }}</h1>
+            <p class="text-sm text-gray-600 mt-0.5">{{ getPrimaryRole(staff.roles) }}</p>
           </div>
           <span class="px-3 py-1 rounded-full text-xs font-semibold border"
-            [class.border-green-300]="staff.status === 'Active'"
-            [class.bg-green-50]="staff.status === 'Active'"
-            [class.text-green-700]="staff.status === 'Active'"
-            [class.border-red-300]="staff.status === 'Suspended'"
-            [class.bg-red-50]="staff.status === 'Suspended'"
-            [class.text-red-700]="staff.status === 'Suspended'"
-            [class.border-gray-300]="staff.status === 'Inactive'"
-            [class.bg-gray-50]="staff.status === 'Inactive'"
-            [class.text-gray-600]="staff.status === 'Inactive'">
-            {{ staff.status }}
+            [class.border-green-300]="staff.isActive"
+            [class.bg-green-50]="staff.isActive"
+            [class.text-green-700]="staff.isActive"
+            [class.border-red-300]="!staff.isActive"
+            [class.bg-red-50]="!staff.isActive"
+            [class.text-red-700]="!staff.isActive">
+            {{ staff.isActive ? 'Active' : 'Inactive' }}
           </span>
         </div>
 
         <div class="mt-3 grid grid-cols-3 gap-x-6 gap-y-1.5 text-sm">
           <div>
             <span class="text-gray-500">Staff ID</span>
-            <p class="font-semibold text-gray-800">{{ staff.id }}</p>
+            <p class="font-semibold text-gray-800">{{ staff.staffId || 'N/A' }}</p>
           </div>
           <div>
-            <span class="text-gray-500">Department</span>
-            <p class="font-semibold text-gray-800">{{ staff.department }}</p>
+            <span class="text-gray-500">Email</span>
+            <p class="font-semibold text-gray-800">{{ staff.email }}</p>
           </div>
           <div>
-            <span class="text-gray-500">Site</span>
-            <p class="font-semibold text-gray-800">{{ staff.site }}</p>
-          </div>
-          <div>
-            <span class="text-gray-500">Start Date</span>
-            <p class="font-semibold text-gray-800">{{ staff.startDate }}</p>
-          </div>
-          <div>
-            <span class="text-gray-500">Employment Type</span>
-            <p class="font-semibold text-gray-800">{{ staff.employmentType }}</p>
-          </div>
-          <div>
-            <span class="text-gray-500">Reporting Manager</span>
-            <p class="font-semibold text-gray-800">{{ staff.reportingManager || '—' }}</p>
+            <span class="text-gray-500">Phone</span>
+            <p class="font-semibold text-gray-800">{{ staff.phoneNumber || '—' }}</p>
           </div>
         </div>
       </div>
@@ -111,7 +86,7 @@
     <div class="px-10 py-6 space-y-6">
 
       <!-- Section: Personal Information -->
-      <div class="content-section personal-info">
+      <div>
         <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
           Personal Information
         </h2>
@@ -121,305 +96,48 @@
             <p class="font-medium text-gray-800">{{ staff.fullName }}</p>
           </div>
           <div>
-            <p class="text-gray-500">Date of Birth</p>
-            <p class="font-medium text-gray-800">{{ staff.dateOfBirth }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Gender</p>
-            <p class="font-medium text-gray-800">{{ staff.gender }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Nationality</p>
-            <p class="font-medium text-gray-800">{{ staff.nationality }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Marital Status</p>
-            <p class="font-medium text-gray-800">{{ staff.maritalStatus }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Place of Birth</p>
-            <p class="font-medium text-gray-800">{{ staff.placeOfBirth }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Region of Birth</p>
-            <p class="font-medium text-gray-800">{{ staff.regionOfBirth }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Height</p>
-            <p class="font-medium text-gray-800">{{ staff.height }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">SNET Number</p>
-            <p class="font-medium text-gray-800">{{ staff.snetNumber }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">National ID (Ghana Card)</p>
-            <p class="font-medium text-gray-800">{{ staff.nationalId }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section: Contact Information -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Contact Information
-        </h2>
-        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
-          <div>
             <p class="text-gray-500">Email Address</p>
             <p class="font-medium text-gray-800">{{ staff.email }}</p>
           </div>
           <div>
             <p class="text-gray-500">Phone Number</p>
-            <p class="font-medium text-gray-800">{{ staff.phone }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Telephone</p>
-            <p class="font-medium text-gray-800">{{ staff.telephone || '—' }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Alternative Phone</p>
-            <p class="font-medium text-gray-800">{{ staff.alternativePhone || '—' }}</p>
-          </div>
-          <div class="col-span-2">
-            <p class="text-gray-500">Residential Address</p>
-            <p class="font-medium text-gray-800">{{ staff.residentialAddress }}, {{ staff.city }}, {{ staff.region }}</p>
-          </div>
-          <div class="col-span-2">
-            <p class="text-gray-500">Postal Address</p>
-            <p class="font-medium text-gray-800">{{ staff.postalAddress || '—' }}</p>
+            <p class="font-medium text-gray-800">{{ staff.phoneNumber || '—' }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Section: Employment Details -->
+      <!-- Section: Role Assignments -->
       <div>
         <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Employment Details
+          Role Assignments
         </h2>
-        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
-          <div>
-            <p class="text-gray-500">Department</p>
-            <p class="font-medium text-gray-800">{{ staff.department }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Job Title</p>
-            <p class="font-medium text-gray-800">{{ staff.jobTitle }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Assigned Site</p>
-            <p class="font-medium text-gray-800">{{ staff.site }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Employment Type</p>
-            <p class="font-medium text-gray-800">{{ staff.employmentType }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Start Date</p>
-            <p class="font-medium text-gray-800">{{ staff.startDate }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Reporting Manager</p>
-            <p class="font-medium text-gray-800">{{ staff.reportingManager || '—' }}</p>
-          </div>
-        </div>
-        @if (staff.notes) {
-          <div class="mt-3">
-            <p class="text-gray-500 text-sm">Notes</p>
-            <p class="text-sm font-medium text-gray-800 mt-1 bg-gray-50 rounded px-3 py-2">{{ staff.notes }}</p>
-          </div>
-        }
-      </div>
-
-      <!-- Section: Banking Information -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Banking Information
-        </h2>
-        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
-          <div>
-            <p class="text-gray-500">Bank Name</p>
-            <p class="font-medium text-gray-800">{{ staff.bankName || '—' }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Bank Account Number</p>
-            <p class="font-medium text-gray-800">{{ staff.bankAccountNumber || '—' }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Mobile Money Name</p>
-            <p class="font-medium text-gray-800">{{ staff.momoName || '—' }}</p>
-          </div>
-          <div>
-            <p class="text-gray-500">Mobile Money Number</p>
-            <p class="font-medium text-gray-800">{{ staff.momoNumber || '—' }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section: Family Information -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Family Information
-        </h2>
-        <div class="space-y-4">
-          <!-- Children -->
-          <div>
-            <p class="text-gray-500 text-sm font-medium mb-3">Number of Children: {{ staff.numberOfChildren }}</p>
-            @if (staff.children.length > 0) {
-              <div class="space-y-2">
-                @for (child of staff.children; track $index; let i = $index) {
-                  <div class="bg-gray-50 rounded p-3 border border-gray-200">
-                    <p class="font-medium text-gray-800 mb-1">Child {{ i + 1 }}: {{ child.name }}</p>
-                    <div class="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <p class="text-gray-500">Address</p>
-                        <p class="font-medium text-gray-700">{{ child.address || '—' }}</p>
-                      </div>
-                      <div>
-                        <p class="text-gray-500">Telephone</p>
-                        <p class="font-medium text-gray-700">{{ child.telephone || '—' }}</p>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <p class="text-gray-400 text-sm italic">No children information available</p>
-            }
-          </div>
-
-          <!-- Parents -->
-          <div class="grid grid-cols-2 gap-6">
-            <!-- Father -->
-            <div>
-              <p class="text-gray-500 text-sm font-medium mb-2">Father's Details</p>
-              <div class="space-y-2 text-sm">
-                <div>
-                  <p class="text-gray-500">Name</p>
-                  <p class="font-medium text-gray-800">{{ staff.fatherName || '—' }}</p>
-                </div>
-                <div>
-                  <p class="text-gray-500">Address</p>
-                  <p class="font-medium text-gray-800">{{ staff.fatherAddress || '—' }}</p>
-                </div>
-                <div>
-                  <p class="text-gray-500">Phone</p>
-                  <p class="font-medium text-gray-800">{{ staff.fatherPhone || '—' }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Mother -->
-            <div>
-              <p class="text-gray-500 text-sm font-medium mb-2">Mother's Details</p>
-              <div class="space-y-2 text-sm">
-                <div>
-                  <p class="text-gray-500">Name</p>
-                  <p class="font-medium text-gray-800">{{ staff.motherName || '—' }}</p>
-                </div>
-                <div>
-                  <p class="text-gray-500">Address</p>
-                  <p class="font-medium text-gray-800">{{ staff.motherAddress || '—' }}</p>
-                </div>
-                <div>
-                  <p class="text-gray-500">Phone</p>
-                  <p class="font-medium text-gray-800">{{ staff.motherPhone || '—' }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section: Medical & Educational Background -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Medical & Educational Background
-        </h2>
-        <div class="space-y-4">
-          <!-- Medical History -->
-          <div>
-            <p class="text-gray-500 text-sm font-medium mb-3">Medical History</p>
-            <div class="space-y-2 text-sm">
-              <div class="flex items-center gap-2">
-                <p class="text-gray-500">Chronic Diseases (last 5 years):</p>
-                <span class="px-2 py-1 rounded text-xs font-medium"
-                  [class.bg-green-100]="!staff.hasChronicDiseases"
-                  [class.text-green-700]="!staff.hasChronicDiseases"
-                  [class.bg-yellow-100]="staff.hasChronicDiseases"
-                  [class.text-yellow-700]="staff.hasChronicDiseases">
-                  {{ staff.hasChronicDiseases ? 'Yes' : 'No' }}
-                </span>
-              </div>
-              @if (staff.hasChronicDiseases && staff.chronicDiseaseDescription) {
-                <div>
-                  <p class="text-gray-500">Description:</p>
-                  <p class="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">{{ staff.chronicDiseaseDescription }}</p>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- Educational Background -->
-          <div>
-            <p class="text-gray-500 text-sm font-medium mb-3">Educational Background</p>
-            <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
-              <div>
-                <p class="text-gray-500">Highest Education</p>
-                <p class="font-medium text-gray-800">{{ staff.highestEducation || '—' }}</p>
-              </div>
-              <div>
-                <p class="text-gray-500">Institution Name</p>
-                <p class="font-medium text-gray-800">{{ staff.institutionName || '—' }}</p>
-              </div>
-              <div>
-                <p class="text-gray-500">Year Completed</p>
-                <p class="font-medium text-gray-800">{{ staff.yearCompleted || '—' }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section: Work Experience -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Work Experience
-        </h2>
-        @if (staff.workExperience.length > 0) {
-          <div class="space-y-3">
-            @for (work of staff.workExperience; track $index; let i = $index) {
+        @if (staff.roles && staff.roles.length > 0) {
+          <div class="space-y-2">
+            @for (role of staff.roles; track role.assignmentId; let i = $index) {
               <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div class="flex items-center justify-between mb-3">
-                  <h5 class="text-sm font-semibold text-gray-800">Previous Employment {{ i + 1 }}</h5>
+                <div class="flex items-center justify-between mb-2">
+                  <h5 class="text-sm font-semibold text-gray-800">{{ role.roleName }}</h5>
+                  <span class="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                    {{ role.scopeLevel }}
+                  </span>
                 </div>
                 <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                  <div>
-                    <p class="text-gray-500">Company</p>
-                    <p class="font-medium text-gray-800">{{ work.company }}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-500">Position</p>
-                    <p class="font-medium text-gray-800">{{ work.position }}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-500">Start Date</p>
-                    <p class="font-medium text-gray-800">{{ work.startDate }}</p>
-                  </div>
-                  <div>
-                    <p class="text-gray-500">End Date</p>
-                    <p class="font-medium text-gray-800">{{ work.endDate || 'Present' }}</p>
-                  </div>
-                  @if (work.responsibilities) {
-                    <div class="col-span-2">
-                      <p class="text-gray-500">Responsibilities</p>
-                      <p class="font-medium text-gray-800 bg-white rounded px-3 py-2">{{ work.responsibilities }}</p>
+                  @if (role.siteName) {
+                    <div>
+                      <p class="text-gray-500">Site</p>
+                      <p class="font-medium text-gray-800">{{ role.siteName }}</p>
                     </div>
                   }
-                  @if (work.reasonForLeaving) {
+                  @if (role.regionName) {
+                    <div>
+                      <p class="text-gray-500">Region</p>
+                      <p class="font-medium text-gray-800">{{ role.regionName }}</p>
+                    </div>
+                  }
+                  @if (role.isActing) {
                     <div class="col-span-2">
-                      <p class="text-gray-500">Reason for Leaving</p>
-                      <p class="font-medium text-gray-800 bg-white rounded px-3 py-2">{{ work.reasonForLeaving }}</p>
+                      <p class="text-gray-500">Acting Role Until</p>
+                      <p class="font-medium text-gray-800">{{ role.actingEndDate | date:'d MMM yyyy' || 'N/A' }}</p>
                     </div>
                   }
                 </div>
@@ -427,80 +145,55 @@
             }
           </div>
         } @else {
-          <p class="text-gray-400 text-sm italic">No work experience information available</p>
+          <p class="text-gray-400 text-sm italic">No role assignments found</p>
         }
       </div>
 
-      <!-- Section: Next of Kin -->
+      <!-- Section: Account Information -->
       <div>
         <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Next of Kin
+          Account Information
         </h2>
-        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+        <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
           <div>
-            <p class="text-gray-500">Contact Name</p>
-            <p class="font-medium text-gray-800">{{ staff.nextOfKinName }}</p>
+            <p class="text-gray-500">User ID</p>
+            <p class="font-medium text-gray-800">{{ staff.id }}</p>
           </div>
           <div>
-            <p class="text-gray-500">Relationship</p>
-            <p class="font-medium text-gray-800">{{ staff.nextOfKinRelationship }}</p>
+            <p class="text-gray-500">Account Created</p>
+            <p class="font-medium text-gray-800">{{ staff.createdAt | date:'d MMM yyyy, HH:mm' }}</p>
           </div>
           <div>
-            <p class="text-gray-500">Phone</p>
-            <p class="font-medium text-gray-800">{{ staff.nextOfKinPhone }}</p>
+            <p class="text-gray-500">Last Login</p>
+            <p class="font-medium text-gray-800">{{ staff.lastLoginAt ? (staff.lastLoginAt | date:'d MMM yyyy, HH:mm') : 'Never' }}</p>
           </div>
-          <div class="col-span-2">
-            <p class="text-gray-500">Address</p>
-            <p class="font-medium text-gray-800">{{ staff.nextOfKinAddress || '—' }}</p>
+          <div>
+            <p class="text-gray-500">Status</p>
+            <p class="font-medium text-gray-800">
+              <span class="px-2 py-1 rounded text-xs font-medium"
+                [class.bg-green-100]="staff.isActive"
+                [class.text-green-700]="staff.isActive"
+                [class.bg-red-100]="!staff.isActive"
+                [class.text-red-700]="!staff.isActive">
+                {{ staff.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- Section: Record Authorisation -->
-      <div>
-        <h2 class="section-title text-xs font-bold uppercase tracking-widest text-blue-600 mb-3 pb-1 border-b border-blue-200">
-          Record Authorisation
-        </h2>
-        <div class="grid grid-cols-2 gap-6 text-sm">
-          <!-- Created by -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <p class="text-gray-500 mb-2">Created By</p>
-            <p class="font-semibold text-gray-800">{{ staff.createdBy }}</p>
-            <p class="text-gray-500 text-xs mt-0.5">{{ staff.createdDate }}</p>
-            <div class="mt-4 border-t border-dashed border-gray-300 pt-3">
-              <p class="text-xs text-gray-400">Signature</p>
-              <div class="h-8"></div>
-            </div>
-          </div>
-
-          <!-- Approved by -->
-          <div class="border border-gray-200 rounded-lg p-4">
-            <p class="text-gray-500 mb-2">Approved By</p>
-            <p class="font-semibold text-gray-800">{{ staff.approvedBy }}</p>
-            <p class="text-gray-500 text-xs mt-0.5">{{ staff.approvedDate }}</p>
-            <div class="mt-4 border-t border-dashed border-gray-300 pt-3">
-              <p class="text-xs text-gray-400">Signature</p>
-              <div class="h-8"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /content grid -->
-
-    <!-- Footer -->
-    <div class="footer-band px-10 py-4 border-t border-gray-200 flex items-center justify-between text-xs text-gray-400 mt-auto">
-      <span>AFWest Security Services — Confidential Personnel Record</span>
-      <span>{{ staff.documentRef }}</span>
     </div>
 
-  </div><!-- /a4-sheet -->
-  }
+    <!-- Footer -->
+    <div class="px-10 py-6 border-t border-gray-200 text-xs text-gray-500 text-center">
+      <p>This is a confidential personnel record. For internal use only.</p>
+      <p class="mt-1">© {{ today | date:'yyyy' }} AFWest Security Services</p>
+    </div>
 
-  @if (!staff) {
-  <div class="flex flex-col items-center justify-center py-24 text-muted-foreground gap-3">
-    <i class="ri-user-search-line text-4xl"></i>
-    <p class="text-sm">Staff record not found.</p>
+  </div>
+  } @else {
+  <div class="text-center py-12">
+    <p class="text-gray-500">Loading staff information...</p>
   </div>
   }
 

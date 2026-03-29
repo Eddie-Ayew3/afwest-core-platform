@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -6,6 +6,7 @@ import {
   DataTableComponent, TolleCellDirective, TableColumn
 } from '@tolle_/tolle-ui';
 import { PermissionsService } from '../../../core/services/permissions.service';
+import { DashboardService, DashboardSummary } from '../../../core/services/dashboard.service';
 
 interface SiteCoverage {
   site: string;
@@ -47,14 +48,19 @@ interface RecentIncident {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashBoardComponent {
+export class DashBoardComponent implements OnInit {
   private router = inject(Router);
+  private dashboardService = inject(DashboardService);
   permissions = inject(PermissionsService);
 
-  guardsOnDuty = 42;
-  activeShifts = 8;
-  absentToday = 5;
-  openIncidents = 3;
+  guardsOnDuty = 0;
+  activeShifts = 0;
+  absentToday = 0;
+  openIncidents = 0;
+  totalGuards = 0;
+  totalClients = 0;
+  totalSites = 0;
+  loading = false;
 
   siteCoverageColumns: TableColumn[] = [
     { key: 'site',          label: 'Site' },
@@ -85,6 +91,30 @@ export class DashBoardComponent {
     { id: 'INC-2025-008', type: 'Suspicious Activity', site: 'Kumasi Branch',       severity: 'Low',    time: '2 days ago', status: 'Resolved' },
     { id: 'INC-2025-007', type: 'Medical Emergency',   site: 'Tema Industrial',     severity: 'High',   time: '2 days ago', status: 'Resolved' },
   ];
+
+  ngOnInit(): void {
+    this.loadDashboardSummary();
+  }
+
+  private loadDashboardSummary(): void {
+    this.loading = true;
+    this.dashboardService.getSummary().subscribe({
+      next: (summary) => {
+        this.guardsOnDuty = summary.guardsOnDuty;
+        this.activeShifts = summary.activeShifts;
+        this.absentToday = summary.absentToday;
+        this.openIncidents = summary.openIncidents;
+        this.totalGuards = summary.totalGuards;
+        this.totalClients = summary.totalClients;
+        this.totalSites = summary.totalSites;
+        this.loading = false;
+      },
+      error: () => {
+        // Silent fallback to zeros
+        this.loading = false;
+      }
+    });
+  }
 
   getCoveragePct(row: SiteCoverage): number {
     return Math.round((row.guardsPresent / row.guardsAssigned) * 100);

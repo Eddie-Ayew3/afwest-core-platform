@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import {
   ButtonComponent,
   BadgeComponent,
@@ -17,8 +19,11 @@ import {
   AlertDialogService,
   ToastService
 } from '@tolle_/tolle-ui';
-import { GhanaSite } from '../../../../core/models/rbac.models';
-import { PermissionsService } from '../../../../core/services/permissions.service';
+import { GhanaSite } from '../../../../../core/models/rbac.models';
+import { PermissionsService } from '../../../../../core/services/permissions.service';
+import { StaffActions } from '../../stores/staff.actions';
+import { selectStaff, selectStaffLoading, selectStaffSaving, selectStaffError } from '../../stores/staff.selectors';
+import { StaffDto } from '../../models/staff.model';
 
 interface StaffMember {
   id: string;
@@ -50,39 +55,45 @@ interface StaffMember {
   styleUrls: ['./staff-management.component.css']
 })
 export class StaffManagementComponent implements OnInit {
+  private store = inject(Store);
   private permissions = inject(PermissionsService);
   private router = inject(Router);
   private alertDialog = inject(AlertDialogService);
   private toast = inject(ToastService);
 
   columns: TableColumn[] = [
-    { key: 'name', label: 'Staff Name' },
+    { key: 'fullName', label: 'Staff Name' },
     { key: 'role', label: 'Role' },
     { key: 'status', label: 'Status' },
     { key: 'contact', label: 'Contact' },
-    { key: 'actions', label: '' },
+    { key: 'actions', label: 'Action', class: 'text-right' },
   ];
 
-  staff: StaffMember[] = [
-    { id: 'ST001', name: 'Kwame Mensah',    role: 'Operations Manager',  status: 'Active',    contact: 'k.mensah@afwest.com.gh',    site: 'Head Office – Accra' },
-    { id: 'ST002', name: 'Ama Boateng',     role: 'HR Assistant',        status: 'Active',    contact: 'a.boateng@afwest.com.gh',   site: 'Kumasi Branch' },
-    { id: 'ST003', name: 'Kofi Asante',     role: 'Zone Coordinator',    status: 'Suspended', contact: 'k.asante@afwest.com.gh',    site: 'Head Office – Accra' },
-    { id: 'ST004', name: 'Abena Osei',      role: 'Admin Specialist',    status: 'Active',    contact: 'a.osei@afwest.com.gh',      site: 'Takoradi Branch' },
-    { id: 'ST005', name: 'Yaw Darko',       role: 'Finance Analyst',     status: 'Active',    contact: 'y.darko@afwest.com.gh',     site: 'Head Office – Accra' },
-    { id: 'ST006', name: 'Akosua Frimpong', role: 'Branch Manager',      status: 'Active',    contact: 'a.frimpong@afwest.com.gh',  site: 'Kumasi Branch' },
-    { id: 'ST007', name: 'Nana Acheampong', role: 'IT Consultant',       status: 'Inactive',  contact: 'n.acheampong@afwest.com.gh',site: 'Head Office – Accra' },
-    { id: 'ST008', name: 'Efua Asante',     role: 'Site Supervisor',     status: 'Active',    contact: 'e.asante@afwest.com.gh',    site: 'Tema Industrial' },
-    { id: 'ST009', name: 'Kweku Baffoe',    role: 'Logistics Officer',   status: 'Active',    contact: 'k.baffoe@afwest.com.gh',    site: 'Cape Coast Post' },
-    { id: 'ST010', name: 'Adwoa Kyei',      role: 'Procurement Officer', status: 'Active',    contact: 'a.kyei@afwest.com.gh',      site: 'Head Office – Accra' },
-    { id: 'ST011', name: 'Kojo Agyemang',   role: 'Control Coordinator', status: 'Active',    contact: 'k.agyemang@afwest.com.gh',  site: 'Kumasi Branch' },
-    { id: 'ST012', name: 'Akua Tetteh',     role: 'Admin Coordinator',   status: 'Suspended', contact: 'a.tetteh@afwest.com.gh',    site: 'Takoradi Branch' },
-  ];
+  staff$: Observable<StaffDto[]> = this.store.select(selectStaff);
+  loading$: Observable<boolean> = this.store.select(selectStaffLoading);
+  saving$: Observable<boolean> = this.store.select(selectStaffSaving);
+  error$: Observable<string | null> = this.store.select(selectStaffError);
+
+  staff: StaffDto[] = [];
 
   ngOnInit(): void {
-    this.staff = this.permissions.filterBySite(this.staff);
+    this.store.dispatch(StaffActions.loadStaff({ params: { pageNumber: 1, pageSize: 50 } }));
+
+    this.staff$.subscribe(staff => {
+      this.staff = staff;
+    });
   }
 
-  viewPerson(person: StaffMember): void {
+  getPrimaryRole(roles: any[]): string {
+    if (!roles || roles.length === 0) return 'No Role';
+    return roles[0].roleName;
+  }
+
+  getStatusText(isActive: boolean, roles: any[]): 'Active' | 'Inactive' {
+    return isActive ? 'Active' : 'Inactive';
+  }
+
+  viewPerson(person: StaffDto): void {
     this.router.navigate(['/hr/staff-management/view-staff', person.id]);
   }
 
@@ -90,17 +101,29 @@ export class StaffManagementComponent implements OnInit {
     this.router.navigate(['/hr/staff-management/new-staff']);
   }
 
-  deleteStaff(staff: StaffMember) {
+  deleteStaff(staff: StaffDto) {
     const ref = this.alertDialog.open({
       title: 'Delete Staff Member?',
-      description: `Remove "${staff.name}" from the system? This cannot be undone.`,
+      description: `Remove "${staff.fullName}" from the system? This cannot be undone.`,
       actionText: 'Delete',
       variant: 'destructive'
     });
     ref.afterClosed$.subscribe(confirmed => {
       if (!confirmed) return;
-      this.staff = this.staff.filter(s => s.id !== staff.id);
-      this.toast.show({ title: 'Staff Deleted', description: `"${staff.name}" has been removed.`, variant: 'destructive' });
+      this.store.dispatch(StaffActions.deleteStaff({ id: staff.id }));
+    });
+  }
+
+  deactivateStaff(staff: StaffDto) {
+    const ref = this.alertDialog.open({
+      title: 'Deactivate Staff Member?',
+      description: `Revoke access for "${staff.fullName}"?`,
+      actionText: 'Deactivate',
+      variant: 'destructive'
+    });
+    ref.afterClosed$.subscribe(confirmed => {
+      if (!confirmed) return;
+      this.store.dispatch(StaffActions.deactivateStaff({ id: staff.id }));
     });
   }
 }
